@@ -313,7 +313,7 @@ namespace ExcelApp
             var s = localFiles.OrderBy(a => regex.Matches(a.ToString())[0]);
             //var sortedByCode = localFiles.OrderBy(a => regex.Matches(a.ToString())[0]).ToArray();
             //MessageBox.Show(String.Join(" ", sortedByCode.ToString()));
-            MessageBox.Show("");
+            MessageBox.Show(" ");
 
         }
 
