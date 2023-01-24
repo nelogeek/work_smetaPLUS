@@ -9,6 +9,7 @@ using System.Threading;
 using System.Windows.Forms;
 using System.IO;
 using Excel = Microsoft.Office.Interop.Excel;
+using Word = Microsoft.Office.Interop.Word;
 using System.Text.RegularExpressions;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -112,7 +113,7 @@ namespace ExcelApp
             }
         }
 
-        //TODO ���������� ������� ������� � PDF
+
 
         private void BtnBuild_Click(object sender, EventArgs e)
         {
@@ -179,36 +180,34 @@ namespace ExcelApp
                 localData = localData.OrderBy(x => x.Code).ThenBy(x => x.Name).ToList(); // Сортировка по коду и названию
                 objectiveData = objectiveData.OrderBy(x => x.Code).ThenBy(x => x.Name).ToList(); // Сортировка по коду и названию
 
-                /// конвертер Excel to PDF
-                int countCompleted = 0;
-                Directory.CreateDirectory($"{_path}\\TEMPdf");
-                foreach (var file in objectiveData)
-                {
-                    string filePath = $"{_path}\\ОС\\{file.FolderInfo}";
-                    Excel.Workbook workbook = app.Workbooks.Open(filePath);
-                    string tempPDFPath = $"{_path}\\TEMPdf\\{file.FolderInfo}";
-                    app.ActiveWorkbook.ExportAsFixedFormat(Excel.XlFixedFormatType.xlTypePDF, tempPDFPath);
-                    workbook.Close();
-                    countCompleted++;
-                    labelCompleted.Text = $"Кол-во обработанных файлов: {countCompleted} из {localFiles.Length + objectiveFiles.Length}";
-                }
-                foreach (var file in localData)
-                {
-                    string filePath = $"{_path}\\{file.FolderInfo}";
-                    Excel.Workbook workbook = app.Workbooks.Open(filePath);
-                    string tempPDFPath = $"{_path}\\TEMPdf\\{file.FolderInfo}";
-                    app.ActiveWorkbook.ExportAsFixedFormat(Excel.XlFixedFormatType.xlTypePDF, tempPDFPath);
-                    workbook.Close();
-                    countCompleted++;
-                    labelCompleted.Text = $"Кол-во обработанных файлов: {countCompleted} из {localFiles.Length + objectiveFiles.Length}";
-                }
+
+
+                ///// конвертер Excel to PDF
+                //int countCompleted = 0;
+                //Directory.CreateDirectory($"{_path}\\TEMPdf");
+                //foreach (var file in objectiveData)
+                //{
+                //    string filePath = $"{_path}\\ОС\\{file.FolderInfo}";
+                //    Excel.Workbook workbook = app.Workbooks.Open(filePath);
+                //    string tempPDFPath = $"{_path}\\TEMPdf\\{file.FolderInfo}";
+                //    app.ActiveWorkbook.ExportAsFixedFormat(Excel.XlFixedFormatType.xlTypePDF, tempPDFPath);
+                //    workbook.Close();
+                //    countCompleted++;
+                //    labelCompleted.Text = $"Кол-во обработанных файлов: {countCompleted} из {localFiles.Length + objectiveFiles.Length}";
+                //}
+                //foreach (var file in localData)
+                //{
+                //    string filePath = $"{_path}\\{file.FolderInfo}";
+                //    Excel.Workbook workbook = app.Workbooks.Open(filePath);
+                //    string tempPDFPath = $"{_path}\\TEMPdf\\{file.FolderInfo}";
+                //    app.ActiveWorkbook.ExportAsFixedFormat(Excel.XlFixedFormatType.xlTypePDF, tempPDFPath);
+                //    workbook.Close();
+                //    countCompleted++;
+                //    labelCompleted.Text = $"Кол-во обработанных файлов: {countCompleted} из {localFiles.Length + objectiveFiles.Length}";
+                //}
 
 
                 app.Quit();
-
-                MessageBox.Show(String.Join(Environment.NewLine, objectiveData)); // если хочется глянуть на результат сортировки
-                MessageBox.Show(String.Join(Environment.NewLine, localData)); // если хочется глянуть на результат сортировки
-
 
 
 
@@ -225,17 +224,46 @@ namespace ExcelApp
 
 
 
-        private void Read_Button_Click(object sender, EventArgs e) // TODO �������� ����������
+        private void Read_Button_Click(object sender, EventArgs e)
         {
-            Regex regex = new Regex(@"(\w*)-(\w*)-(\w*)");
-            var s = localFiles.OrderBy(a => regex.Matches(a.ToString())[0]);
-            //var sortedByCode = localFiles.OrderBy(a => regex.Matches(a.ToString())[0]).ToArray();
-            //MessageBox.Show(String.Join(" ", sortedByCode.ToString()));
-            MessageBox.Show(" ");
+            if (localFiles != null)
+            {
+                Word.Application app = new Word.Application();
+                app.Visible = false;
+                var wordDoc = app.Documents.Add();
 
+                object oMissing = Type.Missing;
+
+                var Paragraph = wordDoc.Paragraphs.Add();
+                var tableRange = Paragraph.Range;
+
+                var header = wordDoc.Sections[1].Headers[Word.WdHeaderFooterIndex.wdHeaderFooterPrimary];
+                header.Range.Tables.Add(tableRange, 1, 6, oMissing, oMissing).set_Style("Сетка таблицы");
+                header.Range.Text = "Содержание";
+                
+
+
+
+                //Word.Table tbl = wordDoc.Tables[1];
+
+                //tbl.set_Style("Сетка таблицы");
+                //tbl.Cell(1, 1).Range.Text = "N п/п";
+                //tbl.Cell(1, 2).Range.Text = "N сметы";
+                //tbl.Cell(1, 3).Range.Text = "Наименование";
+                //tbl.Cell(1, 4).Range.Text = "Всего тыс.руб.";
+                //tbl.Cell(1, 5).Range.Text = "Стр.";
+                //tbl.Cell(1, 6).Range.Text = "Часть";
+
+                app.ActiveDocument.SaveAs2($@"{_path}\TEST.docx");
+                app.Quit();
+            }
+            else
+            {
+                MessageBox.Show($"Ошибка! Вы не выбрали папку");
+            }
         }
 
-        
+
     }
 }
 

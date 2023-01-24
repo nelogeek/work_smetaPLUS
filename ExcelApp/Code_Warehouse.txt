@@ -1,0 +1,113 @@
+﻿//// WORKING  ----------- ЕЩЕ ОДНА СОРТИРОВКА ОБЪЕКТОВ КЛАССА SmetaFile
+localData.Sort(delegate(SmetaFile x, SmetaFile y)
+{
+    return x.Code.CompareTo(y.Code);
+});
+
+objectiveData.Sort(delegate (SmetaFile x, SmetaFile y)
+{
+    return x.Code.CompareTo(y.Code);
+});
+
+MessageBox.Show(String.Join(Environment.NewLine, localData)); // если хочется глянуть на результат сортировки
+MessageBox.Show(String.Join(Environment.NewLine, objectiveData)); // если хочется глянуть на результат сортировки
+
+
+
+// JSON ----------------------------------------------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------------------------------
+
+
+        //public class Local
+        //{
+        //    public string Code { get; set; }
+        //    public string Name { get; set; }
+        //    public string Price { get; set; }
+        //    public int CountPages { get; set; }
+        //}
+
+        //public class Objective
+        //{
+        //    public string Code { get; set; }
+        //    public string Name { get; set; }
+        //    public string Price { get; set; }
+        //    public int CountPages { get; set; }
+        //}
+
+        //public class Root
+        //{
+        //    public List<Objective> objective { get; set; }
+        //    public List<Local> local { get; set; }
+        //}
+
+        // -------
+
+        //var root = new Root
+        //{
+        //    objective = new List<Objective>
+        //        {
+        //            new Objective { Code = "1", Name = "2", Price = "2", CountPages = 1 },
+        //            new Objective { Code = "1", Name = "2", Price = "2", CountPages = 1 },
+        //        },
+
+        //    local = new List<Local>
+        //        {
+        //            new Local { Code = "1", Name = "2", Price = "2", CountPages = 1 },
+        //            new Local { Code = "1", Name = "2", Price = "2", CountPages = 1},
+        //        }
+        //};
+
+        //var options = new JsonSerializerOptions { WriteIndented = true };
+        //string jsonString = JsonSerializer.Serialize(root, options);
+
+        //MessageBox.Show(jsonString);
+
+
+
+//----------------------------------------------------------------------------------------------------------------------------------------------
+//----------------Объединение PDF---------------------------------------------------------------------------------------------------------------
+
+
+
+
+//string newPDFPath = $"{_path}\\TEMPdf";
+                //pdfFolder = new DirectoryInfo(newPDFPath);
+                //FileInfo[] tempPDFFiles = pdfFolder.GetFiles(".", SearchOption.TopDirectoryOnly);
+
+                /*License PdfMergeLicense = new License();
+                PdfMergeLicense.SetLicense("Aspose.pdf.lic");
+
+                PdfFileEditor pdfFileEditor = new PdfFileEditor();
+
+                string[] pdffiles = new string[3];
+                pdffiles[0] = $"{newPDFPath}\\{tempPDFFiles[0]}";
+                pdffiles[1] = $"{newPDFPath}\\{tempPDFFiles[1]}";
+                pdffiles[2] = $"{newPDFPath}\\{tempPDFFiles[2]}";
+
+                pdfFileEditor.Concatenate(pdffiles, $"{newPDFPath}\\MergedPDF.pdf");*/
+
+                /*Document pdfDocument1 = new Document($"{newPDFPath}\\{tempPDFFiles[0]}");
+                Document pdfDocument2 = new Document(newPDFPath + "\\" + tempPDFFiles[1]);
+
+                pdfDocument1.Pages.Add(pdfDocument2.Pages);
+
+                pdfDocument1.Save(newPDFPath + "\\ConcatenatedPDF.pdf");*/
+
+                /*Document pdfDocument1 = new Document(newPDFPath + "\\" + tempPDFFiles[0]);
+                Document pdfDocument2 = new Document(newPDFPath + "\\" + tempPDFFiles[1]);
+                pdfDocument1.Pages.Add(pdfDocument2.Pages);
+                pdfDocument1.Save(newPDFPath + "ConcatenatedPDF.pdf");*/
+                //Document document = new Document();
+                //Page page = document.Pages.Add();
+                //page.Paragraphs.Add(new Aspose.Pdf.Text.TextFragment("Какой то текст"));
+                //document.Save(_path + "\\documentTest.pdf");
+
+
+                /*Document pdfDocument1 = new Document(newPDFPath + "\\" + tempPDFFiles[0]);
+                Document pdfDocument2 = new Document(newPDFPath + "\\" + tempPDFFiles[1]);
+                pdfDocument1.Pages.Add(pdfDocument2.Pages);
+                pdfDocument1.Save(newPDFPath + "ConcatenatedPDF.pdf");*/
+                //Document document = new Document();
+                //Page page = document.Pages.Add();
+                //page.Paragraphs.Add(new Aspose.Pdf.Text.TextFragment("Какой то текст"));
+                //document.Save(_path + "\\documentTest.pdf");
