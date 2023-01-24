@@ -5,7 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 using System.Windows.Forms;
 using System.IO;
 using Excel = Microsoft.Office.Interop.Excel;
@@ -14,6 +14,13 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
+
+
+//TODO Обработать разрывы страниц в PDF
+//TODO Сделать объединение всех PDF
+// TODO JSON
+
+
 
 namespace ExcelApp
 {
@@ -30,6 +37,10 @@ namespace ExcelApp
 
         protected DirectoryInfo childFolder;
         protected FileInfo[] objectiveFiles;
+
+        List<SmetaFile> localData = new List<SmetaFile>();
+        List<SmetaFile> objectiveData = new List<SmetaFile>();
+
 
         public Form1()
         {
@@ -71,7 +82,7 @@ namespace ExcelApp
                     dir = Directory.GetDirectories(_path);
                     if (dir.Length > 1)
                     {
-                        MessageBox.Show("���������� ����� ��������� ���������� ��������");
+                        MessageBox.Show("Количество папок превышает допустимое значение");
                         labelNameFolder.Text = "";
                         return;
                     }
@@ -82,28 +93,22 @@ namespace ExcelApp
                         childFolder = new DirectoryInfo(dir[0]);
                         objectiveFiles = childFolder.GetFiles(".", SearchOption.TopDirectoryOnly);
 
-                        infoTextBox.AppendText($"���-�� ���� ������: {localFiles.Length + objectiveFiles.Length}\n" + Environment.NewLine +
-                            $"���-�� ������ � �������� �����: {localFiles.Length}\n" + Environment.NewLine +
-                            $"���-�� ������ � �������� �����: {objectiveFiles.Length}\n" + Environment.NewLine +
-                            $"���-�� �����: {dir.Length}" + Environment.NewLine + Environment.NewLine);
+                        infoTextBox.AppendText($"Кол-во всех файлов: {localFiles.Length + objectiveFiles.Length}\n" + Environment.NewLine +
+                            $"Кол-во файлов в корневой папке: {localFiles.Length}\n" + Environment.NewLine +
+                            $"Кол-во файлов в дочерней папке: {objectiveFiles.Length}\n" + Environment.NewLine +
+                            $"Кол-во папок: {dir.Length}" + Environment.NewLine + Environment.NewLine);
 
                         string[] fileNames = new string[localFiles.Length + objectiveFiles.Length];
 
                         Directory.GetFiles(_path, ".", SearchOption.TopDirectoryOnly).ToList()
                             .ForEach(f => infoTextBox.AppendText($"\n- {Path.GetFileName(f)}" + Environment.NewLine));
 
-                        infoTextBox.AppendText(Environment.NewLine + $"\n\n����� {dir[0]}" + Environment.NewLine);
+                        infoTextBox.AppendText(Environment.NewLine + $"\n\nПапка {dir[0]}" + Environment.NewLine);
 
                         Directory.GetFiles(dir[0], ".", SearchOption.TopDirectoryOnly).ToList()
                             .ForEach(f => infoTextBox.AppendText($"\n{Path.GetFileName(f)}"));
-
-
-
                     }
-
-
                 }
-
             }
         }
 
@@ -111,34 +116,8 @@ namespace ExcelApp
 
         private void BtnBuild_Click(object sender, EventArgs e)
         {
-
             if (localFiles != null)
             {
-                int countCompleted = 0;
-                Excel.Application app = new Excel.Application();
-                foreach (var fileExcel in localFiles)
-                {
-
-                    System.IO.Directory.CreateDirectory($"{_path}\\TEMPdf");
-                    string filePath = $"{_path}\\{fileExcel}";
-                    Excel.Workbook workbook = app.Workbooks.Open(filePath);
-                    string tempPDFPath = $"{_path}\\TEMPdf\\{fileExcel}";
-
-                    app.ActiveWorkbook.Sheets[1].PageSetup.FirstPageNumber = 5; // ��������� ��������� ��������
-                    app.DisplayAlerts = false; // ��������� ������� �� ����������
-                    app.ActiveWorkbook.ExportAsFixedFormat(Excel.XlFixedFormatType.xlTypePDF, tempPDFPath); /// ��������� Excel to PDF
-                    workbook.Close(false); // ������ ���������� � ����� Excel
-                    countCompleted++;
-                    labelCompleted.Text = $"���-�� ������������ ������: {countCompleted} �� {localFiles.Length + objectiveFiles.Length}";
-                }
-
-
-
-                object[,] arrLocalData = new object[localFiles.Length, 5];
-                object[,] arrObjectiveData = new object[objectiveFiles.Length, 5];
-
-                Excel.Application ObjWorkExcel = new Excel.Application();
-
                 int countPages = 1;
                 int documentNumber = 1;
 
@@ -147,163 +126,102 @@ namespace ExcelApp
                     countPages = Convert.ToInt32(startNumberTextBox.Text);
                 }
 
-                infoTextBox.Text += Environment.NewLine + Environment.NewLine;
+                Excel.Application app = new Excel.Application();
 
-                for (int i = 0; i < objectiveFiles.Length; i++) /// ������ ��� ��������� ����
+                for (int i = 0; i < objectiveFiles.Length; i++) /// шаблон для объектных смет
                 {
                     string filePath = $"{childFolder}\\{objectiveFiles[i]}";
-                    Excel.Workbook ObjWorkBook = ObjWorkExcel.Workbooks.Open($@"{filePath}");
+                    Excel.Workbook ObjWorkBook = app.Workbooks.Open($@"{filePath}");
                     Excel.Worksheet ObjWorkSheet = (Excel.Worksheet)ObjWorkBook.Sheets[1];
 
-                    int j = 0;
-                    arrObjectiveData[i, j] = documentNumber;/// ����� ���������
-                    j++;
                     Regex regex = new Regex(@"(\w*)-(\w*)-(\w*)");
                     MatchCollection match = regex.Matches(ObjWorkSheet.Range["B10"].Value.ToString());
-                    arrObjectiveData[i, j] = match[0];/// ��� �����
-                    infoTextBox.AppendText(arrObjectiveData[i, j] + Environment.NewLine);
-                    j++;
-                    arrObjectiveData[i, j] = ObjWorkSheet.Range["B7"].Value;/// ������������
-                    infoTextBox.AppendText(arrObjectiveData[i, j] + Environment.NewLine);
-                    j++;
-                    arrObjectiveData[i, j] = ObjWorkSheet.Range["F14"].Value;/// ����� �����
-                    infoTextBox.AppendText(arrObjectiveData[i, j] + Environment.NewLine);
-                    j++;
-                    arrObjectiveData[i, j] = countPages; /// ����� ������ �������� 
-                    infoTextBox.AppendText("��������: " + arrObjectiveData[i, j] + Environment.NewLine);
 
-                    countPages += ObjWorkBook.Sheets[1].PageSetup.Pages.Count; /// ���-�� ������� �� �����
+                    int pages = ObjWorkBook.Sheets[1].PageSetup.Pages.Count; /// кол-во страниц на листе
+                    countPages += pages;
+
+                    objectiveData.Add(new SmetaFile(
+                        match[0].ToString(), // код сметы
+                        ObjWorkSheet.Range["B7"].Value.ToString(), // Наименование
+                        ObjWorkSheet.Range["F14"].Value.ToString(), // Сумма денег
+                        ObjWorkBook.Sheets[1].PageSetup.Pages.Count, // кол-во страниц на листе
+                        objectiveFiles[i]));
 
                     ObjWorkBook.Close();
 
                     documentNumber++;
                 }
 
-                for (int i = 0; i < localFiles.Length; i++) // TODO ���������� ������ ��� ��������� ����
+                for (int i = 0; i < localFiles.Length; i++) // шаблон для локальных смет
                 {
                     string filePath = $"{rootFolder}\\{localFiles[i]}";
-                    Excel.Workbook ObjWorkBook = ObjWorkExcel.Workbooks.Open($@"{filePath}");
+                    Excel.Workbook ObjWorkBook = app.Workbooks.Open($@"{filePath}");
                     Excel.Worksheet ObjWorkSheet = (Excel.Worksheet)ObjWorkBook.Sheets[1];
 
-                    int j = 0;
-                    arrLocalData[i, j] = i + 1;
-                    j++;
                     Regex regex = new Regex(@"(\w*)-(\w*)-(\w*)");
                     MatchCollection match = regex.Matches(ObjWorkSheet.Range["A18"].Value.ToString());
-                    arrLocalData[i, j] = match[0];
-                    infoTextBox.Text += arrLocalData[i, j] + Environment.NewLine;
-                    j++;
-                    arrLocalData[i, j] = ObjWorkSheet.Range["A20"].Value;
-                    infoTextBox.Text += arrLocalData[i, j] + Environment.NewLine;
-                    j++;
-                    arrLocalData[i, j] = ObjWorkSheet.Range["C28"].Value;
-                    infoTextBox.Text += arrLocalData[i, j] + Environment.NewLine;
-                    j++;
-                    arrLocalData[i, j] = countPages; /// TODO ����� ��������(�� ������)
-                    infoTextBox.Text += "��������: " + arrLocalData[i, j] + Environment.NewLine;
 
-                    countPages += ObjWorkBook.Sheets[1].PageSetup.Pages.Count; // TODO ���-�� ������� �� �����
+                    var pages = ObjWorkBook.Sheets[1].PageSetup.Pages.Count;
+                    countPages += pages; // кол-во страниц на листе
+
+
+                    localData.Add(new SmetaFile(
+                        match[0].ToString(), // код сметы
+                        ObjWorkSheet.Range["A20"].Value.ToString(), // Наименование
+                        ObjWorkSheet.Range["C28"].Value.ToString(), // Сумма денег
+                        ObjWorkBook.Sheets[1].PageSetup.Pages.Count, // кол-во страниц на листе
+                        localFiles[i]));
+
                     ObjWorkBook.Close();
                     documentNumber++;
                 }
-                ObjWorkExcel.Quit();
+
+                localData = localData.OrderBy(x => x.Code).ThenBy(x => x.Name).ToList(); // Сортировка по коду и названию
+                objectiveData = objectiveData.OrderBy(x => x.Code).ThenBy(x => x.Name).ToList(); // Сортировка по коду и названию
+
+                /// конвертер Excel to PDF
+                int countCompleted = 0;
+                Directory.CreateDirectory($"{_path}\\TEMPdf");
+                foreach (var file in objectiveData)
+                {
+                    string filePath = $"{_path}\\ОС\\{file.FolderInfo}";
+                    Excel.Workbook workbook = app.Workbooks.Open(filePath);
+                    string tempPDFPath = $"{_path}\\TEMPdf\\{file.FolderInfo}";
+                    app.ActiveWorkbook.ExportAsFixedFormat(Excel.XlFixedFormatType.xlTypePDF, tempPDFPath);
+                    workbook.Close();
+                    countCompleted++;
+                    labelCompleted.Text = $"Кол-во обработанных файлов: {countCompleted} из {localFiles.Length + objectiveFiles.Length}";
+                }
+                foreach (var file in localData)
+                {
+                    string filePath = $"{_path}\\{file.FolderInfo}";
+                    Excel.Workbook workbook = app.Workbooks.Open(filePath);
+                    string tempPDFPath = $"{_path}\\TEMPdf\\{file.FolderInfo}";
+                    app.ActiveWorkbook.ExportAsFixedFormat(Excel.XlFixedFormatType.xlTypePDF, tempPDFPath);
+                    workbook.Close();
+                    countCompleted++;
+                    labelCompleted.Text = $"Кол-во обработанных файлов: {countCompleted} из {localFiles.Length + objectiveFiles.Length}";
+                }
+
+
                 app.Quit();
 
-                //string newPDFPath = $"{_path}\\TEMPdf";
-                //pdfFolder = new DirectoryInfo(newPDFPath);
-                //FileInfo[] tempPDFFiles = pdfFolder.GetFiles(".", SearchOption.TopDirectoryOnly);
-
-                /*License PdfMergeLicense = new License();
-                PdfMergeLicense.SetLicense("Aspose.pdf.lic");
-
-                PdfFileEditor pdfFileEditor = new PdfFileEditor();
-
-                string[] pdffiles = new string[3];
-                pdffiles[0] = $"{newPDFPath}\\{tempPDFFiles[0]}";
-                pdffiles[1] = $"{newPDFPath}\\{tempPDFFiles[1]}";
-                pdffiles[2] = $"{newPDFPath}\\{tempPDFFiles[2]}";
-
-                pdfFileEditor.Concatenate(pdffiles, $"{newPDFPath}\\MergedPDF.pdf");*/
-
-                /*Document pdfDocument1 = new Document($"{newPDFPath}\\{tempPDFFiles[0]}");
-                Document pdfDocument2 = new Document(newPDFPath + "\\" + tempPDFFiles[1]);
-
-                pdfDocument1.Pages.Add(pdfDocument2.Pages);
-
-                pdfDocument1.Save(newPDFPath + "\\ConcatenatedPDF.pdf");*/
-
-                /*Document pdfDocument1 = new Document(newPDFPath + "\\" + tempPDFFiles[0]);
-                Document pdfDocument2 = new Document(newPDFPath + "\\" + tempPDFFiles[1]);
-                pdfDocument1.Pages.Add(pdfDocument2.Pages);
-                pdfDocument1.Save(newPDFPath + "ConcatenatedPDF.pdf");*/
-                //Document document = new Document();
-                //Page page = document.Pages.Add();
-                //page.Paragraphs.Add(new Aspose.Pdf.Text.TextFragment("����� �� �����"));
-                //document.Save(_path + "\\documentTest.pdf");
+                MessageBox.Show(String.Join(Environment.NewLine, objectiveData)); // если хочется глянуть на результат сортировки
+                MessageBox.Show(String.Join(Environment.NewLine, localData)); // если хочется глянуть на результат сортировки
 
 
-                /*Document pdfDocument1 = new Document(newPDFPath + "\\" + tempPDFFiles[0]);
-                Document pdfDocument2 = new Document(newPDFPath + "\\" + tempPDFFiles[1]);
-                pdfDocument1.Pages.Add(pdfDocument2.Pages);
-                pdfDocument1.Save(newPDFPath + "ConcatenatedPDF.pdf");*/
-                //Document document = new Document();
-                //Page page = document.Pages.Add();
-                //page.Paragraphs.Add(new Aspose.Pdf.Text.TextFragment("����� �� �����"));
-                //document.Save(_path + "\\documentTest.pdf");
+
+
+
+
+
 
             }
             else
             {
-                MessageBox.Show($"������! �� �� ������� �����");
+                MessageBox.Show($"Ошибка! Вы не выбрали папку");
             }
-
-
         }
-
-        // TODO JSON
-        //public class Local
-        //{
-        //    public string Code { get; set; }
-        //    public string Name { get; set; }
-        //    public string Price { get; set; }
-        //    public int CountPages { get; set; }
-        //}
-
-        //public class Objective
-        //{
-        //    public string Code { get; set; }
-        //    public string Name { get; set; }
-        //    public string Price { get; set; }
-        //    public int CountPages { get; set; }
-        //}
-
-        //public class Root
-        //{
-        //    public List<Objective> objective { get; set; }
-        //    public List<Local> local { get; set; }
-        //}
-
-        // -------
-
-        //var root = new Root
-        //{
-        //    objective = new List<Objective>
-        //        {
-        //            new Objective { Code = "1", Name = "2", Price = "2", CountPages = 1 },
-        //            new Objective { Code = "1", Name = "2", Price = "2", CountPages = 1 },
-        //        },
-
-        //    local = new List<Local>
-        //        {
-        //            new Local { Code = "1", Name = "2", Price = "2", CountPages = 1 },
-        //            new Local { Code = "1", Name = "2", Price = "2", CountPages = 1},
-        //        }
-        //};
-
-        //var options = new JsonSerializerOptions { WriteIndented = true };
-        //string jsonString = JsonSerializer.Serialize(root, options);
-
-        //MessageBox.Show(jsonString);
 
 
 
@@ -320,6 +238,12 @@ namespace ExcelApp
         
     }
 }
+
+
+
+
+
+
 
 
 
