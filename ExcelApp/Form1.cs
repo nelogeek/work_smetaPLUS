@@ -15,15 +15,8 @@ using System.Text.Json.Serialization;
 using PdfSharp.Pdf;
 using PdfSharp.Pdf.IO;
 using iTextSharp.text;
-
-
-
-
-//TODO Обработать разрывы страниц в PDF
-//TODO Сделать объединение всех PDF
-// TODO JSON
-
-
+using ExcelApp;
+using System.Diagnostics;
 
 namespace ExcelAPP
 {
@@ -48,9 +41,7 @@ namespace ExcelAPP
         int documentNumber = 1;
         int countPages;
 
-
-
-
+        Stopwatch stopWatch = new Stopwatch();
 
         public Form1()
         {
@@ -58,6 +49,8 @@ namespace ExcelAPP
             backgroundWorker.WorkerReportsProgress = true;
             backgroundWorker.WorkerSupportsCancellation = true;
         }
+        private void Form1_Load(object sender, EventArgs e)
+        {
 
         private void backgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
@@ -350,39 +343,53 @@ namespace ExcelAPP
 
 
 
-        //Надо что бы 1 страница была сверху с двусторонней печатью
-
         protected void AddPageNumberITextSharp(string filePath)
         {
             byte[] bytes = File.ReadAllBytes(filePath);
+            byte[] bytesTitle = File.ReadAllBytes($"{pdfFolder}\\title.pdf");
+
             Font blackFont = FontFactory.GetFont("Arial", 8, iTextSharp.text.Font.NORMAL, BaseColor.BLACK);
             using (MemoryStream stream = new MemoryStream())
             {
                 iTextSharp.text.pdf.PdfReader reader = new iTextSharp.text.pdf.PdfReader(bytes);
+                iTextSharp.text.pdf.PdfReader readerOnlyTitle = new iTextSharp.text.pdf.PdfReader(bytesTitle);
+                int titlePages = readerOnlyTitle.NumberOfPages;
+                int pages = reader.NumberOfPages;
+
                 using (iTextSharp.text.pdf.PdfStamper stamper = new iTextSharp.text.pdf.PdfStamper(reader, stream))
                 {
+                    int startPageNumber = Convert.ToInt32(StartNumberTextBox.Value) - 1;
+                    int pagesPzCount = Convert.ToInt32(CountPagePZ.Value);
+
                     if (TwoSidedPrintCheckBox.Checked)
                     {
-                        int pages = reader.NumberOfPages;
+                        //Нумерация страниц содержания
+                        for (int i = 1; i <= titlePages; i++)
+                        {
+                            iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + startPageNumber).ToString(), blackFont), 565f, 15f, 0);
+                        }
                         for (int i = 1; i <= pages; i++)
                         {
                             if (i % 2 == 0)
                             {
-                                iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase(i.ToString(), blackFont), 810f, 575f, 0);
+                                iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + startPageNumber + pagesPzCount).ToString(), blackFont), 810f, 575f, 0);
                             }
                             else
                             {
-                                iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase(i.ToString(), blackFont), 810f, 15f, 0);
+                                iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + startPageNumber + pagesPzCount).ToString(), blackFont), 810f, 15f, 0);
                             }
                         }
                     }
                     else
                     {
-
-                        int pages = reader.NumberOfPages;
-                        for (int i = 1; i <= pages; i++)
+                        //Нумерация страниц содержания
+                        for (int i = 1; i <= titlePages; i++)
                         {
-                            iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase(i.ToString(), blackFont), 810f, 15f, 0);
+                            iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + startPageNumber).ToString(), blackFont), 565f, 15f, 0);
+                        }
+                        for (int i = titlePages + 1; i <= pages; i++)
+                        {
+                            iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + startPageNumber + pagesPzCount).ToString(), blackFont), 810f, 15f, 0);
                         }
 
                     }
@@ -398,25 +405,12 @@ namespace ExcelAPP
 
         }
 
-
-
-        //private void TwoSidedPrintCheckBox_CheckedChanged(object sender, EventArgs e)
-        //{
-        //    TwoSidedPrintCheckBox = TwoSidedPrintCheckBox.Checked;
-        //}
-
-
-
-
-
-
         private void TitleGeneration()
         {
 
             // ---------------- Генерация содержания ----------------------------------------------------------------------------
 
-
-            int countPages = (int)StartNumberNumeric.Value;
+            int countPages = (int)StartNumberTextBox.Value;
 
             if (localFiles != null)
             {
@@ -489,7 +483,7 @@ namespace ExcelAPP
 
                 //---
                 row++;
-                countPages += (int)CountPagePZNumeric.Value;
+                countPages += (int)CountPagePZ.Value;
 
                 // шапка объектной сметы
                 wTable1.Rows.Add();
@@ -575,9 +569,7 @@ namespace ExcelAPP
                             countPages += lData.PageCount;
                             row++;
                         }
-
                     }
-
                 }
 
                 wTable1.Columns[1].PreferredWidth = 6f;
@@ -619,8 +611,6 @@ namespace ExcelAPP
                 wTable1.Rows[1].Cells[6].Borders[Word.WdBorderType.wdBorderLeft].Color = Word.WdColor.wdColorGray30;
                 // ---
 
-
-
                 wDocument.ExportAsFixedFormat($@"{pdfFolder}\title.pdf", Word.WdExportFormat.wdExportFormatPDF);
                 wDocument.Close(Word.WdSaveOptions.wdDoNotSaveChanges, Word.WdOriginalFormat.wdOriginalDocumentFormat, false);
                 //app.ActiveDocument.SaveAs2($@"{_path}\TEST.docx");
@@ -630,18 +620,11 @@ namespace ExcelAPP
             {
                 MessageBox.Show($"Ошибка! Вы не выбрали папку");
             }
-
-
-
-
         }
 
+        private void label5_Click(object sender, EventArgs e)
+        {
 
-
-
-
+        }
     }
-
-
-
 }
