@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 
-namespace ExcelApp
+namespace ExcelAPP
 {
     class SmetaFile : IComparable<SmetaFile>
     {
@@ -14,14 +14,16 @@ namespace ExcelApp
         public string Price { get; set; }
         public int PageCount { get; set; }
         public FileInfo FolderInfo { get; set; }
+        public string ShortCode { get; set; }
 
-        public SmetaFile(string Code, string Name, string Price, int PageCount, FileInfo FolderInfo)
+        public SmetaFile(string Code, string Name, string Price, int PageCount, FileInfo FolderInfo, string ShortCode)
         {
             this.Code = Code;
             this.Name = Name;
             this.Price = Price;
             this.PageCount = PageCount;
             this.FolderInfo = FolderInfo;
+            this.ShortCode = ShortCode;
 
         }
 
@@ -47,8 +49,16 @@ namespace ExcelApp
 
         public override string ToString()
         {
-            //return $"{Code} - {Name} - {Price} - {PageCount}";
-            return $"{Code} - {Name} - {FolderInfo}";
+            return $"Code: {Code} \nName: {Name} \nPrice: {Price} \nPageCount: {PageCount} \nFolderInfo{FolderInfo} \nShortCode: {ShortCode} \n\n";
+            //return $"{Code} - {Name} - {FolderInfo}";
         }
+    }
+
+
+
+    public class Pair
+    {
+        public string Key { get; set; }
+        public string Value { get; set; }
     }
 }
