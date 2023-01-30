@@ -246,6 +246,51 @@ namespace ExcelAPP
             List<SmetaFile> tempFilesArray = objectiveData;
             tempFilesArray.AddRange(localData);
 
+            /// конвертер Excel to PDF
+            int countCompleted = 0;
+            Directory.CreateDirectory($"{_path}\\TEMPdf");
+            foreach (var file in objectiveData)
+            {
+                string filePath = $"{_path}\\ОС\\{file.FolderInfo}";
+                Excel.Workbook workbook = app.Workbooks.Open(filePath);
+                string tempPDFPath = $"{_path}\\TEMPdf\\{file.FolderInfo}";
+                workbook.Sheets[1].PageSetup.RightFooter = ""; ///Удаление нумерации станиц в Excel
+                app.ActiveWorkbook.ExportAsFixedFormat(Excel.XlFixedFormatType.xlTypePDF, tempPDFPath);
+                workbook.Close();
+                countCompleted++;
+                labelCompleted.Text = $"Кол-во обработанных файлов: {countCompleted} из {localFiles.Length + objectiveFiles.Length}";
+            }
+            foreach (var file in localData)
+            {
+                string filePath = $"{_path}\\{file.FolderInfo}";
+                Excel.Workbook workbook = app.Workbooks.Open(filePath);
+                string tempPDFPath = $"{_path}\\TEMPdf\\{file.FolderInfo}";
+                workbook.Sheets[1].PageSetup.RightFooter = ""; ///Удаление нумерации станиц в Excel
+                app.ActiveWorkbook.ExportAsFixedFormat(Excel.XlFixedFormatType.xlTypePDF, tempPDFPath);
+                workbook.Close();
+                countCompleted++;
+                labelCompleted.Text = $"Кол-во обработанных файлов: {countCompleted} из {localFiles.Length + objectiveFiles.Length}";
+            }
+
+            app.Quit();
+        }
+
+            string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
+            string fileNameConcatPdf = $"{desktopPath}\\smetaBook.pdf";
+            outputPdfDocument.Save(fileNameConcatPdf);
+            outputPdfDocument.Close();
+
+            
+
+            //Добавление правильной нумерации страниц
+            //iTextSharp
+            AddPageNumberITextSharp(fileNameConcatPdf);
+
+        protected void PdfMerge()
+        {
+            List<SmetaFile> tempFilesArray = objectiveData;
+            tempFilesArray.AddRange(localData);
+
             //Объединение PDF
             PdfDocument outputPdfDocument = new PdfDocument();
             int countCompleted = 0;
