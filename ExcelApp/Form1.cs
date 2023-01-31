@@ -61,10 +61,10 @@ namespace ExcelAPP
             {
                 labelCompleted.Text = "Ошибка: " + e.Error.Message;
             }
-            //else
-            //{
-            //    labelCompleted.Text = "Сборка завершена!";
-            //}
+            else
+            {
+                EnabledButton();
+            }
         }
 
         private void backgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -179,6 +179,7 @@ namespace ExcelAPP
         {
             if (backgroundWorker.IsBusy != true)
             {
+                DisableButton();
                 // Start the asynchronous operation.
                 backgroundWorker.RunWorkerAsync();
                 
