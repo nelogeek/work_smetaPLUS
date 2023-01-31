@@ -15,7 +15,7 @@ using System.Text.Json.Serialization;
 using PdfSharp.Pdf;
 using PdfSharp.Pdf.IO;
 using iTextSharp.text;
-using ExcelApp;
+
 using System.Diagnostics;
 
 namespace ExcelAPP
@@ -49,8 +49,7 @@ namespace ExcelAPP
             backgroundWorker.WorkerReportsProgress = true;
             backgroundWorker.WorkerSupportsCancellation = true;
         }
-        private void Form1_Load(object sender, EventArgs e)
-        {
+        
 
         private void backgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
@@ -62,21 +61,23 @@ namespace ExcelAPP
             {
                 labelCompleted.Text = "Ошибка: " + e.Error.Message;
             }
-            else
-            {
-                labelCompleted.Text = "Сборка завершена!";
-            }
+            //else
+            //{
+            //    labelCompleted.Text = "Сборка завершена!";
+            //}
         }
 
         private void backgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            //labelCompleted.Text = e.ProgressPercentage.ToString();
+            labelCompleted.Text = e.UserState.ToString();
             
         }
         private void backgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
+            backgroundWorker.ReportProgress(1, "Сборка начата...");
+            stopWatch.Start(); //Запуск секундомера для отчета о времени выполнения программы
             BackgroundWorker worker = sender as BackgroundWorker;
-            DisableButton();
+            //DisableButton();
             if (localFiles != null)
             {
                 countPages = (int)StartNumberNumeric.Value;
@@ -88,8 +89,13 @@ namespace ExcelAPP
             {
                 MessageBox.Show($"Ошибка! Вы не выбрали папку");
             }
-            EnabledButton();
-            
+            //EnabledButton();
+            stopWatch.Stop(); //Остановка секундомера
+            TimeSpan ts = stopWatch.Elapsed;
+            string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}", ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
+            string Time = $"Время сборки: {elapsedTime}";
+
+            backgroundWorker.ReportProgress(1, Time);
         }
         protected void DisableButton()
         {
@@ -358,8 +364,8 @@ namespace ExcelAPP
 
                 using (iTextSharp.text.pdf.PdfStamper stamper = new iTextSharp.text.pdf.PdfStamper(reader, stream))
                 {
-                    int startPageNumber = Convert.ToInt32(StartNumberTextBox.Value) - 1;
-                    int pagesPzCount = Convert.ToInt32(CountPagePZ.Value);
+                    int startPageNumber = Convert.ToInt32(StartNumberNumeric.Value) - 1;
+                    int pagesPzCount = Convert.ToInt32(CountPagePZNumeric.Value);
 
                     if (TwoSidedPrintCheckBox.Checked)
                     {
@@ -410,7 +416,7 @@ namespace ExcelAPP
 
             // ---------------- Генерация содержания ----------------------------------------------------------------------------
 
-            int countPages = (int)StartNumberTextBox.Value;
+            int countPages = (int)StartNumberNumeric.Value;
 
             if (localFiles != null)
             {
@@ -483,7 +489,7 @@ namespace ExcelAPP
 
                 //---
                 row++;
-                countPages += (int)CountPagePZ.Value;
+                countPages += (int)CountPagePZNumeric.Value;
 
                 // шапка объектной сметы
                 wTable1.Rows.Add();

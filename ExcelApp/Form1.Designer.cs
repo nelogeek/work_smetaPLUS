@@ -1,4 +1,4 @@
-﻿namespace ExcelApp
+﻿namespace ExcelAPP
 {
     partial class Form1
     {
@@ -40,11 +40,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.CountPagePZNumeric)).BeginInit();
-            this.labelStopwatchComplete = new System.Windows.Forms.Label();
-            ((System.ComponentModel.ISupportInitialize)(this.StartNumberTextBox)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.CountPagePZ)).BeginInit();
             this.SuspendLayout();
             // 
             // labelNameFolder
@@ -233,7 +228,6 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(856, 398);
-            this.Controls.Add(this.labelStopwatchComplete);
             this.Controls.Add(this.TwoSidedPrintCheckBox);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.CountPagePZNumeric);
