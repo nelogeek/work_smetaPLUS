@@ -18,6 +18,7 @@ using iTextSharp.text;
 
 
 
+
 //TODO Обработать разрывы страниц в PDF
 //TODO Сделать объединение всех PDF
 // TODO JSON
@@ -54,14 +55,69 @@ namespace ExcelAPP
         public Form1()
         {
             InitializeComponent();
+            backgroundWorker.WorkerReportsProgress = true;
+            backgroundWorker.WorkerSupportsCancellation = true;
         }
 
-        private void Form1_Load(object sender, EventArgs e)
+        private void backgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-
+            if (e.Cancelled == true)
+            {
+                labelCompleted.Text = "Отмена!";
+            }
+            else if (e.Error != null)
+            {
+                labelCompleted.Text = "Ошибка: " + e.Error.Message;
+            }
+            else
+            {
+                labelCompleted.Text = "Сборка завершена!";
+            }
         }
 
-
+        private void backgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            //labelCompleted.Text = e.ProgressPercentage.ToString();
+            
+        }
+        private void backgroundWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            BackgroundWorker worker = sender as BackgroundWorker;
+            DisableButton();
+            if (localFiles != null)
+            {
+                countPages = (int)StartNumberNumeric.Value;
+                ExcelParser_Converter();
+                TitleGeneration();
+                PdfMerge();
+            }
+            else
+            {
+                MessageBox.Show($"Ошибка! Вы не выбрали папку");
+            }
+            EnabledButton();
+            
+        }
+        protected void DisableButton()
+        {
+            this.StartNumberNumeric.Enabled = false;
+            this.numericUpDown1.Enabled = false;
+            this.numericUpDown2.Enabled = false;
+            this.CountPagePZNumeric.Enabled = false;
+            this.btnBuild.Enabled = false;
+            this.btnSelectFolder.Enabled = false;
+            this.TwoSidedPrintCheckBox.Enabled = false;
+        }
+        protected void EnabledButton()
+        {
+            this.StartNumberNumeric.Enabled = true;
+            this.numericUpDown1.Enabled = true;
+            this.numericUpDown2.Enabled = true;
+            this.CountPagePZNumeric.Enabled = true;
+            this.btnBuild.Enabled = true;
+            this.btnSelectFolder.Enabled = true;
+            this.TwoSidedPrintCheckBox.Enabled = true;
+        }
 
         private void BtnSelectFolder_Click(object sender, EventArgs e)
         {
@@ -122,86 +178,80 @@ namespace ExcelAPP
 
         private void BtnBuild_Click(object sender, EventArgs e)
         {
-
-            if (localFiles != null)
+            if (backgroundWorker.IsBusy != true)
             {
-                countPages = (int)StartNumberTextBox.Value;
-
-                ExcelParser_Converter();
-
-                TitleGeneration();
-
-                PdfMerge();
-
-
+                // Start the asynchronous operation.
+                backgroundWorker.RunWorkerAsync();
+                
             }
 
-
-
-            else
-            {
-                MessageBox.Show($"Ошибка! Вы не выбрали папку");
-
-            }
+            
         }
 
 
         private void ExcelParser_Converter()
         {
+            
             Excel.Application app = new Excel.Application
             {
                 DisplayAlerts = false
             };
 
+            Excel.Workbook eWorkbook;
+            Excel.Worksheet eWorksheet;
+            int pages;
+
             for (int i = 0; i < objectiveFiles.Length; i++) /// шаблон для объектных смет
             {
                 string filePath = $"{childFolder}\\{objectiveFiles[i]}";
-                Excel.Workbook ObjWorkBook = app.Workbooks.Open($@"{filePath}");
-                Excel.Worksheet ObjWorkSheet = (Excel.Worksheet)ObjWorkBook.Sheets[1];
+                eWorkbook = app.Workbooks.Open($@"{filePath}");
+                eWorksheet = (Excel.Worksheet)eWorkbook.Sheets[1];
 
                 Regex regex = new Regex(@"(\w*)-(\w*)-(\w*)");
-                MatchCollection match = regex.Matches(ObjWorkSheet.Range["B10"].Value.ToString());
+                MatchCollection match = regex.Matches(eWorksheet.Range["B10"].Value.ToString());
 
-                int pages = ObjWorkBook.Sheets[1].PageSetup.Pages.Count; /// кол-во страниц на листе
+                pages = eWorkbook.Sheets[1].PageSetup.Pages.Count; /// кол-во страниц на листе
                 countPages += pages;
 
                 objectiveData.Add(new SmetaFile(
                     match[0].ToString(), // код сметы
-                    ObjWorkSheet.Range["B7"].Value.ToString(), // Наименование
-                    ObjWorkSheet.Range["F14"].Value.ToString(), // Сумма денег
-                    ObjWorkBook.Sheets[1].PageSetup.Pages.Count, // кол-во страниц на листе
+                    eWorksheet.Range["B7"].Value.ToString(), // Наименование
+                    eWorksheet.Range["F14"].Value.ToString(), // Сумма денег
+                    eWorkbook.Sheets[1].PageSetup.Pages.Count, // кол-во страниц на листе
                     objectiveFiles[i],
                     match[0].ToString().Substring(3)));
 
-                ObjWorkBook.Close(false);
-
+                eWorkbook.Close(false);
                 documentNumber++;
+                
             }
 
             for (int i = 0; i < localFiles.Length; i++) // шаблон для локальных смет
             {
                 string filePath = $"{rootFolder}\\{localFiles[i]}";
-                Excel.Workbook ObjWorkBook = app.Workbooks.Open($@"{filePath}");
-                Excel.Worksheet ObjWorkSheet = (Excel.Worksheet)ObjWorkBook.Sheets[1];
+                eWorkbook = app.Workbooks.Open($@"{filePath}");
+                eWorksheet = (Excel.Worksheet)eWorkbook.Sheets[1];
 
                 Regex regex = new Regex(@"(\w*)-(\w*)-(\w*)");
-                MatchCollection match = regex.Matches(ObjWorkSheet.Range["A18"].Value.ToString());
+                MatchCollection match = regex.Matches(eWorksheet.Range["A18"].Value.ToString());
 
-                var pages = ObjWorkBook.Sheets[1].PageSetup.Pages.Count;
+                pages = eWorkbook.Sheets[1].PageSetup.Pages.Count;
                 countPages += pages; // кол-во страниц на листе
 
 
                 localData.Add(new SmetaFile(
                     match[0].ToString(), // код сметы
-                    ObjWorkSheet.Range["A20"].Value.ToString(), // Наименование
-                    ObjWorkSheet.Range["D28"].Value.ToString(), // Сумма денег
-                    ObjWorkBook.Sheets[1].PageSetup.Pages.Count, // кол-во страниц на листе
+                    eWorksheet.Range["A20"].Value.ToString(), // Наименование
+                    eWorksheet.Range["D28"].Value.ToString(), // Сумма денег
+                    eWorkbook.Sheets[1].PageSetup.Pages.Count, // кол-во страниц на листе
                     localFiles[i],
                     match[0].ToString().Substring(3)));
 
-                ObjWorkBook.Close(false);
+                eWorkbook.Close(false);
                 documentNumber++;
             }
+
+
 
             localData = localData.OrderBy(x => x.Code).ThenBy(x => x.Name).ToList(); // Сортировка по коду и названию
             objectiveData = objectiveData.OrderBy(x => x.Code).ThenBy(x => x.Name).ToList(); // Сортировка по коду и названию
@@ -214,27 +264,33 @@ namespace ExcelAPP
             foreach (var file in objectiveData)
             {
                 string filePath = $"{_path}\\ОС\\{file.FolderInfo}";
-                Excel.Workbook workbook = app.Workbooks.Open(filePath);
+                eWorkbook = app.Workbooks.Open(filePath);
                 string tempPDFPath = $"{_path}\\TEMPdf\\{file.FolderInfo}";
-                workbook.Sheets[1].PageSetup.RightFooter = ""; ///Удаление нумерации станиц в Excel
+                eWorkbook.Sheets[1].PageSetup.RightFooter = ""; ///Удаление нумерации станиц в Excel
                 app.ActiveWorkbook.ExportAsFixedFormat(Excel.XlFixedFormatType.xlTypePDF, tempPDFPath);
-                workbook.Close();
+                eWorkbook.Close(false);
                 countCompleted++;
-                labelCompleted.Text = $"Кол-во обработанных файлов: {countCompleted} из {localFiles.Length + objectiveFiles.Length}";
+
+                //labelCompleted.Text = $"Кол-во обработанных файлов: {countCompleted} из {localFiles.Length + objectiveFiles.Length}";
+
             }
             foreach (var file in localData)
             {
                 string filePath = $"{_path}\\{file.FolderInfo}";
-                Excel.Workbook workbook = app.Workbooks.Open(filePath);
+                eWorkbook = app.Workbooks.Open(filePath);
                 string tempPDFPath = $"{_path}\\TEMPdf\\{file.FolderInfo}";
-                workbook.Sheets[1].PageSetup.RightFooter = ""; ///Удаление нумерации станиц в Excel
+                eWorkbook.Sheets[1].PageSetup.RightFooter = ""; ///Удаление нумерации станиц в Excel
                 app.ActiveWorkbook.ExportAsFixedFormat(Excel.XlFixedFormatType.xlTypePDF, tempPDFPath);
-                workbook.Close();
+                eWorkbook.Close(false);
                 countCompleted++;
-                labelCompleted.Text = $"Кол-во обработанных файлов: {countCompleted} из {localFiles.Length + objectiveFiles.Length}";
+                //labelCompleted.Text = $"Кол-во обработанных файлов: {countCompleted} из {localFiles.Length + objectiveFiles.Length}";
             }
 
             app.Quit();
+            eWorkbook = null;
+            eWorksheet = null;
+            pages = 0;
+            GC.Collect();
         }
 
 
@@ -259,7 +315,7 @@ namespace ExcelAPP
                 outputPdfDocument.AddPage(page);
             }
             countCompleted++;
-            labelCompleted.Text = $"Кол-во обработанных файлов: {countCompleted} из {localFiles.Length + objectiveFiles.Length + 1}";
+            //labelCompleted.Text = $"Кол-во обработанных файлов: {countCompleted} из {localFiles.Length + objectiveFiles.Length + 1}";
 
             // add pages of books
             foreach (var file in tempFilesArray)
@@ -272,7 +328,7 @@ namespace ExcelAPP
                     outputPdfDocument.AddPage(page);
                 }
                 countCompleted++;
-                labelCompleted.Text = $"Кол-во обработанных файлов: {countCompleted} из {localFiles.Length + objectiveFiles.Length + 1}";
+                //labelCompleted.Text = $"Кол-во обработанных файлов: {countCompleted} из {localFiles.Length + objectiveFiles.Length + 1}";
             }
 
             string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
@@ -288,7 +344,7 @@ namespace ExcelAPP
 
             //MessageBox.Show("Нумерование страниц завершено");
             MessageBox.Show("Сборка книги завершена");
-            labelCompleted.Text = "Обработка файлов завершена";
+            //labelCompleted.Text = "Обработка файлов завершена";
         }
 
 
@@ -360,7 +416,7 @@ namespace ExcelAPP
             // ---------------- Генерация содержания ----------------------------------------------------------------------------
 
 
-            int countPages = (int)StartNumberTextBox.Value;
+            int countPages = (int)StartNumberNumeric.Value;
 
             if (localFiles != null)
             {
@@ -433,7 +489,7 @@ namespace ExcelAPP
 
                 //---
                 row++;
-                countPages += (int)CountPagePZ.Value;
+                countPages += (int)CountPagePZNumeric.Value;
 
                 // шапка объектной сметы
                 wTable1.Rows.Add();
