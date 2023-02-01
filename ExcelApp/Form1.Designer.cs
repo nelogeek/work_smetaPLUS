@@ -123,6 +123,7 @@
             // 
             // numericUpDown1
             // 
+            this.numericUpDown1.Enabled = false;
             this.numericUpDown1.Location = new System.Drawing.Point(201, 111);
             this.numericUpDown1.Margin = new System.Windows.Forms.Padding(4, 4, 13, 12);
             this.numericUpDown1.Maximum = new decimal(new int[] {
@@ -161,6 +162,7 @@
             // 
             // numericUpDown2
             // 
+            this.numericUpDown2.Enabled = false;
             this.numericUpDown2.Location = new System.Drawing.Point(201, 151);
             this.numericUpDown2.Margin = new System.Windows.Forms.Padding(4, 4, 13, 12);
             this.numericUpDown2.Maximum = new decimal(new int[] {

@@ -43,23 +43,27 @@ namespace ExcelAPP
 
         Stopwatch stopWatch = new Stopwatch();
 
+        string DesktopFolder = $@"{Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)}\Книга смет";
+
         public Form1()
         {
             InitializeComponent();
             backgroundWorker.WorkerReportsProgress = true;
             backgroundWorker.WorkerSupportsCancellation = true;
         }
-        
+
 
         private void backgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             if (e.Cancelled == true)
             {
                 labelCompleted.Text = "Отмена!";
+                EnabledButton();
             }
             else if (e.Error != null)
             {
                 labelCompleted.Text = "Ошибка: " + e.Error.Message;
+                EnabledButton();
             }
             else
             {
@@ -70,7 +74,7 @@ namespace ExcelAPP
         private void backgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             labelCompleted.Text = e.UserState.ToString();
-            
+
         }
         private void backgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
@@ -80,10 +84,19 @@ namespace ExcelAPP
             //DisableButton();
             if (localFiles != null)
             {
-                countPages = (int)StartNumberNumeric.Value;
-                ExcelParser_Converter();
-                TitleGeneration();
-                PdfMerge();
+                if (CreateDesktopFolder())
+                {
+                    countPages = (int)StartNumberNumeric.Value;
+                    ExcelParser();
+                    ExcelConverter();
+                    TitleGeneration();
+                    PdfMerge();
+                }
+                else
+                {
+                    MessageBox.Show("Папка 'Книга смет' уже существует");
+                }
+                
             }
             else
             {
@@ -138,14 +151,27 @@ namespace ExcelAPP
                 if (rootFolder.Exists)
                 {
                     localFiles = rootFolder.GetFiles(".", SearchOption.TopDirectoryOnly);
-
-                    dir = Directory.GetDirectories(_path);
-                    if (dir.Length > 1)
+                    foreach (var file in localFiles)
                     {
-                        MessageBox.Show("Количество папок превышает допустимое значение");
-                        labelNameFolder.Text = "";
+                        string fileName = file.Name;
+
+                        Regex regex = new Regex(@".*", RegexOptions.RightToLeft);
+                        MatchCollection match = regex.Matches(fileName);
+                        string fileNameStr = match[0].ToString();
+                        string[] fileType = fileNameStr.Split('.');
+                        if (fileType[fileType.Length - 1] != "xlsx")
+                        {
+                            MessageBox.Show($"В папке находится недопустимый файл");
+                        }
+                    }
+                    dir = Directory.GetDirectories(_path);
+                    if (dir.Length != 1)
+                    {
+                        MessageBox.Show("В сметах должна быть только одна папка, которая должна содержать объектные сметы!");
+                        labelNameFolder.Text = "Добавьте папку со объектными сметами\"ОС\"";
                         return;
                     }
+                   
                     else
                     {
                         labelNameFolder.Text = _path;
@@ -182,16 +208,17 @@ namespace ExcelAPP
                 DisableButton();
                 // Start the asynchronous operation.
                 backgroundWorker.RunWorkerAsync();
-                
+
+
             }
 
-            
+
         }
 
 
-        private void ExcelParser_Converter()
+        private void ExcelParser()
         {
-            
+
             Excel.Application app = new Excel.Application
             {
                 DisplayAlerts = false
@@ -223,7 +250,7 @@ namespace ExcelAPP
 
                 eWorkbook.Close(false);
                 documentNumber++;
-                
+
             }
 
             for (int i = 0; i < localFiles.Length; i++) // шаблон для локальных смет
@@ -257,6 +284,22 @@ namespace ExcelAPP
             objectiveData = objectiveData.OrderBy(x => x.Code).ThenBy(x => x.Name).ToList(); // Сортировка по коду и названию
 
 
+            app.Quit();
+            eWorkbook = null;
+            eWorksheet = null;
+            pages = 0;
+            GC.Collect();
+        }
+
+        protected void ExcelConverter()
+        {
+            Excel.Application app = new Excel.Application
+            {
+                DisplayAlerts = false
+            };
+
+            Excel.Workbook eWorkbook;
+
 
             /// конвертер Excel to PDF
             int countCompleted = 0;
@@ -288,12 +331,8 @@ namespace ExcelAPP
 
             app.Quit();
             eWorkbook = null;
-            eWorksheet = null;
-            pages = 0;
             GC.Collect();
         }
-
-
 
 
 
@@ -343,7 +382,7 @@ namespace ExcelAPP
             AddPageNumberITextSharp(fileNameConcatPdf);
 
             //MessageBox.Show("Нумерование страниц завершено");
-            MessageBox.Show("Сборка книги завершена");
+            //MessageBox.Show("Сборка книги завершена");
             //labelCompleted.Text = "Обработка файлов завершена";
         }
 
@@ -412,7 +451,9 @@ namespace ExcelAPP
 
         }
 
-        private void TitleGeneration()
+
+
+        protected void TitleGeneration()
         {
 
             // ---------------- Генерация содержания ----------------------------------------------------------------------------
@@ -618,7 +659,7 @@ namespace ExcelAPP
                 wTable1.Rows[1].Cells[6].Borders[Word.WdBorderType.wdBorderLeft].Color = Word.WdColor.wdColorGray30;
                 // ---
 
-                wDocument.ExportAsFixedFormat($@"{pdfFolder}\title.pdf", Word.WdExportFormat.wdExportFormatPDF);
+                wDocument.ExportAsFixedFormat($@"{DesktopFolder}\Содержание.pdf", Word.WdExportFormat.wdExportFormatPDF);
                 wDocument.Close(Word.WdSaveOptions.wdDoNotSaveChanges, Word.WdOriginalFormat.wdOriginalDocumentFormat, false);
                 //app.ActiveDocument.SaveAs2($@"{_path}\TEST.docx");
                 app.Quit();
@@ -629,9 +670,17 @@ namespace ExcelAPP
             }
         }
 
-        private void label5_Click(object sender, EventArgs e)
+        protected bool CreateDesktopFolder()
         {
-
+            
+            if (!System.IO.Directory.Exists(DesktopFolder))
+            {
+                System.IO.Directory.CreateDirectory(DesktopFolder);
+                return true;
+            }
+            return false;
         }
+
+        
     }
 }
