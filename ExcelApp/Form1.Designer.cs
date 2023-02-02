@@ -20,12 +20,12 @@
 
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.labelNameFolder = new System.Windows.Forms.Label();
             this.folderBrowserDialog = new System.Windows.Forms.FolderBrowserDialog();
             this.btnSelectFolder = new System.Windows.Forms.Button();
             this.labelCompleted = new System.Windows.Forms.Label();
             this.btnBuild = new System.Windows.Forms.Button();
-            this.infoTextBox = new System.Windows.Forms.TextBox();
             this.StartNumberNumeric = new System.Windows.Forms.NumericUpDown();
             this.label1 = new System.Windows.Forms.Label();
             this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
@@ -37,6 +37,7 @@
             this.TwoSidedPrintCheckBox = new System.Windows.Forms.CheckBox();
             this.backgroundWorker = new System.ComponentModel.BackgroundWorker();
             this.SplitBookContentCheckBox = new System.Windows.Forms.CheckBox();
+            this.infoTextBox = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.StartNumberNumeric)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).BeginInit();
@@ -82,17 +83,6 @@
             this.btnBuild.Text = "Собрать";
             this.btnBuild.UseVisualStyleBackColor = true;
             this.btnBuild.Click += new System.EventHandler(this.BtnBuild_Click);
-            // 
-            // infoTextBox
-            // 
-            this.infoTextBox.Location = new System.Drawing.Point(295, 50);
-            this.infoTextBox.Margin = new System.Windows.Forms.Padding(4);
-            this.infoTextBox.Multiline = true;
-            this.infoTextBox.Name = "infoTextBox";
-            this.infoTextBox.ReadOnly = true;
-            this.infoTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.infoTextBox.Size = new System.Drawing.Size(544, 265);
-            this.infoTextBox.TabIndex = 6;
             // 
             // StartNumberNumeric
             // 
@@ -236,11 +226,24 @@
             this.SplitBookContentCheckBox.Text = "Содержание отдельно";
             this.SplitBookContentCheckBox.UseVisualStyleBackColor = true;
             // 
+            // infoTextBox
+            // 
+            this.infoTextBox.BackColor = System.Drawing.SystemColors.Menu;
+            this.infoTextBox.Location = new System.Drawing.Point(293, 70);
+            this.infoTextBox.Multiline = true;
+            this.infoTextBox.Name = "infoTextBox";
+            this.infoTextBox.ReadOnly = true;
+            this.infoTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.infoTextBox.Size = new System.Drawing.Size(547, 260);
+            this.infoTextBox.TabIndex = 21;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.ClientSize = new System.Drawing.Size(856, 398);
+            this.Controls.Add(this.infoTextBox);
             this.Controls.Add(this.SplitBookContentCheckBox);
             this.Controls.Add(this.TwoSidedPrintCheckBox);
             this.Controls.Add(this.label4);
@@ -252,12 +255,13 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this.StartNumberNumeric);
             this.Controls.Add(this.labelCompleted);
-            this.Controls.Add(this.infoTextBox);
             this.Controls.Add(this.btnBuild);
             this.Controls.Add(this.btnSelectFolder);
             this.Controls.Add(this.labelNameFolder);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "Form1";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Smeta++";
             ((System.ComponentModel.ISupportInitialize)(this.StartNumberNumeric)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
@@ -273,7 +277,6 @@
         private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog;
         private System.Windows.Forms.Button btnSelectFolder;
         private System.Windows.Forms.Button btnBuild;
-        private System.Windows.Forms.TextBox infoTextBox;
         private System.Windows.Forms.Label labelCompleted;
         private System.Windows.Forms.NumericUpDown StartNumberNumeric;
         private System.Windows.Forms.Label label1;
@@ -286,5 +289,6 @@
         private System.Windows.Forms.CheckBox TwoSidedPrintCheckBox;
         private System.ComponentModel.BackgroundWorker backgroundWorker;
         private System.Windows.Forms.CheckBox SplitBookContentCheckBox;
+        private System.Windows.Forms.TextBox infoTextBox;
     }
 }
