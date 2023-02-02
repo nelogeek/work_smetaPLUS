@@ -18,6 +18,7 @@ using iTextSharp.text;
 
 using System.Diagnostics;
 
+
 namespace ExcelAPP
 {
     public partial class Form1 : Form
@@ -91,6 +92,7 @@ namespace ExcelAPP
                     ExcelConverter();
                     TitleGeneration();
                     PdfMerge();
+                    MoveFiles();
                 }
                 else
                 {
@@ -345,16 +347,18 @@ namespace ExcelAPP
             PdfDocument outputPdfDocument = new PdfDocument();
             int countCompleted = 0;
 
-            // add title
-            PdfDocument inputPdfDocument = PdfReader.Open($"{pdfFolder}\\title.pdf", PdfDocumentOpenMode.Import);
+            
+            PdfDocument inputPdfDocument = PdfReader.Open($"{pdfFolder}\\Содержание.pdf", PdfDocumentOpenMode.Import);
             int count = inputPdfDocument.PageCount;
-            for (int i = 0; i < count; i++)
-            {
-                PdfPage page = inputPdfDocument.Pages[i];
-                outputPdfDocument.AddPage(page);
-            }
-            countCompleted++;
-            //labelCompleted.Text = $"Кол-во обработанных файлов: {countCompleted} из {localFiles.Length + objectiveFiles.Length + 1}";
+
+            //// add title
+            //for (int i = 0; i < count; i++)
+            //{
+            //    PdfPage page = inputPdfDocument.Pages[i];
+            //    outputPdfDocument.AddPage(page);
+            //}
+            //countCompleted++;
+            ////labelCompleted.Text = $"Кол-во обработанных файлов: {countCompleted} из {localFiles.Length + objectiveFiles.Length + 1}";
 
             // add pages of books
             foreach (var file in tempFilesArray)
@@ -370,8 +374,8 @@ namespace ExcelAPP
                 //labelCompleted.Text = $"Кол-во обработанных файлов: {countCompleted} из {localFiles.Length + objectiveFiles.Length + 1}";
             }
 
-            string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
-            string fileNameConcatPdf = $"{desktopPath}\\smetaBook.pdf";
+            //string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
+            string fileNameConcatPdf = $"{DesktopFolder}\\smetaBook.pdf";
             outputPdfDocument.Save(fileNameConcatPdf);
             outputPdfDocument.Close();
 
@@ -392,9 +396,9 @@ namespace ExcelAPP
         protected void AddPageNumberITextSharp(string filePath)
         {
             byte[] bytes = File.ReadAllBytes(filePath);
-            byte[] bytesTitle = File.ReadAllBytes($"{pdfFolder}\\title.pdf");
+            byte[] bytesTitle = File.ReadAllBytes($"{pdfFolder}\\Содержание.pdf");
 
-            Font blackFont = FontFactory.GetFont("Arial", 8, iTextSharp.text.Font.NORMAL, BaseColor.BLACK);
+            iTextSharp.text.Font blackFont = FontFactory.GetFont("Arial", 8, iTextSharp.text.Font.NORMAL, BaseColor.BLACK);
             using (MemoryStream stream = new MemoryStream())
             {
                 iTextSharp.text.pdf.PdfReader reader = new iTextSharp.text.pdf.PdfReader(bytes);
@@ -414,7 +418,7 @@ namespace ExcelAPP
                         {
                             iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + startPageNumber).ToString(), blackFont), 565f, 15f, 0);
                         }
-                        for (int i = 1; i <= pages; i++)
+                        for (int i = 1 + titlePages; i <= pages; i++)
                         {
                             if (i % 2 == 0)
                             {
@@ -658,8 +662,8 @@ namespace ExcelAPP
                 wTable1.Rows[1].Cells[6].Borders[Word.WdBorderType.wdBorderBottom].Color = Word.WdColor.wdColorGray30;
                 wTable1.Rows[1].Cells[6].Borders[Word.WdBorderType.wdBorderLeft].Color = Word.WdColor.wdColorGray30;
                 // ---
-
-                wDocument.ExportAsFixedFormat($@"{DesktopFolder}\Содержание.pdf", Word.WdExportFormat.wdExportFormatPDF);
+                //wDocument.SaveAs2($"{pdfFolder}\\Содержание.pdf", WdSaveFormat.wdFormatPDF);
+                wDocument.ExportAsFixedFormat($"{pdfFolder}\\Содержание.pdf", Word.WdExportFormat.wdExportFormatPDF);
                 wDocument.Close(Word.WdSaveOptions.wdDoNotSaveChanges, Word.WdOriginalFormat.wdOriginalDocumentFormat, false);
                 //app.ActiveDocument.SaveAs2($@"{_path}\TEST.docx");
                 app.Quit();
@@ -681,6 +685,11 @@ namespace ExcelAPP
             return false;
         }
 
-        
+        protected void MoveFiles()
+        {
+            File.Move($@"{_path}\TEMPdf\Содержание.pdf", $@"{DesktopFolder}\Содержание.pdf");
+        }
+
+
     }
 }
