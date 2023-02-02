@@ -274,7 +274,7 @@ namespace ExcelAPP
                 //documentNumber++;
 
             }
-            bool flag = true;
+            
             for (int i = 0; i < localFiles.Length; i++) // шаблон для локальных смет
             {
                 string filePath = $"{rootFolder}\\{localFiles[i]}";
