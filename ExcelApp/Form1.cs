@@ -1,23 +1,17 @@
+using iTextSharp.text;
+using PdfSharp.Pdf;
+using PdfSharp.Pdf.IO;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Windows.Forms;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Windows.Forms;
 using Excel = Microsoft.Office.Interop.Excel;
 using Word = Microsoft.Office.Interop.Word;
-using System.Text.RegularExpressions;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using PdfSharp.Pdf;
-using PdfSharp.Pdf.IO;
-using iTextSharp.text;
-
-using System.Diagnostics;
-using System.Runtime.InteropServices.WindowsRuntime;
 
 namespace ExcelAPP
 {
@@ -245,9 +239,9 @@ namespace ExcelAPP
             Excel.Worksheet eWorksheet;
             int pages;
 
-            //try
-            //{
-            for (int i = 0; i < objectiveFiles.Length; i++) /// шаблон для объектных смет
+            try
+            {
+                for (int i = 0; i < objectiveFiles.Length; i++) /// шаблон для объектных смет
             {
                 string filePath = $"{childFolder}\\{objectiveFiles[i]}";
                 eWorkbook = app.Workbooks.Open($@"{filePath}");
@@ -274,7 +268,7 @@ namespace ExcelAPP
                 //documentNumber++;
 
             }
-            
+
             for (int i = 0; i < localFiles.Length; i++) // шаблон для локальных смет
             {
                 string filePath = $"{rootFolder}\\{localFiles[i]}";
@@ -291,7 +285,7 @@ namespace ExcelAPP
                 {
                     money = eWorksheet.Range["D28"].Value.ToString().Replace("(", "").Replace(")", "");
                 }
-                
+
 
                 localData.Add(new SmetaFile(
                     match[0].ToString(), // код сметы
@@ -318,22 +312,22 @@ namespace ExcelAPP
 
             return true;
 
-            //}
-            //catch (Exception)
-            //{
-            //    MessageBox.Show("Ошибка! Неверный шаблон сметы");
-            //    backgroundWorker.CancelAsync();
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Ошибка! Неверный шаблон сметы");
+                backgroundWorker.CancelAsync();
 
-            //    app.Quit();
-            //    eWorkbook = null;
-            //    eWorksheet = null;
-            //    pages = 0;
-            //    GC.Collect();
+                app.Quit();
+                eWorkbook = null;
+                eWorksheet = null;
+                pages = 0;
+                GC.Collect();
 
-            //    backgroundWorker.ReportProgress(1, "Сборка остановлена...");
+                backgroundWorker.ReportProgress(1, "Сборка остановлена...");
 
-            //    return false;
-            //}
+                return false;
+            }
 
 
 
@@ -1137,6 +1131,6 @@ namespace ExcelAPP
         }
 
 
-        
+
     }
 }
