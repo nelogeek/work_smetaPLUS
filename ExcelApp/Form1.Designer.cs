@@ -36,6 +36,7 @@
             this.CountPagePZNumeric = new System.Windows.Forms.NumericUpDown();
             this.TwoSidedPrintCheckBox = new System.Windows.Forms.CheckBox();
             this.backgroundWorker = new System.ComponentModel.BackgroundWorker();
+            this.SplitBookContentCheckBox = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.StartNumberNumeric)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).BeginInit();
@@ -225,11 +226,22 @@
             this.backgroundWorker.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.backgroundWorker_ProgressChanged);
             this.backgroundWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.backgroundWorker_RunWorkerCompleted);
             // 
+            // SplitBookContentCheckBox
+            // 
+            this.SplitBookContentCheckBox.AutoSize = true;
+            this.SplitBookContentCheckBox.Location = new System.Drawing.Point(21, 288);
+            this.SplitBookContentCheckBox.Name = "SplitBookContentCheckBox";
+            this.SplitBookContentCheckBox.Size = new System.Drawing.Size(176, 20);
+            this.SplitBookContentCheckBox.TabIndex = 20;
+            this.SplitBookContentCheckBox.Text = "Содержание отдельно";
+            this.SplitBookContentCheckBox.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(856, 398);
+            this.Controls.Add(this.SplitBookContentCheckBox);
             this.Controls.Add(this.TwoSidedPrintCheckBox);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.CountPagePZNumeric);
@@ -273,5 +285,6 @@
         private System.Windows.Forms.NumericUpDown CountPagePZNumeric;
         private System.Windows.Forms.CheckBox TwoSidedPrintCheckBox;
         private System.ComponentModel.BackgroundWorker backgroundWorker;
+        private System.Windows.Forms.CheckBox SplitBookContentCheckBox;
     }
 }
