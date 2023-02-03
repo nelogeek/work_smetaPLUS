@@ -11,15 +11,17 @@ namespace ExcelAPP
     {
         public string Code { get; set; }
         public string Name { get; set; }
+        public string NameDate { get; set; }
         public string Price { get; set; }
         public int PageCount { get; set; }
         public FileInfo FolderInfo { get; set; }
         public string ShortCode { get; set; }
 
-        public SmetaFile(string Code, string Name, string Price, int PageCount, FileInfo FolderInfo, string ShortCode)
+        public SmetaFile(string Code, string Name, string NameDate, string Price, int PageCount, FileInfo FolderInfo, string ShortCode)
         {
             this.Code = Code;
             this.Name = Name;
+            this.NameDate = NameDate;
             this.Price = Price;
             this.PageCount = PageCount;
             this.FolderInfo = FolderInfo;
