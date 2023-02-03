@@ -219,6 +219,8 @@
             // SplitBookContentCheckBox
             // 
             this.SplitBookContentCheckBox.AutoSize = true;
+            this.SplitBookContentCheckBox.Checked = true;
+            this.SplitBookContentCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
             this.SplitBookContentCheckBox.Location = new System.Drawing.Point(21, 288);
             this.SplitBookContentCheckBox.Name = "SplitBookContentCheckBox";
             this.SplitBookContentCheckBox.Size = new System.Drawing.Size(176, 20);
