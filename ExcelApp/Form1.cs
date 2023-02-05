@@ -10,6 +10,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Windows.Forms;
 using System.Xml.Linq;
 using Excel = Microsoft.Office.Interop.Excel;
@@ -1193,6 +1194,27 @@ namespace ExcelAPP
             objectiveFiles = null;
             localData = new List<SmetaFile>(); ;
             objectiveData = new List<SmetaFile>(); ;
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            Excel.Application app = new Excel.Application
+            {
+                DisplayAlerts = false,
+                Visible = true,
+            };
+            Excel.Workbook eWorkbook = app.Workbooks.Open($@"C:\Users\lokot\Desktop\test.xlsx");
+            Excel.Worksheet eWorksheet = (Excel.Worksheet)eWorkbook.Sheets[1];
+            eWorksheet.HPageBreaks.Add(eWorksheet.Range["A20"]);
+            Thread.Sleep(6000);
+            eWorksheet.HPageBreaks[1].Delete();
+            eWorksheet.HPageBreaks.Add(eWorksheet.Range["A30"]);
+            
+            var a = eWorksheet.HPageBreaks;
+            MessageBox.Show(a.ToString() );
+
+
+
         }
     }
 }
