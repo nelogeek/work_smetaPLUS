@@ -1,4 +1,5 @@
 using iTextSharp.text;
+using Microsoft.Office.Interop.Excel;
 using Microsoft.Office.Interop.Word;
 using PdfSharp.Pdf;
 using PdfSharp.Pdf.IO;
@@ -376,6 +377,7 @@ namespace ExcelAPP
             };
 
             Excel.Workbook eWorkbook;
+            Excel.Worksheet eWorksheet;
 
             try
             {
@@ -387,8 +389,30 @@ namespace ExcelAPP
                 {
                     string filePath = $"{_path}\\ОС\\{file.FolderInfo}";
                     eWorkbook = app.Workbooks.Open(filePath);
+                    eWorksheet = (Excel.Worksheet)eWorkbook.Sheets[1];
                     string tempPDFPath = $"{_path}\\TEMPdf\\{file.FolderInfo}";
-                    eWorkbook.Sheets[1].PageSetup.RightFooter = ""; ///Удаление нумерации станиц в Excel
+                    eWorksheet.PageSetup.RightFooter = ""; ///Удаление нумерации станиц в Excel
+
+                    //// разделение (разрыв) страниц
+                    //var lastUsedRow = eWorksheet.Cells.Find("*", System.Reflection.Missing.Value,
+                    //           System.Reflection.Missing.Value, System.Reflection.Missing.Value,
+                    //           Excel.XlSearchOrder.xlByRows, Excel.XlSearchDirection.xlPrevious,
+                    //           false, System.Reflection.Missing.Value, System.Reflection.Missing.Value).Row;
+                    //int rowsCount = 34; // кол-во строк на странице
+                    //while (((lastUsedRow) % rowsCount) < 13)
+                    //{
+                    //    rowsCount--;
+                    //    eWorksheet.HPageBreaks[1].DragOff(Excel.XlDirection.xlDown, 1);
+
+                    //    eWorksheet.HPageBreaks.Add(eWorksheet.Range[$"A34"]);
+                    //    int i = 2;
+                    //    while (rowsCount * i < lastUsedRow)
+                    //    {
+                    //        eWorksheet.HPageBreaks.Add(eWorksheet.Range[$"A{rowsCount * i}"]);
+                    //        i++;
+                    //    }
+                    //}
+
                     app.ActiveWorkbook.ExportAsFixedFormat(Excel.XlFixedFormatType.xlTypePDF, tempPDFPath);
                     eWorkbook.Close(false);
                     countCompleted++;
@@ -400,8 +424,30 @@ namespace ExcelAPP
                 {
                     string filePath = $"{_path}\\{file.FolderInfo}";
                     eWorkbook = app.Workbooks.Open(filePath);
+                    eWorksheet = (Excel.Worksheet)eWorkbook.Sheets[1];
                     string tempPDFPath = $"{_path}\\TEMPdf\\{file.FolderInfo}";
-                    eWorkbook.Sheets[1].PageSetup.RightFooter = ""; ///Удаление нумерации станиц в Excel
+                    eWorksheet.PageSetup.RightFooter = ""; ///Удаление нумерации стpаниц в Excel
+
+                    //// разделение (разрыв) страниц
+                    //var lastUsedRow = eWorksheet.Cells.Find("*", System.Reflection.Missing.Value,
+                    //           System.Reflection.Missing.Value, System.Reflection.Missing.Value,
+                    //           Excel.XlSearchOrder.xlByRows, Excel.XlSearchDirection.xlPrevious,
+                    //           false, System.Reflection.Missing.Value, System.Reflection.Missing.Value).Row;
+                    //int rowsCount = 30; // кол-во строк на странице
+                    //while (((lastUsedRow) % rowsCount) < 13)
+                    //{
+                    //    rowsCount--;
+                    //    eWorksheet.HPageBreaks[1].DragOff(Excel.XlDirection.xlDown, 1);
+
+                    //    eWorksheet.HPageBreaks.Add(eWorksheet.Range[$"A34"]);
+                    //    int i = 2;
+                    //    while (rowsCount * i < lastUsedRow)
+                    //    {
+                    //        eWorksheet.HPageBreaks.Add(eWorksheet.Range[$"A{rowsCount * i}"]);
+                    //        i++;
+                    //    }
+                    //}
+
                     app.ActiveWorkbook.ExportAsFixedFormat(Excel.XlFixedFormatType.xlTypePDF, tempPDFPath);
                     eWorkbook.Close(false);
                     countCompleted++;
@@ -409,6 +455,7 @@ namespace ExcelAPP
                 }
                 app.Quit();
                 eWorkbook = null;
+                eWorksheet = null;
                 GC.Collect();
                 return true;
             }
@@ -1196,22 +1243,47 @@ namespace ExcelAPP
             objectiveData = new List<SmetaFile>(); ;
         }
 
+        
+
         private void button1_Click(object sender, EventArgs e)
         {
+            
+
             Excel.Application app = new Excel.Application
             {
                 DisplayAlerts = false,
-                Visible = true,
+                Visible = true
             };
-            Excel.Workbook eWorkbook = app.Workbooks.Open($@"C:\Users\lokot\Desktop\test.xlsx");
-            Excel.Worksheet eWorksheet = (Excel.Worksheet)eWorkbook.Sheets[1];
-            eWorksheet.HPageBreaks.Add(eWorksheet.Range["A20"]);
-            Thread.Sleep(6000);
-            eWorksheet.HPageBreaks[1].Delete();
-            eWorksheet.HPageBreaks.Add(eWorksheet.Range["A30"]);
-            
-            var a = eWorksheet.HPageBreaks;
-            MessageBox.Show(a.ToString() );
+
+            Excel.Workbook eWorkbook;
+            Excel.Worksheet eWorksheet;
+
+            eWorkbook = app.Workbooks.Open($@"C:\Users\lokot\Desktop\test3.xlsx");
+            eWorksheet = (Excel.Worksheet)eWorkbook.Sheets[1];
+
+            // разделение (разрыв) страниц
+            var lastUsedRow = eWorksheet.Cells.Find("*", System.Reflection.Missing.Value,
+                       System.Reflection.Missing.Value, System.Reflection.Missing.Value,
+                       Excel.XlSearchOrder.xlByRows, Excel.XlSearchDirection.xlPrevious,
+                       false, System.Reflection.Missing.Value, System.Reflection.Missing.Value).Row;
+            int rowsCount = 30; // кол-во строк на странице
+            while (((lastUsedRow) % rowsCount) < 13)
+            {
+                rowsCount--;
+                eWorksheet.HPageBreaks[1].DragOff(Excel.XlDirection.xlDown, 1);
+
+                eWorksheet.HPageBreaks.Add(eWorksheet.Range[$"A34"]);
+                int i = 2;
+                while (rowsCount * i < lastUsedRow)
+                {
+                    eWorksheet.HPageBreaks.Add(eWorksheet.Range[$"A{rowsCount * i}"]);
+                    i++;
+                }
+            }
+
+
+
+
 
 
 
