@@ -31,7 +31,7 @@
             this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
-            this.numericUpDown2 = new System.Windows.Forms.NumericUpDown();
+            this.afterTitleNumeric = new System.Windows.Forms.NumericUpDown();
             this.label4 = new System.Windows.Forms.Label();
             this.CountPagePZNumeric = new System.Windows.Forms.NumericUpDown();
             this.TwoSidedPrintCheckBox = new System.Windows.Forms.CheckBox();
@@ -40,7 +40,7 @@
             this.infoTextBox = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.StartNumberNumeric)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.afterTitleNumeric)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.CountPagePZNumeric)).BeginInit();
             this.SuspendLayout();
             // 
@@ -151,20 +151,20 @@
             this.label3.TabIndex = 15;
             this.label3.Text = "Стр. после содержания";
             // 
-            // numericUpDown2
+            // afterTitleNumeric
             // 
-            this.numericUpDown2.Enabled = false;
-            this.numericUpDown2.Location = new System.Drawing.Point(201, 151);
-            this.numericUpDown2.Margin = new System.Windows.Forms.Padding(4, 4, 13, 12);
-            this.numericUpDown2.Maximum = new decimal(new int[] {
+            this.afterTitleNumeric.Enabled = false;
+            this.afterTitleNumeric.Location = new System.Drawing.Point(201, 151);
+            this.afterTitleNumeric.Margin = new System.Windows.Forms.Padding(4, 4, 13, 12);
+            this.afterTitleNumeric.Maximum = new decimal(new int[] {
             999999999,
             0,
             0,
             0});
-            this.numericUpDown2.Name = "numericUpDown2";
-            this.numericUpDown2.Size = new System.Drawing.Size(76, 22);
-            this.numericUpDown2.TabIndex = 14;
-            this.numericUpDown2.Value = new decimal(new int[] {
+            this.afterTitleNumeric.Name = "afterTitleNumeric";
+            this.afterTitleNumeric.Size = new System.Drawing.Size(76, 22);
+            this.afterTitleNumeric.TabIndex = 14;
+            this.afterTitleNumeric.Value = new decimal(new int[] {
             1,
             0,
             0,
@@ -251,7 +251,7 @@
             this.Controls.Add(this.label4);
             this.Controls.Add(this.CountPagePZNumeric);
             this.Controls.Add(this.label3);
-            this.Controls.Add(this.numericUpDown2);
+            this.Controls.Add(this.afterTitleNumeric);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.numericUpDown1);
             this.Controls.Add(this.label1);
@@ -267,7 +267,7 @@
             this.Text = "Smeta++";
             ((System.ComponentModel.ISupportInitialize)(this.StartNumberNumeric)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.afterTitleNumeric)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.CountPagePZNumeric)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -285,7 +285,7 @@
         private System.Windows.Forms.NumericUpDown numericUpDown1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.NumericUpDown numericUpDown2;
+        private System.Windows.Forms.NumericUpDown afterTitleNumeric;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.NumericUpDown CountPagePZNumeric;
         private System.Windows.Forms.CheckBox TwoSidedPrintCheckBox;

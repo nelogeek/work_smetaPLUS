@@ -231,7 +231,7 @@ namespace ExcelAPP
         {
             this.StartNumberNumeric.Enabled = false;
             this.numericUpDown1.Enabled = false;
-            this.numericUpDown2.Enabled = false;
+            this.afterTitleNumeric.Enabled = false;
             this.CountPagePZNumeric.Enabled = false;
             this.btnBuild.Enabled = false;
             this.btnSelectFolder.Enabled = false;
@@ -242,7 +242,7 @@ namespace ExcelAPP
         {
             this.StartNumberNumeric.Enabled = true;
             this.numericUpDown1.Enabled = true;
-            this.numericUpDown2.Enabled = true;
+            this.afterTitleNumeric.Enabled = true;
             this.CountPagePZNumeric.Enabled = true;
             this.btnBuild.Enabled = true;
             this.btnSelectFolder.Enabled = true;
