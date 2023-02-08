@@ -649,6 +649,7 @@ namespace ExcelAPP
                     iTextSharp.text.pdf.PdfReader readerOnlyTitle = new iTextSharp.text.pdf.PdfReader(bytesTitle);
                     int titlePages = readerOnlyTitle.NumberOfPages;
                     int pages = reader.NumberOfPages;
+                    int afterTitleNumericPages = Convert.ToInt32(afterTitleNumeric.Value);
 
                     using (iTextSharp.text.pdf.PdfStamper stamper = new iTextSharp.text.pdf.PdfStamper(reader, stream))
                     {
@@ -662,12 +663,12 @@ namespace ExcelAPP
                             {
                                 if (flag)
                                 {
-                                    iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + startPageNumber + pagesPzCount + titlePages).ToString(), blackFont), 810f, 575f, 0);
+                                    iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + afterTitleNumericPages + startPageNumber + pagesPzCount + titlePages).ToString(), blackFont), 810f, 575f, 0);
                                     flag = false;
                                 }
                                 else
                                 {
-                                    iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + startPageNumber + pagesPzCount + titlePages).ToString(), blackFont), 810f, 15f, 0);
+                                    iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + afterTitleNumericPages + pagesPzCount + titlePages).ToString(), blackFont), 810f, 15f, 0);
                                     flag = true;
                                 }
                             }
@@ -676,7 +677,7 @@ namespace ExcelAPP
                         {
                             for (int i = 1; i <= pages; i++)
                             {
-                                iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + startPageNumber + pagesPzCount + titlePages).ToString(), blackFont), 810f, 15f, 0);
+                                iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + afterTitleNumericPages + startPageNumber + pagesPzCount + titlePages).ToString(), blackFont), 810f, 15f, 0);
                             }
                         }
                     }
@@ -712,6 +713,7 @@ namespace ExcelAPP
                     iTextSharp.text.pdf.PdfReader readerOnlyTitle = new iTextSharp.text.pdf.PdfReader(bytesTitle);
                     int titlePages = readerOnlyTitle.NumberOfPages;
                     int pages = reader.NumberOfPages;
+                    int afterTitleNumericPages = Convert.ToInt32(afterTitleNumeric.Value);
 
                     using (iTextSharp.text.pdf.PdfStamper stamper = new iTextSharp.text.pdf.PdfStamper(reader, stream))
                     {
@@ -730,12 +732,12 @@ namespace ExcelAPP
                             {
                                 if (flag)
                                 {
-                                    iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + startPageNumber + pagesPzCount).ToString(), blackFont), 810f, 15f, 0);
+                                    iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + afterTitleNumericPages + startPageNumber + pagesPzCount).ToString(), blackFont), 810f, 15f, 0);
                                     flag = false;
                                 }
                                 else
                                 {
-                                    iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + startPageNumber + pagesPzCount).ToString(), blackFont), 810f, 575f, 0);
+                                    iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + afterTitleNumericPages + startPageNumber + pagesPzCount).ToString(), blackFont), 810f, 575f, 0);
                                     flag = true;
                                 }
                             }
@@ -749,7 +751,7 @@ namespace ExcelAPP
                             }
                             for (int i = titlePages + 1; i <= pages; i++)
                             {
-                                iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + startPageNumber + pagesPzCount).ToString(), blackFont), 810f, 15f, 0);
+                                iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + afterTitleNumericPages + startPageNumber + pagesPzCount).ToString(), blackFont), 810f, 15f, 0);
                             }
                         }
                     }
