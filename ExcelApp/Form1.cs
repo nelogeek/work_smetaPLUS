@@ -256,7 +256,8 @@ namespace ExcelAPP
             Excel.Application app = new Excel.Application
             {
                 DisplayAlerts = false,
-                Visible = false
+                Visible = false,
+                ScreenUpdating = false
             };
 
             Excel.Workbook eWorkbook;
@@ -428,7 +429,10 @@ namespace ExcelAPP
 
             Excel.Application app = new Excel.Application
             {
-                DisplayAlerts = false
+                DisplayAlerts = false,
+                Visible = false,
+                ScreenUpdating = false
+
             };
 
             Excel.Workbook eWorkbook;
@@ -775,8 +779,11 @@ namespace ExcelAPP
 
             Word.Application app = new Word.Application
             {
-                Visible = false
+                
+                Visible = false,
+                ScreenUpdating = false
             };
+            
 
             try
             {
@@ -985,7 +992,7 @@ namespace ExcelAPP
 
                     int pagesInTitle = wDocument.ComputeStatistics(WdStatistic.wdStatisticPages, false);
                     //MessageBox.Show(pagesInTitle.ToString());
-                    int countPages = (int)StartNumberNumeric.Value + (int)CountPagePZNumeric.Value + pagesInTitle - 1;
+                    int countPages = (int)StartNumberNumeric.Value + (int)afterTitleNumeric.Value + (int)CountPagePZNumeric.Value + pagesInTitle - 1;
 
                     row = 3;
 
@@ -1169,7 +1176,7 @@ namespace ExcelAPP
 
                     int pagesInTitle = wDocument.ComputeStatistics(WdStatistic.wdStatisticPages, false);
                     //MessageBox.Show(pagesInTitle.ToString());
-                    int countPages = (int)StartNumberNumeric.Value + (int)CountPagePZNumeric.Value + pagesInTitle - 1;
+                    int countPages = (int)StartNumberNumeric.Value + (int)afterTitleNumeric.Value + (int)CountPagePZNumeric.Value + pagesInTitle - 1;
 
                     row = 3;
 

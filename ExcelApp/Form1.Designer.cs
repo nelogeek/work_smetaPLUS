@@ -153,7 +153,6 @@
             // 
             // afterTitleNumeric
             // 
-            this.afterTitleNumeric.Enabled = false;
             this.afterTitleNumeric.Location = new System.Drawing.Point(201, 151);
             this.afterTitleNumeric.Margin = new System.Windows.Forms.Padding(4, 4, 13, 12);
             this.afterTitleNumeric.Maximum = new decimal(new int[] {
