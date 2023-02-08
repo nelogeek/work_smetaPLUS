@@ -71,9 +71,10 @@ namespace ExcelAPP
                         MatchCollection match = regex.Matches(fileName);
                         string fileNameStr = match[0].ToString();
                         string[] fileType = fileNameStr.Split('.');
-                        if (fileType[fileType.Length - 1] != "xlsx")
+                        if (fileType[fileType.Length - 1] != "xlsx" && fileType[fileType.Length - 1] != "xls") 
                         {
                             MessageBox.Show($"В папке находится недопустимый файл");
+                            return;
                         }
                     }
                     dir = Directory.GetDirectories(_path);
@@ -254,7 +255,8 @@ namespace ExcelAPP
 
             Excel.Application app = new Excel.Application
             {
-                DisplayAlerts = false
+                DisplayAlerts = false,
+                Visible = false
             };
 
             Excel.Workbook eWorkbook;
@@ -281,6 +283,31 @@ namespace ExcelAPP
                     string date = eWorksheet.Range["B20"].Value.ToString().Split(new string[] { " цен " }, StringSplitOptions.None)[1];
                     nameDate += $"\n(в ценах на {date})";
 
+                    
+
+                    // разделение (разрыв) страниц
+                    var lastUsedRow = eWorksheet.Cells.Find("*", System.Reflection.Missing.Value,
+                               System.Reflection.Missing.Value, System.Reflection.Missing.Value,
+                               Excel.XlSearchOrder.xlByRows, Excel.XlSearchDirection.xlPrevious,
+                               false, System.Reflection.Missing.Value, System.Reflection.Missing.Value).Row;
+                    int rowsCount = 34; // кол-во строк на странице
+                    while (((lastUsedRow) % rowsCount) < 13)
+                    {
+                        rowsCount--;
+                        
+                        eWorksheet.ResetAllPageBreaks();
+
+                        eWorksheet.HPageBreaks.Add(eWorksheet.Range[$"A34"]);
+                        int ind = 2;
+                        while (rowsCount * ind < lastUsedRow)
+                        {
+                            eWorksheet.HPageBreaks.Add(eWorksheet.Range[$"A{rowsCount * ind}"]);
+                            ind++;
+                        }
+                        
+                    }
+
+
                     objectiveData.Add(new SmetaFile(
                         match[0].ToString(), // код сметы
                         eWorksheet.Range["B7"].Value.ToString(),
@@ -292,14 +319,14 @@ namespace ExcelAPP
                         match[0].ToString().Substring(3)));
                     nameDate = null;
                     date = null;
-                    eWorkbook.Close(false);
+                    eWorkbook.Close(SaveChanges:Word.WdSaveOptions.wdSaveChanges);
                     //documentNumber++;
 
                 }
 
-                for (int i = 0; i < localFiles.Length; i++) // шаблон для локальных смет
+                for (int j = 0; j < localFiles.Length; j++) // шаблон для локальных смет
                 {
-                    string filePath = $"{rootFolder}\\{localFiles[i]}";
+                    string filePath = $"{rootFolder}\\{localFiles[j]}";
                     eWorkbook = app.Workbooks.Open($@"{filePath}");
                     eWorksheet = (Excel.Worksheet)eWorkbook.Sheets[1];
 
@@ -318,6 +345,31 @@ namespace ExcelAPP
                     string date = eWorksheet.Range["D26"].Value.ToString();
                     nameDate += $"\n(в ценах на {date})";
 
+                    
+
+                    // разделение (разрыв) страниц
+                    var lastUsedRow = eWorksheet.Cells.Find("*", System.Reflection.Missing.Value,
+                               System.Reflection.Missing.Value, System.Reflection.Missing.Value,
+                               Excel.XlSearchOrder.xlByRows, Excel.XlSearchDirection.xlPrevious,
+                               false, System.Reflection.Missing.Value, System.Reflection.Missing.Value).Row;
+                    int rowsCount = 30; // кол-во строк на странице
+                    while (((lastUsedRow) % rowsCount) < 13)
+                    {
+                        rowsCount--;
+                        
+                        eWorksheet.ResetAllPageBreaks();
+
+                        eWorksheet.HPageBreaks.Add(eWorksheet.Range[$"A34"]);
+                        int i = 2;
+                        while (rowsCount * i < lastUsedRow)
+                        {
+                            eWorksheet.HPageBreaks.Add(eWorksheet.Range[$"A{rowsCount * i}"]);
+                            i++;
+                        }
+                        
+                    }
+                    //-----------
+
 
                     localData.Add(new SmetaFile(
                         match[0].ToString(), // код сметы
@@ -325,11 +377,11 @@ namespace ExcelAPP
                     nameDate, // Наименование c датой
                         money, // Сумма денег
                         eWorkbook.Sheets[1].PageSetup.Pages.Count, // кол-во страниц на листе
-                        localFiles[i],
+                        localFiles[j],
                         match[0].ToString().Substring(3)));
                     nameDate = null;
                     date = null;
-                    eWorkbook.Close(false);
+                    eWorkbook.Close(SaveChanges: Word.WdSaveOptions.wdSaveChanges);
                     //documentNumber++;
                 }
 
@@ -351,8 +403,11 @@ namespace ExcelAPP
             {
                 MessageBox.Show("Ошибка! Неверный шаблон сметы");
                 MessageBox.Show(ex.Message.ToString());
+                Console.WriteLine(ex.StackTrace);
+                Console.WriteLine(ex.Message.ToString());
                 backgroundWorker.CancelAsync();
-
+                DeleteTempFiles();
+                DeleteTempVar();
                 app.Quit();
                 eWorkbook = null;
                 eWorksheet = null;
@@ -393,25 +448,7 @@ namespace ExcelAPP
                     string tempPDFPath = $"{_path}\\TEMPdf\\{file.FolderInfo}";
                     eWorksheet.PageSetup.RightFooter = ""; ///Удаление нумерации станиц в Excel
 
-                    //// разделение (разрыв) страниц
-                    //var lastUsedRow = eWorksheet.Cells.Find("*", System.Reflection.Missing.Value,
-                    //           System.Reflection.Missing.Value, System.Reflection.Missing.Value,
-                    //           Excel.XlSearchOrder.xlByRows, Excel.XlSearchDirection.xlPrevious,
-                    //           false, System.Reflection.Missing.Value, System.Reflection.Missing.Value).Row;
-                    //int rowsCount = 34; // кол-во строк на странице
-                    //while (((lastUsedRow) % rowsCount) < 13)
-                    //{
-                    //    rowsCount--;
-                    //    eWorksheet.HPageBreaks[1].DragOff(Excel.XlDirection.xlDown, 1);
-
-                    //    eWorksheet.HPageBreaks.Add(eWorksheet.Range[$"A34"]);
-                    //    int i = 2;
-                    //    while (rowsCount * i < lastUsedRow)
-                    //    {
-                    //        eWorksheet.HPageBreaks.Add(eWorksheet.Range[$"A{rowsCount * i}"]);
-                    //        i++;
-                    //    }
-                    //}
+                    
 
                     app.ActiveWorkbook.ExportAsFixedFormat(Excel.XlFixedFormatType.xlTypePDF, tempPDFPath);
                     eWorkbook.Close(false);
@@ -423,31 +460,13 @@ namespace ExcelAPP
                 foreach (var file in localData)
                 {
                     string filePath = $"{_path}\\{file.FolderInfo}";
+                    string tempPDFPath = $"{_path}\\TEMPdf\\{file.FolderInfo}";
                     eWorkbook = app.Workbooks.Open(filePath);
                     eWorksheet = (Excel.Worksheet)eWorkbook.Sheets[1];
-                    string tempPDFPath = $"{_path}\\TEMPdf\\{file.FolderInfo}";
+                    
+                    
+
                     eWorksheet.PageSetup.RightFooter = ""; ///Удаление нумерации стpаниц в Excel
-
-                    //// разделение (разрыв) страниц
-                    //var lastUsedRow = eWorksheet.Cells.Find("*", System.Reflection.Missing.Value,
-                    //           System.Reflection.Missing.Value, System.Reflection.Missing.Value,
-                    //           Excel.XlSearchOrder.xlByRows, Excel.XlSearchDirection.xlPrevious,
-                    //           false, System.Reflection.Missing.Value, System.Reflection.Missing.Value).Row;
-                    //int rowsCount = 30; // кол-во строк на странице
-                    //while (((lastUsedRow) % rowsCount) < 13)
-                    //{
-                    //    rowsCount--;
-                    //    eWorksheet.HPageBreaks[1].DragOff(Excel.XlDirection.xlDown, 1);
-
-                    //    eWorksheet.HPageBreaks.Add(eWorksheet.Range[$"A34"]);
-                    //    int i = 2;
-                    //    while (rowsCount * i < lastUsedRow)
-                    //    {
-                    //        eWorksheet.HPageBreaks.Add(eWorksheet.Range[$"A{rowsCount * i}"]);
-                    //        i++;
-                    //    }
-                    //}
-
                     app.ActiveWorkbook.ExportAsFixedFormat(Excel.XlFixedFormatType.xlTypePDF, tempPDFPath);
                     eWorkbook.Close(false);
                     countCompleted++;
@@ -464,6 +483,8 @@ namespace ExcelAPP
                 MessageBox.Show("Ошибка конвертации в pdf");
                 MessageBox.Show(ex.Message.ToString());
                 backgroundWorker.CancelAsync();
+                DeleteTempFiles();
+                DeleteTempVar();
 
                 app.Quit();
                 eWorkbook = null;
@@ -560,7 +581,8 @@ namespace ExcelAPP
             {
                 MessageBox.Show("Ошибка сборки книги");
                 backgroundWorker.CancelAsync();
-
+                DeleteTempFiles();
+                DeleteTempVar();
                 backgroundWorker.ReportProgress(1, "Сборка остановлена...");
 
                 return false;
@@ -600,7 +622,8 @@ namespace ExcelAPP
             catch (Exception)
             {
                 MessageBox.Show("Ошибка нумерации содержания");
-
+                DeleteTempFiles();
+                DeleteTempVar();
                 backgroundWorker.ReportProgress(1, "Сборка остановлена...");
 
                 backgroundWorker.CancelAsync();
@@ -662,7 +685,8 @@ namespace ExcelAPP
             catch (Exception)
             {
                 MessageBox.Show("Ошибка нумерации смет");
-
+                DeleteTempFiles();
+                DeleteTempVar();
                 backgroundWorker.ReportProgress(1, "Сборка остановлена...");
 
                 backgroundWorker.CancelAsync();
@@ -733,6 +757,8 @@ namespace ExcelAPP
             }
             catch (Exception)
             {
+                DeleteTempFiles();
+                DeleteTempVar();
                 MessageBox.Show("Ошибка нумерации книги");
                 backgroundWorker.ReportProgress(1, "Сборка остановлена...");
                 backgroundWorker.CancelAsync();
@@ -1174,6 +1200,8 @@ namespace ExcelAPP
             }
             catch (Exception)
             {
+                DeleteTempFiles();
+                DeleteTempVar();
                 MessageBox.Show("Ошибка генерации содержания");
                 backgroundWorker.CancelAsync();
                 backgroundWorker.ReportProgress(1, "Сборка остановлена...");
@@ -1212,6 +1240,8 @@ namespace ExcelAPP
             }
             catch (Exception)
             {
+                DeleteTempFiles();
+                DeleteTempVar();
                 MessageBox.Show("Ошибка перемещения файлов на рабочий стол");
                 backgroundWorker.CancelAsync();
                 backgroundWorker.ReportProgress(1, "Сборка остановлена...");
@@ -1232,6 +1262,7 @@ namespace ExcelAPP
 
         protected void DeleteTempVar()
         {
+            
             _path = null;
             dir = null;
             pdfFolder = null;
