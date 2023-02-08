@@ -1274,50 +1274,5 @@ namespace ExcelAPP
             objectiveData = new List<SmetaFile>(); ;
         }
 
-        
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            
-
-            Excel.Application app = new Excel.Application
-            {
-                DisplayAlerts = false,
-                Visible = true
-            };
-
-            Excel.Workbook eWorkbook;
-            Excel.Worksheet eWorksheet;
-
-            eWorkbook = app.Workbooks.Open($@"C:\Users\lokot\Desktop\test3.xlsx");
-            eWorksheet = (Excel.Worksheet)eWorkbook.Sheets[1];
-
-            // разделение (разрыв) страниц
-            var lastUsedRow = eWorksheet.Cells.Find("*", System.Reflection.Missing.Value,
-                       System.Reflection.Missing.Value, System.Reflection.Missing.Value,
-                       Excel.XlSearchOrder.xlByRows, Excel.XlSearchDirection.xlPrevious,
-                       false, System.Reflection.Missing.Value, System.Reflection.Missing.Value).Row;
-            int rowsCount = 30; // кол-во строк на странице
-            while (((lastUsedRow) % rowsCount) < 13)
-            {
-                rowsCount--;
-                eWorksheet.HPageBreaks[1].DragOff(Excel.XlDirection.xlDown, 1);
-
-                eWorksheet.HPageBreaks.Add(eWorksheet.Range[$"A34"]);
-                int i = 2;
-                while (rowsCount * i < lastUsedRow)
-                {
-                    eWorksheet.HPageBreaks.Add(eWorksheet.Range[$"A{rowsCount * i}"]);
-                    i++;
-                }
-            }
-
-
-
-
-
-
-
-        }
     }
 }
