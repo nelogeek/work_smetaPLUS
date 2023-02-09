@@ -28,7 +28,7 @@
             this.btnBuild = new System.Windows.Forms.Button();
             this.StartNumberNumeric = new System.Windows.Forms.NumericUpDown();
             this.label1 = new System.Windows.Forms.Label();
-            this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
+            this.numberPagesInBook = new System.Windows.Forms.NumericUpDown();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.afterTitleNumeric = new System.Windows.Forms.NumericUpDown();
@@ -39,7 +39,7 @@
             this.SplitBookContentCheckBox = new System.Windows.Forms.CheckBox();
             this.infoTextBox = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.StartNumberNumeric)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numberPagesInBook)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.afterTitleNumeric)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.CountPagePZNumeric)).BeginInit();
             this.SuspendLayout();
@@ -97,7 +97,7 @@
             this.StartNumberNumeric.Size = new System.Drawing.Size(76, 22);
             this.StartNumberNumeric.TabIndex = 10;
             this.StartNumberNumeric.Value = new decimal(new int[] {
-            3,
+            1,
             0,
             0,
             0});
@@ -112,21 +112,20 @@
             this.label1.TabIndex = 11;
             this.label1.Text = "Номер первой страницы";
             // 
-            // numericUpDown1
+            // numberPagesInBook
             // 
-            this.numericUpDown1.Enabled = false;
-            this.numericUpDown1.Location = new System.Drawing.Point(201, 111);
-            this.numericUpDown1.Margin = new System.Windows.Forms.Padding(4, 4, 13, 12);
-            this.numericUpDown1.Maximum = new decimal(new int[] {
+            this.numberPagesInBook.Location = new System.Drawing.Point(201, 111);
+            this.numberPagesInBook.Margin = new System.Windows.Forms.Padding(4, 4, 13, 12);
+            this.numberPagesInBook.Maximum = new decimal(new int[] {
             999999999,
             0,
             0,
             0});
-            this.numericUpDown1.Name = "numericUpDown1";
-            this.numericUpDown1.Size = new System.Drawing.Size(76, 22);
-            this.numericUpDown1.TabIndex = 12;
-            this.numericUpDown1.Value = new decimal(new int[] {
-            1,
+            this.numberPagesInBook.Name = "numberPagesInBook";
+            this.numberPagesInBook.Size = new System.Drawing.Size(76, 22);
+            this.numberPagesInBook.TabIndex = 12;
+            this.numberPagesInBook.Value = new decimal(new int[] {
+            500,
             0,
             0,
             0});
@@ -163,11 +162,6 @@
             this.afterTitleNumeric.Name = "afterTitleNumeric";
             this.afterTitleNumeric.Size = new System.Drawing.Size(76, 22);
             this.afterTitleNumeric.TabIndex = 14;
-            this.afterTitleNumeric.Value = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
             // 
             // label4
             // 
@@ -191,11 +185,6 @@
             this.CountPagePZNumeric.Name = "CountPagePZNumeric";
             this.CountPagePZNumeric.Size = new System.Drawing.Size(76, 22);
             this.CountPagePZNumeric.TabIndex = 16;
-            this.CountPagePZNumeric.Value = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
             // 
             // TwoSidedPrintCheckBox
             // 
@@ -252,7 +241,7 @@
             this.Controls.Add(this.label3);
             this.Controls.Add(this.afterTitleNumeric);
             this.Controls.Add(this.label2);
-            this.Controls.Add(this.numericUpDown1);
+            this.Controls.Add(this.numberPagesInBook);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.StartNumberNumeric);
             this.Controls.Add(this.labelCompleted);
@@ -264,8 +253,9 @@
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Smeta++";
+            this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.StartNumberNumeric)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numberPagesInBook)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.afterTitleNumeric)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.CountPagePZNumeric)).EndInit();
             this.ResumeLayout(false);
@@ -281,7 +271,7 @@
         private System.Windows.Forms.Label labelCompleted;
         private System.Windows.Forms.NumericUpDown StartNumberNumeric;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.NumericUpDown numericUpDown1;
+        private System.Windows.Forms.NumericUpDown numberPagesInBook;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.NumericUpDown afterTitleNumeric;

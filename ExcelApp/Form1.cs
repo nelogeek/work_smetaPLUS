@@ -51,6 +51,7 @@ namespace ExcelAPP
         private void BtnSelectFolder_Click(object sender, EventArgs e)
         {
             FolderBrowserDialog fbd = new FolderBrowserDialog();
+            int numberPagesInBooks = 0;
 
             if (fbd.ShowDialog() == DialogResult.OK)
             {
@@ -84,15 +85,49 @@ namespace ExcelAPP
                         labelNameFolder.Text = "Добавьте папку с объектными сметами\"ОС\"";
                         return;
                     }
-
                     else
                     {
                         labelNameFolder.Text = _path;
 
                         childFolder = new DirectoryInfo(dir[0]);
                         objectiveFiles = childFolder.GetFiles(".", SearchOption.TopDirectoryOnly);
-                        infoTextBox.Text = "";
-                        infoTextBox.AppendText($"Кол-во всех файлов: {localFiles.Length + objectiveFiles.Length}\n" + Environment.NewLine +
+                        
+                        //Подсчет общего количества страниц
+                        Excel.Application app = new Excel.Application {DisplayAlerts = false, Visible = false, ScreenUpdating = false };
+                        Excel.Workbook eWorkbook;
+                        try
+                        {
+                            infoTextBox.Text = "Идет подсчет страниц...";
+                            for (int i = 0; i < objectiveFiles.Length; i++)
+                            {
+                                eWorkbook = app.Workbooks.Open($"{childFolder}\\{objectiveFiles[i]}");
+                                numberPagesInBooks += eWorkbook.Sheets[1].PageSetup.Pages.Count;
+                                eWorkbook.Close();
+                            }
+                            for (int j = 0; j < localFiles.Length; j++)
+                            {
+                                eWorkbook = app.Workbooks.Open($"{rootFolder}\\{localFiles[j]}");
+                                numberPagesInBooks += eWorkbook.Sheets[1].PageSetup.Pages.Count;
+                                eWorkbook.Close();
+                            }
+                            app.Quit();
+                            eWorkbook = null;
+                            GC.Collect();
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show("Ошибка!");
+                            Console.WriteLine(ex.StackTrace);
+                            Console.WriteLine(ex.Message.ToString());
+                            DeleteTempFiles();
+                            DeleteTempVar();
+                            app.Quit();
+                            eWorkbook = null;
+                            GC.Collect();
+                        }
+
+                        infoTextBox.AppendText($"Общее количество страниц: {numberPagesInBooks}" + Environment.NewLine + 
+                            $"Кол-во всех файлов: {localFiles.Length + objectiveFiles.Length}\n" + Environment.NewLine +
                             $"Кол-во папок: {dir.Length}" + Environment.NewLine +
                             $"Кол-во объектных файлов: {objectiveFiles.Length}\n" + Environment.NewLine +
                             $"Кол-во локальных файлов: {localFiles.Length}\n" + Environment.NewLine);
@@ -106,8 +141,6 @@ namespace ExcelAPP
 
                         Directory.GetFiles(_path, ".", SearchOption.TopDirectoryOnly).ToList()
                             .ForEach(f => infoTextBox.AppendText($"\n- {Path.GetFileName(f)}" + Environment.NewLine));
-
-
                     }
                     pdfFolder = new DirectoryInfo($"{_path}\\TEMPdf");
                 }
@@ -209,13 +242,6 @@ namespace ExcelAPP
                     string Time = $"Время сборки: {elapsedTime}";
                     backgroundWorker.ReportProgress(1, Time);
                 }
-
-
-
-
-
-
-
             }
             else
             {
@@ -223,14 +249,12 @@ namespace ExcelAPP
                 backgroundWorker.ReportProgress(1, "Сборка остановлена...");
                 return;
             }
-
-
         }
 
         protected void DisableButton()
         {
             this.StartNumberNumeric.Enabled = false;
-            this.numericUpDown1.Enabled = false;
+            this.numberPagesInBook.Enabled = false;
             this.afterTitleNumeric.Enabled = false;
             this.CountPagePZNumeric.Enabled = false;
             this.btnBuild.Enabled = false;
@@ -241,13 +265,16 @@ namespace ExcelAPP
         protected void EnabledButton()
         {
             this.StartNumberNumeric.Enabled = true;
-            this.numericUpDown1.Enabled = true;
+            this.numberPagesInBook.Enabled = true;
             this.afterTitleNumeric.Enabled = true;
             this.CountPagePZNumeric.Enabled = true;
             this.btnBuild.Enabled = true;
             this.btnSelectFolder.Enabled = true;
             this.TwoSidedPrintCheckBox.Enabled = true;
             this.SplitBookContentCheckBox.Enabled = true;
+        }
+
+        protected void PageCounterFunc() {
         }
 
         private bool ExcelParser()
@@ -668,7 +695,7 @@ namespace ExcelAPP
                                 }
                                 else
                                 {
-                                    iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + afterTitleNumericPages + pagesPzCount + titlePages).ToString(), blackFont), 810f, 15f, 0);
+                                    iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + afterTitleNumericPages + startPageNumber + pagesPzCount + titlePages).ToString(), blackFont), 810f, 15f, 0);
                                     flag = true;
                                 }
                             }
@@ -1283,5 +1310,9 @@ namespace ExcelAPP
             objectiveData = new List<SmetaFile>(); ;
         }
 
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 }
