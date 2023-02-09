@@ -1,4 +1,5 @@
 using iTextSharp.text;
+using Microsoft.Office.Interop.Excel;
 using Microsoft.Office.Interop.Word;
 using PdfSharp.Pdf;
 using PdfSharp.Pdf.IO;
@@ -10,6 +11,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Windows.Forms;
 using System.Xml.Linq;
 using Excel = Microsoft.Office.Interop.Excel;
@@ -69,9 +71,10 @@ namespace ExcelAPP
                         MatchCollection match = regex.Matches(fileName);
                         string fileNameStr = match[0].ToString();
                         string[] fileType = fileNameStr.Split('.');
-                        if (fileType[fileType.Length - 1] != "xlsx")
+                        if (fileType[fileType.Length - 1] != "xlsx" && fileType[fileType.Length - 1] != "xls")
                         {
                             MessageBox.Show($"В папке находится недопустимый файл");
+                            return;
                         }
                     }
                     dir = Directory.GetDirectories(_path);
@@ -227,8 +230,8 @@ namespace ExcelAPP
         protected void DisableButton()
         {
             this.StartNumberNumeric.Enabled = false;
-            this.numericUpDown1.Enabled = false;
-            this.numericUpDown2.Enabled = false;
+            //this.numericUpDown1.Enabled = false;
+            this.afterTitleNumeric.Enabled = false;
             this.CountPagePZNumeric.Enabled = false;
             this.btnBuild.Enabled = false;
             this.btnSelectFolder.Enabled = false;
@@ -238,8 +241,8 @@ namespace ExcelAPP
         protected void EnabledButton()
         {
             this.StartNumberNumeric.Enabled = true;
-            this.numericUpDown1.Enabled = true;
-            this.numericUpDown2.Enabled = true;
+            //this.numericUpDown1.Enabled = true;
+            this.afterTitleNumeric.Enabled = true;
             this.CountPagePZNumeric.Enabled = true;
             this.btnBuild.Enabled = true;
             this.btnSelectFolder.Enabled = true;
@@ -252,7 +255,9 @@ namespace ExcelAPP
 
             Excel.Application app = new Excel.Application
             {
-                DisplayAlerts = false
+                DisplayAlerts = false,
+                Visible = false,
+                ScreenUpdating = false
             };
 
             Excel.Workbook eWorkbook;
@@ -267,45 +272,79 @@ namespace ExcelAPP
                     eWorkbook = app.Workbooks.Open($@"{filePath}");
                     eWorksheet = (Excel.Worksheet)eWorkbook.Sheets[1];
 
-                    Regex regex = new Regex(@"(\w*)-(\w*)-(\w*)");
-                    MatchCollection match = regex.Matches(eWorksheet.Range["B10"].Value.ToString());
+                    var code = eWorksheet.Range["G5"].Value.ToString().Split(' ')[0];
 
-                    MatchCollection money = new Regex(@"(\w*).(\w*),(\w*)").Matches(eWorksheet.Range["F14"].Value.ToString());
+                    MatchCollection money = new Regex(@"(\w*),(\w*)").Matches(eWorksheet.Range["C11"].Value.ToString());
 
-                    pages = eWorkbook.Sheets[1].PageSetup.Pages.Count; /// кол-во страниц на листе
-                    //countPages += pages;
-
-                    string nameDate = eWorksheet.Range["B7"].Value.ToString();
-                    string date = eWorksheet.Range["B20"].Value.ToString().Split(new string[] { " цен " }, StringSplitOptions.None)[1];
+                    string nameDate = eWorksheet.Range["D8"].Value.ToString();
+                    string date = eWorksheet.Range["C14"].Value.ToString().Split(new string[] { " на " }, StringSplitOptions.None)[1];
                     nameDate += $"\n(в ценах на {date})";
 
+
+
+                    // разделение (разрыв) страниц
+                    var lastUsedRow = eWorksheet.Cells.Find("*", System.Reflection.Missing.Value,
+                               System.Reflection.Missing.Value, System.Reflection.Missing.Value,
+                               Excel.XlSearchOrder.xlByRows, Excel.XlSearchDirection.xlPrevious,
+                               false, System.Reflection.Missing.Value, System.Reflection.Missing.Value).Row;
+                    int rowsCount = 43; // кол-во строк на странице
+                    if (lastUsedRow != 38)
+                    {
+                        while (((lastUsedRow) % rowsCount) < 15)
+                        {
+                            rowsCount--;
+
+                            eWorksheet.ResetAllPageBreaks();
+
+                            //eWorksheet.HPageBreaks.Add(eWorksheet.Range[$"A34"]);
+
+                            int ind = 2;
+                            while (rowsCount * ind < lastUsedRow)
+                            {
+                                eWorksheet.HPageBreaks.Add(eWorksheet.Range[$"A{rowsCount * ind}"]);
+                                ind++;
+                            }
+
+
+                        }
+                    }
+                    else
+                    {
+                        
+                    }
+                    //Thread.Sleep(8000);
+                    pages = eWorkbook.Sheets[1].PageSetup.Pages.Count; /// кол-во страниц на листе
+
+
                     objectiveData.Add(new SmetaFile(
-                        match[0].ToString(), // код сметы
-                        eWorksheet.Range["B7"].Value.ToString(),
+                        code, // код сметы
+                        eWorksheet.Range["D8"].Value.ToString(),
                         nameDate, // Наименование
                         money[0].ToString(), // Сумма денег
-                                             //eWorksheet.Range["F14"].Value.ToString(),
-                        eWorkbook.Sheets[1].PageSetup.Pages.Count, // кол-во страниц на листе
+                        pages, // кол-во страниц на листе
                         objectiveFiles[i],
-                        match[0].ToString().Substring(3)));
+                        code));
                     nameDate = null;
                     date = null;
+                    eWorkbook.Save();
                     eWorkbook.Close(false);
                     //documentNumber++;
 
                 }
 
-                for (int i = 0; i < localFiles.Length; i++) // шаблон для локальных смет
+                for (int j = 0; j < localFiles.Length; j++) // шаблон для локальных смет
                 {
-                    string filePath = $"{rootFolder}\\{localFiles[i]}";
+                    string filePath = $"{rootFolder}\\{localFiles[j]}";
                     eWorkbook = app.Workbooks.Open($@"{filePath}");
                     eWorksheet = (Excel.Worksheet)eWorkbook.Sheets[1];
 
                     Regex regex = new Regex(@"(\w*)-(\w*)-(\w*)");
                     MatchCollection match = regex.Matches(eWorksheet.Range["A18"].Value.ToString());
 
-                    pages = eWorkbook.Sheets[1].PageSetup.Pages.Count;
-                    //countPages += pages; // кол-во страниц на листе
+                    regex = new Regex(@"(\w*)-(\w*)");
+                    string shortCode = regex.Matches(match[0].Value.ToString())[0].ToString(); // TODO сделать шорт-код
+
+
                     string money = eWorksheet.Range["C28"].Value.ToString().Replace("(", "").Replace(")", "");
                     if (money == "0")
                     {
@@ -317,16 +356,45 @@ namespace ExcelAPP
                     nameDate += $"\n(в ценах на {date})";
 
 
+
+                    // разделение (разрыв) страниц
+                    var lastUsedRow = eWorksheet.Cells.Find("*", System.Reflection.Missing.Value,
+                               System.Reflection.Missing.Value, System.Reflection.Missing.Value,
+                               Excel.XlSearchOrder.xlByRows, Excel.XlSearchDirection.xlPrevious,
+                               false, System.Reflection.Missing.Value, System.Reflection.Missing.Value).Row;
+                    int rowsCount = 43; // кол-во строк на странице
+                    while (((lastUsedRow) % rowsCount) < 13)
+                    {
+                        rowsCount--;
+
+                        eWorksheet.ResetAllPageBreaks();
+
+                        eWorksheet.HPageBreaks.Add(eWorksheet.Range[$"A35"]);
+                        int i = 2;
+                        while (rowsCount * i < lastUsedRow)
+                        {
+                            eWorksheet.HPageBreaks.Add(eWorksheet.Range[$"A{rowsCount * i}"]);
+                            i++;
+                        }
+                    }
+
+
+
+                    pages = eWorkbook.Sheets[1].PageSetup.Pages.Count;// кол-во страниц на листе
+                    //-----------
+
+
                     localData.Add(new SmetaFile(
                         match[0].ToString(), // код сметы
                         eWorksheet.Range["A20"].Value.ToString(), // наименование
-                    nameDate, // Наименование c датой
+                        nameDate, // Наименование c датой
                         money, // Сумма денег
-                        eWorkbook.Sheets[1].PageSetup.Pages.Count, // кол-во страниц на листе
-                        localFiles[i],
-                        match[0].ToString().Substring(3)));
+                        pages, // кол-во страниц на листе
+                        localFiles[j],
+                        shortCode));
                     nameDate = null;
                     date = null;
+                    eWorkbook.Save();
                     eWorkbook.Close(false);
                     //documentNumber++;
                 }
@@ -349,8 +417,11 @@ namespace ExcelAPP
             {
                 MessageBox.Show("Ошибка! Неверный шаблон сметы");
                 MessageBox.Show(ex.Message.ToString());
+                Console.WriteLine(ex.StackTrace);
+                Console.WriteLine(ex.Message.ToString());
                 backgroundWorker.CancelAsync();
-
+                DeleteTempFiles();
+                DeleteTempVar();
                 app.Quit();
                 eWorkbook = null;
                 eWorksheet = null;
@@ -371,10 +442,14 @@ namespace ExcelAPP
 
             Excel.Application app = new Excel.Application
             {
-                DisplayAlerts = false
+                DisplayAlerts = false,
+                Visible = false,
+                ScreenUpdating = false
+
             };
 
             Excel.Workbook eWorkbook;
+            Excel.Worksheet eWorksheet;
 
             try
             {
@@ -386,8 +461,12 @@ namespace ExcelAPP
                 {
                     string filePath = $"{_path}\\ОС\\{file.FolderInfo}";
                     eWorkbook = app.Workbooks.Open(filePath);
+                    eWorksheet = (Excel.Worksheet)eWorkbook.Sheets[1];
                     string tempPDFPath = $"{_path}\\TEMPdf\\{file.FolderInfo}";
-                    eWorkbook.Sheets[1].PageSetup.RightFooter = ""; ///Удаление нумерации станиц в Excel
+                    eWorksheet.PageSetup.RightFooter = ""; ///Удаление нумерации станиц в Excel
+
+
+
                     app.ActiveWorkbook.ExportAsFixedFormat(Excel.XlFixedFormatType.xlTypePDF, tempPDFPath);
                     eWorkbook.Close(false);
                     countCompleted++;
@@ -398,9 +477,13 @@ namespace ExcelAPP
                 foreach (var file in localData)
                 {
                     string filePath = $"{_path}\\{file.FolderInfo}";
-                    eWorkbook = app.Workbooks.Open(filePath);
                     string tempPDFPath = $"{_path}\\TEMPdf\\{file.FolderInfo}";
-                    eWorkbook.Sheets[1].PageSetup.RightFooter = ""; ///Удаление нумерации станиц в Excel
+                    eWorkbook = app.Workbooks.Open(filePath);
+                    eWorksheet = (Excel.Worksheet)eWorkbook.Sheets[1];
+
+
+
+                    eWorksheet.PageSetup.RightFooter = ""; ///Удаление нумерации стpаниц в Excel
                     app.ActiveWorkbook.ExportAsFixedFormat(Excel.XlFixedFormatType.xlTypePDF, tempPDFPath);
                     eWorkbook.Close(false);
                     countCompleted++;
@@ -408,6 +491,7 @@ namespace ExcelAPP
                 }
                 app.Quit();
                 eWorkbook = null;
+                eWorksheet = null;
                 GC.Collect();
                 return true;
             }
@@ -416,6 +500,8 @@ namespace ExcelAPP
                 MessageBox.Show("Ошибка конвертации в pdf");
                 MessageBox.Show(ex.Message.ToString());
                 backgroundWorker.CancelAsync();
+                DeleteTempFiles();
+                DeleteTempVar();
 
                 app.Quit();
                 eWorkbook = null;
@@ -512,7 +598,8 @@ namespace ExcelAPP
             {
                 MessageBox.Show("Ошибка сборки книги");
                 backgroundWorker.CancelAsync();
-
+                DeleteTempFiles();
+                DeleteTempVar();
                 backgroundWorker.ReportProgress(1, "Сборка остановлена...");
 
                 return false;
@@ -552,7 +639,8 @@ namespace ExcelAPP
             catch (Exception)
             {
                 MessageBox.Show("Ошибка нумерации содержания");
-
+                DeleteTempFiles();
+                DeleteTempVar();
                 backgroundWorker.ReportProgress(1, "Сборка остановлена...");
 
                 backgroundWorker.CancelAsync();
@@ -574,6 +662,7 @@ namespace ExcelAPP
                     iTextSharp.text.pdf.PdfReader readerOnlyTitle = new iTextSharp.text.pdf.PdfReader(bytesTitle);
                     int titlePages = readerOnlyTitle.NumberOfPages;
                     int pages = reader.NumberOfPages;
+                    int afterTitleNumericPages = Convert.ToInt32(afterTitleNumeric.Value);
 
                     using (iTextSharp.text.pdf.PdfStamper stamper = new iTextSharp.text.pdf.PdfStamper(reader, stream))
                     {
@@ -587,12 +676,12 @@ namespace ExcelAPP
                             {
                                 if (flag)
                                 {
-                                    iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + startPageNumber + pagesPzCount + titlePages).ToString(), blackFont), 810f, 575f, 0);
+                                    iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + afterTitleNumericPages + startPageNumber + pagesPzCount + titlePages).ToString(), blackFont), 810f, 575f, 0);
                                     flag = false;
                                 }
                                 else
                                 {
-                                    iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + startPageNumber + pagesPzCount + titlePages).ToString(), blackFont), 810f, 15f, 0);
+                                    iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + afterTitleNumericPages + pagesPzCount + titlePages).ToString(), blackFont), 810f, 15f, 0);
                                     flag = true;
                                 }
                             }
@@ -601,7 +690,7 @@ namespace ExcelAPP
                         {
                             for (int i = 1; i <= pages; i++)
                             {
-                                iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + startPageNumber + pagesPzCount + titlePages).ToString(), blackFont), 810f, 15f, 0);
+                                iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + afterTitleNumericPages + startPageNumber + pagesPzCount + titlePages).ToString(), blackFont), 810f, 15f, 0);
                             }
                         }
                     }
@@ -614,7 +703,8 @@ namespace ExcelAPP
             catch (Exception)
             {
                 MessageBox.Show("Ошибка нумерации смет");
-
+                DeleteTempFiles();
+                DeleteTempVar();
                 backgroundWorker.ReportProgress(1, "Сборка остановлена...");
 
                 backgroundWorker.CancelAsync();
@@ -636,6 +726,7 @@ namespace ExcelAPP
                     iTextSharp.text.pdf.PdfReader readerOnlyTitle = new iTextSharp.text.pdf.PdfReader(bytesTitle);
                     int titlePages = readerOnlyTitle.NumberOfPages;
                     int pages = reader.NumberOfPages;
+                    int afterTitleNumericPages = Convert.ToInt32(afterTitleNumeric.Value);
 
                     using (iTextSharp.text.pdf.PdfStamper stamper = new iTextSharp.text.pdf.PdfStamper(reader, stream))
                     {
@@ -654,12 +745,12 @@ namespace ExcelAPP
                             {
                                 if (flag)
                                 {
-                                    iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + startPageNumber + pagesPzCount).ToString(), blackFont), 810f, 15f, 0);
+                                    iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + afterTitleNumericPages + startPageNumber + pagesPzCount).ToString(), blackFont), 810f, 15f, 0);
                                     flag = false;
                                 }
                                 else
                                 {
-                                    iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + startPageNumber + pagesPzCount).ToString(), blackFont), 810f, 575f, 0);
+                                    iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + afterTitleNumericPages + startPageNumber + pagesPzCount).ToString(), blackFont), 810f, 575f, 0);
                                     flag = true;
                                 }
                             }
@@ -673,7 +764,7 @@ namespace ExcelAPP
                             }
                             for (int i = titlePages + 1; i <= pages; i++)
                             {
-                                iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + startPageNumber + pagesPzCount).ToString(), blackFont), 810f, 15f, 0);
+                                iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + afterTitleNumericPages + startPageNumber + pagesPzCount).ToString(), blackFont), 810f, 15f, 0);
                             }
                         }
                     }
@@ -685,6 +776,8 @@ namespace ExcelAPP
             }
             catch (Exception)
             {
+                DeleteTempFiles();
+                DeleteTempVar();
                 MessageBox.Show("Ошибка нумерации книги");
                 backgroundWorker.ReportProgress(1, "Сборка остановлена...");
                 backgroundWorker.CancelAsync();
@@ -701,8 +794,11 @@ namespace ExcelAPP
 
             Word.Application app = new Word.Application
             {
-                Visible = false
+
+                Visible = false,
+                ScreenUpdating = false
             };
+
 
             try
             {
@@ -821,7 +917,7 @@ namespace ExcelAPP
                     List<Pair> pairs = new List<Pair>();
                     foreach (var data in objectiveData)
                     {
-                        pairs.Add(new Pair() { Key = data.ShortCode, Value = data.Name });
+                        pairs.Add(new Pair() { Key = data.Code, Value = data.Name });
                     }
                     var setDict = pairs.GroupBy(x => x.Key.Trim()).Select(y => y.FirstOrDefault());
 
@@ -837,6 +933,8 @@ namespace ExcelAPP
                         wTable1.Cell(row, 3).Range.Font.Size = 10;
                         wTable1.Cell(row, 3).Range.Font.Italic = 1;
                         wTable1.Cell(row, 3).Range.Font.Underline = Word.WdUnderline.wdUnderlineSingle;
+                        wTable1.Cell(row, 3).Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
+
                         //---
                         row++;
 
@@ -845,7 +943,7 @@ namespace ExcelAPP
                         // вывод соответствующих локальных смет
                         foreach (var lData in localData)
                         {
-                            if (lData.Code.Contains(oData.Key))
+                            if (lData.ShortCode == oData.Key)
                             {
                                 NumberDocument++;
                                 wTable1.Rows.Add();
@@ -911,7 +1009,7 @@ namespace ExcelAPP
 
                     int pagesInTitle = wDocument.ComputeStatistics(WdStatistic.wdStatisticPages, false);
                     //MessageBox.Show(pagesInTitle.ToString());
-                    int countPages = (int)StartNumberNumeric.Value + (int)CountPagePZNumeric.Value + pagesInTitle - 1;
+                    int countPages = (int)StartNumberNumeric.Value + (int)afterTitleNumeric.Value + (int)CountPagePZNumeric.Value + pagesInTitle - 1;
 
                     row = 3;
 
@@ -927,13 +1025,30 @@ namespace ExcelAPP
                         row++;
                     }
 
-                    row += 2;
 
-                    foreach (var lData in localData) // локальные сметы
+
+                    //foreach (var lData in localData) 
+                    //{
+                    //    wTable1.Cell(row, 5).Range.Text = countPages.ToString();
+                    //    countPages += lData.PageCount;
+                    //    row++;
+                    //}
+
+                    row++;
+
+                    foreach (var oData in setDict) // локальные сметы
                     {
-                        wTable1.Cell(row, 5).Range.Text = countPages.ToString();
-                        countPages += lData.PageCount;
                         row++;
+
+                        foreach (var lData in localData)
+                        {
+                            if (lData.ShortCode == oData.Key) 
+                            {
+                                wTable1.Cell(row, 5).Range.Text = countPages.ToString();
+                                countPages += lData.PageCount;
+                                row++;
+                            }
+                        }
                     }
 
                     //------------------
@@ -1095,7 +1210,7 @@ namespace ExcelAPP
 
                     int pagesInTitle = wDocument.ComputeStatistics(WdStatistic.wdStatisticPages, false);
                     //MessageBox.Show(pagesInTitle.ToString());
-                    int countPages = (int)StartNumberNumeric.Value + (int)CountPagePZNumeric.Value + pagesInTitle - 1;
+                    int countPages = (int)StartNumberNumeric.Value + (int)afterTitleNumeric.Value + (int)CountPagePZNumeric.Value + pagesInTitle - 1;
 
                     row = 3;
 
@@ -1126,6 +1241,8 @@ namespace ExcelAPP
             }
             catch (Exception)
             {
+                DeleteTempFiles();
+                DeleteTempVar();
                 MessageBox.Show("Ошибка генерации содержания");
                 backgroundWorker.CancelAsync();
                 backgroundWorker.ReportProgress(1, "Сборка остановлена...");
@@ -1164,6 +1281,8 @@ namespace ExcelAPP
             }
             catch (Exception)
             {
+                DeleteTempFiles();
+                DeleteTempVar();
                 MessageBox.Show("Ошибка перемещения файлов на рабочий стол");
                 backgroundWorker.CancelAsync();
                 backgroundWorker.ReportProgress(1, "Сборка остановлена...");
@@ -1184,6 +1303,7 @@ namespace ExcelAPP
 
         protected void DeleteTempVar()
         {
+
             _path = null;
             dir = null;
             pdfFolder = null;
@@ -1194,5 +1314,6 @@ namespace ExcelAPP
             localData = new List<SmetaFile>(); ;
             objectiveData = new List<SmetaFile>(); ;
         }
+
     }
 }
