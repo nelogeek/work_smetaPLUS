@@ -230,7 +230,7 @@ namespace ExcelAPP
         protected void DisableButton()
         {
             this.StartNumberNumeric.Enabled = false;
-            this.numericUpDown1.Enabled = false;
+            //this.numericUpDown1.Enabled = false;
             this.afterTitleNumeric.Enabled = false;
             this.CountPagePZNumeric.Enabled = false;
             this.btnBuild.Enabled = false;
@@ -241,7 +241,7 @@ namespace ExcelAPP
         protected void EnabledButton()
         {
             this.StartNumberNumeric.Enabled = true;
-            this.numericUpDown1.Enabled = true;
+            //this.numericUpDown1.Enabled = true;
             this.afterTitleNumeric.Enabled = true;
             this.CountPagePZNumeric.Enabled = true;
             this.btnBuild.Enabled = true;
