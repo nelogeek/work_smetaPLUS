@@ -28,8 +28,6 @@
             this.btnBuild = new System.Windows.Forms.Button();
             this.StartNumberNumeric = new System.Windows.Forms.NumericUpDown();
             this.label1 = new System.Windows.Forms.Label();
-            this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
-            this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.afterTitleNumeric = new System.Windows.Forms.NumericUpDown();
             this.label4 = new System.Windows.Forms.Label();
@@ -39,7 +37,6 @@
             this.SplitBookContentCheckBox = new System.Windows.Forms.CheckBox();
             this.infoTextBox = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.StartNumberNumeric)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.afterTitleNumeric)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.CountPagePZNumeric)).BeginInit();
             this.SuspendLayout();
@@ -112,39 +109,10 @@
             this.label1.TabIndex = 11;
             this.label1.Text = "Номер первой страницы";
             // 
-            // numericUpDown1
-            // 
-            this.numericUpDown1.Enabled = false;
-            this.numericUpDown1.Location = new System.Drawing.Point(201, 111);
-            this.numericUpDown1.Margin = new System.Windows.Forms.Padding(4, 4, 13, 12);
-            this.numericUpDown1.Maximum = new decimal(new int[] {
-            999999999,
-            0,
-            0,
-            0});
-            this.numericUpDown1.Name = "numericUpDown1";
-            this.numericUpDown1.Size = new System.Drawing.Size(76, 22);
-            this.numericUpDown1.TabIndex = 12;
-            this.numericUpDown1.Value = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(17, 113);
-            this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(114, 16);
-            this.label2.TabIndex = 13;
-            this.label2.Text = "Страниц в книге";
-            // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(17, 154);
+            this.label3.Location = new System.Drawing.Point(17, 110);
             this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(158, 16);
@@ -153,7 +121,7 @@
             // 
             // afterTitleNumeric
             // 
-            this.afterTitleNumeric.Location = new System.Drawing.Point(201, 151);
+            this.afterTitleNumeric.Location = new System.Drawing.Point(201, 108);
             this.afterTitleNumeric.Margin = new System.Windows.Forms.Padding(4, 4, 13, 12);
             this.afterTitleNumeric.Maximum = new decimal(new int[] {
             999999999,
@@ -172,7 +140,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(16, 194);
+            this.label4.Location = new System.Drawing.Point(18, 148);
             this.label4.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(96, 16);
@@ -181,7 +149,7 @@
             // 
             // CountPagePZNumeric
             // 
-            this.CountPagePZNumeric.Location = new System.Drawing.Point(201, 192);
+            this.CountPagePZNumeric.Location = new System.Drawing.Point(201, 146);
             this.CountPagePZNumeric.Margin = new System.Windows.Forms.Padding(4, 4, 13, 12);
             this.CountPagePZNumeric.Maximum = new decimal(new int[] {
             999999999,
@@ -251,8 +219,6 @@
             this.Controls.Add(this.CountPagePZNumeric);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.afterTitleNumeric);
-            this.Controls.Add(this.label2);
-            this.Controls.Add(this.numericUpDown1);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.StartNumberNumeric);
             this.Controls.Add(this.labelCompleted);
@@ -265,7 +231,6 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Smeta++";
             ((System.ComponentModel.ISupportInitialize)(this.StartNumberNumeric)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.afterTitleNumeric)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.CountPagePZNumeric)).EndInit();
             this.ResumeLayout(false);
@@ -281,8 +246,6 @@
         private System.Windows.Forms.Label labelCompleted;
         private System.Windows.Forms.NumericUpDown StartNumberNumeric;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.NumericUpDown numericUpDown1;
-        private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.NumericUpDown afterTitleNumeric;
         private System.Windows.Forms.Label label4;
