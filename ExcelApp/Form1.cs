@@ -276,9 +276,9 @@ namespace ExcelAPP
                     eWorksheet = (Excel.Worksheet)eWorkbook.Sheets[1];
                     eWorksheet.PageSetup.Orientation = XlPageOrientation.xlLandscape; // TODO
 
-                    Regex regex = new Regex(@"(\w*)-(\w*)-(\w*)");
-                    string code = regex.Matches(eWorksheet.Range["E8"].Value.ToString())[0].ToString();
-                    string ShortCode = code.Substring(3);
+                    Regex regex = new Regex(@"(\w*)-(\d*)-(\d*)");
+                    string code = regex.Matches(eWorksheet.Range["E8"].Value.ToString())[0].ToString() + "p"; // TODO переделать
+                    string ShortCode = code.Substring(3,5);
                     //MessageBox.Show(ShortCode);
 
                     //MatchCollection money = new Regex(@"(\w*),(\w*)").Matches(eWorksheet.Range["C11"].Value.ToString());
@@ -290,33 +290,33 @@ namespace ExcelAPP
 
 
 
-                    // разделение (разрыв) страниц
-                    var lastUsedRow = eWorksheet.Cells.Find("*", System.Reflection.Missing.Value,
-                               System.Reflection.Missing.Value, System.Reflection.Missing.Value,
-                               Excel.XlSearchOrder.xlByRows, Excel.XlSearchDirection.xlPrevious,
-                               false, System.Reflection.Missing.Value, System.Reflection.Missing.Value).Row;
-                    int rowsCount = 42; // кол-во строк на странице
+                    //// разделение (разрыв) страниц
+                    //var lastUsedRow = eWorksheet.Cells.Find("*", System.Reflection.Missing.Value,
+                    //           System.Reflection.Missing.Value, System.Reflection.Missing.Value,
+                    //           Excel.XlSearchOrder.xlByRows, Excel.XlSearchDirection.xlPrevious,
+                    //           false, System.Reflection.Missing.Value, System.Reflection.Missing.Value).Row;
+                    //int rowsCount = 42; // кол-во строк на странице
 
 
-                    while (((lastUsedRow) % rowsCount) < 13)
-                    {
+                    //while (((lastUsedRow) % rowsCount) < 15)
+                    //{
 
-                        rowsCount--;
+                    //    rowsCount--;
 
-                        eWorksheet.ResetAllPageBreaks();
+                    //    eWorksheet.ResetAllPageBreaks();
 
-                        //eWorksheet.HPageBreaks.Add(eWorksheet.Range[$"A34"]);
+                    //    //eWorksheet.HPageBreaks.Add(eWorksheet.Range[$"A34"]);
 
-                        int ind = 1;
-                        while (rowsCount * ind < lastUsedRow)
-                        {
-                            eWorksheet.HPageBreaks.Add(eWorksheet.Range[$"A{rowsCount * ind}"]);
-                            ind++;
+                    //    int ind = 1;
+                    //    while (rowsCount * ind < lastUsedRow)
+                    //    {
+                    //        eWorksheet.HPageBreaks.Add(eWorksheet.Range[$"A{rowsCount * ind}"]);
+                    //        ind++;
 
-                        }
+                    //    }
 
 
-                    }
+                    //}
 
 
 
@@ -380,7 +380,7 @@ namespace ExcelAPP
                     int rowsCount = 43; // кол-во строк на странице
 
 
-                    while (((lastUsedRow) % rowsCount) < 13)
+                    while (((lastUsedRow) % rowsCount) < 15)
                     {
 
                         rowsCount--;
@@ -711,7 +711,7 @@ namespace ExcelAPP
                                 }
                                 else
                                 {
-                                    iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + afterTitleNumericPages + pagesPzCount + titlePages).ToString(), blackFont), 810f, 15f, 0);
+                                    iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + afterTitleNumericPages + startPageNumber + pagesPzCount + titlePages).ToString(), blackFont), 810f, 15f, 0);
                                     flag = true;
                                 }
                             }
@@ -1039,7 +1039,7 @@ namespace ExcelAPP
 
                     int pagesInTitle = wDocument.ComputeStatistics(WdStatistic.wdStatisticPages, false);
                     //MessageBox.Show(pagesInTitle.ToString());
-                    int countPages = (int)StartNumberNumeric.Value + (int)afterTitleNumeric.Value + (int)CountPagePZNumeric.Value + pagesInTitle - 1;
+                    int countPages = (int)StartNumberNumeric.Value + (int)afterTitleNumeric.Value + (int)CountPagePZNumeric.Value + pagesInTitle - 2; // TODO  2 переделать
 
                     row = 3;
 
