@@ -311,28 +311,46 @@ namespace ExcelAPP
                     string date = eWorksheet.Range["B20"].Value.ToString().Split(new string[] { " цен " }, StringSplitOptions.None)[1];
                     nameDate += $"\n(в ценах на {date})";
 
-                    
+
 
                     // разделение (разрыв) страниц
+                    //var lastUsedRow = eWorksheet.Cells.Find("*", System.Reflection.Missing.Value,
+                    //           System.Reflection.Missing.Value, System.Reflection.Missing.Value,
+                    //           XlSearchOrder.xlByRows, XlSearchDirection.xlPrevious,
+                    //           false, System.Reflection.Missing.Value, System.Reflection.Missing.Value).Row;
+                    //int rowsCount = 34; // кол-во строк на странице
+                    //while (((lastUsedRow) % rowsCount) < 13)
+                    //{
+                    //    rowsCount--;
+
+                    //    eWorksheet.ResetAllPageBreaks();
+
+                    //    eWorksheet.HPageBreaks.Add(eWorksheet.Range[$"A34"]);
+                    //    int ind = 2;
+                    //    while (rowsCount * ind < lastUsedRow)
+                    //    {
+                    //        eWorksheet.HPageBreaks.Add(eWorksheet.Range[$"A{rowsCount * ind}"]);
+                    //        ind++;
+                    //    }
+
+                    //}
+
                     var lastUsedRow = eWorksheet.Cells.Find("*", System.Reflection.Missing.Value,
                                System.Reflection.Missing.Value, System.Reflection.Missing.Value,
-                               Excel.XlSearchOrder.xlByRows, Excel.XlSearchDirection.xlPrevious,
+                               XlSearchOrder.xlByRows, XlSearchDirection.xlPrevious,
                                false, System.Reflection.Missing.Value, System.Reflection.Missing.Value).Row;
                     int rowsCount = 34; // кол-во строк на странице
-                    while (((lastUsedRow) % rowsCount) < 13)
+                    if ((lastUsedRow % rowsCount) < 13)
                     {
-                        rowsCount--;
-                        
                         eWorksheet.ResetAllPageBreaks();
 
-                        eWorksheet.HPageBreaks.Add(eWorksheet.Range[$"A34"]);
-                        int ind = 2;
-                        while (rowsCount * ind < lastUsedRow)
+                        int nubmerPageBreaks = lastUsedRow / rowsCount;
+
+                        for (int ind = 1; ind < nubmerPageBreaks; ind++)
                         {
                             eWorksheet.HPageBreaks.Add(eWorksheet.Range[$"A{rowsCount * ind}"]);
-                            ind++;
                         }
-                        
+                        eWorksheet.HPageBreaks.Add(eWorksheet.Range[$"A{lastUsedRow - 15}"]);
                     }
 
 
@@ -373,28 +391,25 @@ namespace ExcelAPP
                     string date = eWorksheet.Range["D26"].Value.ToString();
                     nameDate += $"\n(в ценах на {date})";
 
-                    
+
 
                     // разделение (разрыв) страниц
                     var lastUsedRow = eWorksheet.Cells.Find("*", System.Reflection.Missing.Value,
                                System.Reflection.Missing.Value, System.Reflection.Missing.Value,
-                               Excel.XlSearchOrder.xlByRows, Excel.XlSearchDirection.xlPrevious,
+                               XlSearchOrder.xlByRows, XlSearchDirection.xlPrevious,
                                false, System.Reflection.Missing.Value, System.Reflection.Missing.Value).Row;
-                    int rowsCount = 30; // кол-во строк на странице
-                    while (((lastUsedRow) % rowsCount) < 13)
+                    int rowsCount = 34; // кол-во строк на странице
+                    if ((lastUsedRow % rowsCount) < 13)
                     {
-                        rowsCount--;
-                        
                         eWorksheet.ResetAllPageBreaks();
 
-                        eWorksheet.HPageBreaks.Add(eWorksheet.Range[$"A34"]);
-                        int i = 2;
-                        while (rowsCount * i < lastUsedRow)
+                        int nubmerPageBreaks = lastUsedRow / rowsCount;
+
+                        for (int ind = 1; ind < nubmerPageBreaks; ind++)
                         {
-                            eWorksheet.HPageBreaks.Add(eWorksheet.Range[$"A{rowsCount * i}"]);
-                            i++;
+                            eWorksheet.HPageBreaks.Add(eWorksheet.Range[$"A{rowsCount * ind}"]);
                         }
-                        
+                        eWorksheet.HPageBreaks.Add(eWorksheet.Range[$"A{lastUsedRow - 15}"]);
                     }
                     //-----------
 

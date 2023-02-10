@@ -114,6 +114,7 @@
             // 
             // numberPagesInBook
             // 
+            this.numberPagesInBook.Enabled = false;
             this.numberPagesInBook.Location = new System.Drawing.Point(201, 111);
             this.numberPagesInBook.Margin = new System.Windows.Forms.Padding(4, 4, 13, 12);
             this.numberPagesInBook.Maximum = new decimal(new int[] {
