@@ -372,31 +372,32 @@ namespace ExcelAPP
 
 
 
-                    // разделение (разрыв) страниц
-                    var lastUsedRow = eWorksheet.Cells.Find("*", System.Reflection.Missing.Value,
-                               System.Reflection.Missing.Value, System.Reflection.Missing.Value,
-                               Excel.XlSearchOrder.xlByRows, Excel.XlSearchDirection.xlPrevious,
-                               false, System.Reflection.Missing.Value, System.Reflection.Missing.Value).Row;
-                    int rowsCount = 43; // кол-во строк на странице
+                    //// разделение (разрыв) страниц
+                    //var lastUsedRow = eWorksheet.Cells.Find("*", System.Reflection.Missing.Value,
+                    //           System.Reflection.Missing.Value, System.Reflection.Missing.Value,
+                    //           Excel.XlSearchOrder.xlByRows, Excel.XlSearchDirection.xlPrevious,
+                    //           false, System.Reflection.Missing.Value, System.Reflection.Missing.Value).Row;
+                    //int rowsCount = 43; // кол-во строк на странице
 
 
-                    while (((lastUsedRow) % rowsCount) < 15)
-                    {
+                    //while (((lastUsedRow) % rowsCount) < 15)
+                    //{
 
-                        rowsCount--;
+                    //    rowsCount--;
 
-                        eWorksheet.ResetAllPageBreaks();
+                    //    eWorksheet.ResetAllPageBreaks();
 
-                        //eWorksheet.HPageBreaks.Add(eWorksheet.Range[$"A35"]);
-                        int i = 1;
-                        while (rowsCount * i < lastUsedRow)
-                        {
-                            eWorksheet.HPageBreaks.Add(eWorksheet.Range[$"A{rowsCount * i}"]);
-                            i++;
+                    //    //eWorksheet.HPageBreaks.Add(eWorksheet.Range[$"A35"]);
+                    //    int i = 1;
+                    //    while (rowsCount * i < lastUsedRow)
+                    //    {
+                    //        eWorksheet.HPageBreaks.Add(eWorksheet.Range[$"A{rowsCount * i}"]);
+                    //        i++;
 
-                        }
-                    }
-                    //Thread.Sleep(7000);
+                    //    }
+                    //}
+                    
+
 
 
                     int pages = eWorksheet.PageSetup.Pages.Count; /// кол-во страниц на листе
@@ -1085,7 +1086,7 @@ namespace ExcelAPP
 
 
                     // ---
-                    //wDocument.SaveAs2($"{pdfFolder}\\Содержание.pdf", WdSaveFormat.wdFormatPDF);
+                    wDocument.SaveAs2($"{pdfFolder}\\Содержание.docx");
                     wDocument.ExportAsFixedFormat($"{pdfFolder}\\Содержание.pdf", Word.WdExportFormat.wdExportFormatPDF);
                     wDocument.Close(Word.WdSaveOptions.wdDoNotSaveChanges, Word.WdOriginalFormat.wdOriginalDocumentFormat, false);
                     //app.ActiveDocument.SaveAs2($@"{_path}\TEST.docx");
@@ -1302,6 +1303,7 @@ namespace ExcelAPP
                 {
                     File.Move($@"{_path}\TEMPdf\Содержание.pdf", $@"{DesktopFolder}\Содержание.pdf");
                     File.Move($@"{_path}\TEMPdf\Сметы.pdf", $@"{DesktopFolder}\Сметы.pdf");
+                    File.Move($@"{_path}\TEMPdf\Содержание.docx", $@"{DesktopFolder}\Содержание.docx");
                 }
                 else
                 {
