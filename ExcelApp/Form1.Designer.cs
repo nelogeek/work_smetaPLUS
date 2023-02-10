@@ -36,6 +36,8 @@
             this.backgroundWorker = new System.ComponentModel.BackgroundWorker();
             this.SplitBookContentCheckBox = new System.Windows.Forms.CheckBox();
             this.infoTextBox = new System.Windows.Forms.TextBox();
+            this.button1 = new System.Windows.Forms.Button();
+            this.toggleButton1 = new ExcelApp.Controls.ToggleButton();
             ((System.ComponentModel.ISupportInitialize)(this.StartNumberNumeric)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.afterTitleNumeric)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.CountPagePZNumeric)).BeginInit();
@@ -206,12 +208,37 @@
             this.infoTextBox.Size = new System.Drawing.Size(547, 260);
             this.infoTextBox.TabIndex = 21;
             // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(346, 47);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(8, 8);
+            this.button1.TabIndex = 22;
+            this.button1.Text = "button1";
+            this.button1.UseVisualStyleBackColor = true;
+            // 
+            // toggleButton1
+            // 
+            this.toggleButton1.AutoSize = true;
+            this.toggleButton1.Location = new System.Drawing.Point(31, 330);
+            this.toggleButton1.MinimumSize = new System.Drawing.Size(45, 22);
+            this.toggleButton1.Name = "toggleButton1";
+            this.toggleButton1.OffBackColor = System.Drawing.Color.Gray;
+            this.toggleButton1.OffToggleColor = System.Drawing.Color.Gainsboro;
+            this.toggleButton1.OnBackColor = System.Drawing.Color.MediumSlateBlue;
+            this.toggleButton1.OnToggleColor = System.Drawing.Color.WhiteSmoke;
+            this.toggleButton1.Size = new System.Drawing.Size(45, 22);
+            this.toggleButton1.TabIndex = 23;
+            this.toggleButton1.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.ClientSize = new System.Drawing.Size(856, 398);
+            this.Controls.Add(this.toggleButton1);
+            this.Controls.Add(this.button1);
             this.Controls.Add(this.infoTextBox);
             this.Controls.Add(this.SplitBookContentCheckBox);
             this.Controls.Add(this.TwoSidedPrintCheckBox);
@@ -254,5 +281,7 @@
         private System.ComponentModel.BackgroundWorker backgroundWorker;
         private System.Windows.Forms.CheckBox SplitBookContentCheckBox;
         private System.Windows.Forms.TextBox infoTextBox;
+        private System.Windows.Forms.Button button1;
+        private ExcelApp.Controls.ToggleButton toggleButton1;
     }
 }
