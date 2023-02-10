@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -200,6 +201,8 @@ namespace ExcelAPP
                     if (!PdfMerge()) return;
                     if (!CreateDesktopFolder()) return;
                     if (!MoveFiles()) return;
+                    
+
                     DeleteTempFiles();
                     DeleteTempVar();
 
@@ -262,7 +265,7 @@ namespace ExcelAPP
 
             Excel.Workbook eWorkbook;
             Excel.Worksheet eWorksheet;
-            int pages;
+            
 
             try
             {
@@ -271,13 +274,18 @@ namespace ExcelAPP
                     string filePath = $"{childFolder}\\{objectiveFiles[i]}";
                     eWorkbook = app.Workbooks.Open($@"{filePath}");
                     eWorksheet = (Excel.Worksheet)eWorkbook.Sheets[1];
+                    eWorksheet.PageSetup.Orientation = XlPageOrientation.xlLandscape; // TODO
 
-                    var code = eWorksheet.Range["G5"].Value.ToString().Split(' ')[0];
+                    Regex regex = new Regex(@"(\w*)-(\w*)-(\w*)");
+                    string code = regex.Matches(eWorksheet.Range["E8"].Value.ToString())[0].ToString();
+                    string ShortCode = code.Substring(3);
+                    //MessageBox.Show(ShortCode);
 
-                    MatchCollection money = new Regex(@"(\w*),(\w*)").Matches(eWorksheet.Range["C11"].Value.ToString());
+                    //MatchCollection money = new Regex(@"(\w*),(\w*)").Matches(eWorksheet.Range["C11"].Value.ToString());
+                    string money = eWorksheet.Range["G12"].Value.ToString();
 
-                    string nameDate = eWorksheet.Range["D8"].Value.ToString();
-                    string date = eWorksheet.Range["C14"].Value.ToString().Split(new string[] { " на " }, StringSplitOptions.None)[1];
+                    string nameDate = eWorksheet.Range["C5"].Value.ToString();
+                    string date = eWorksheet.Range["C18"].Value.ToString().Split(new string[] { " цен " }, StringSplitOptions.None)[1];
                     nameDate += $"\n(в ценах на {date})";
 
 
@@ -287,43 +295,48 @@ namespace ExcelAPP
                                System.Reflection.Missing.Value, System.Reflection.Missing.Value,
                                Excel.XlSearchOrder.xlByRows, Excel.XlSearchDirection.xlPrevious,
                                false, System.Reflection.Missing.Value, System.Reflection.Missing.Value).Row;
-                    int rowsCount = 43; // кол-во строк на странице
-                    if (lastUsedRow != 38)
+                    int rowsCount = 42; // кол-во строк на странице
+
+
+                    while (((lastUsedRow) % rowsCount) < 13)
                     {
-                        while (((lastUsedRow) % rowsCount) < 15)
+
+                        rowsCount--;
+
+                        eWorksheet.ResetAllPageBreaks();
+
+                        //eWorksheet.HPageBreaks.Add(eWorksheet.Range[$"A34"]);
+
+                        int ind = 1;
+                        while (rowsCount * ind < lastUsedRow)
                         {
-                            rowsCount--;
-
-                            eWorksheet.ResetAllPageBreaks();
-
-                            //eWorksheet.HPageBreaks.Add(eWorksheet.Range[$"A34"]);
-
-                            int ind = 2;
-                            while (rowsCount * ind < lastUsedRow)
-                            {
-                                eWorksheet.HPageBreaks.Add(eWorksheet.Range[$"A{rowsCount * ind}"]);
-                                ind++;
-                            }
-
+                            eWorksheet.HPageBreaks.Add(eWorksheet.Range[$"A{rowsCount * ind}"]);
+                            ind++;
 
                         }
+
+
                     }
-                    else
-                    {
-                        
-                    }
+
+
+
+                    int pages = eWorkbook.Sheets[1].PageSetup.Pages.Count; /// кол-во страниц на листе
+
+
                     //Thread.Sleep(8000);
-                    pages = eWorkbook.Sheets[1].PageSetup.Pages.Count; /// кол-во страниц на листе
+                    //
 
 
                     objectiveData.Add(new SmetaFile(
                         code, // код сметы
-                        eWorksheet.Range["D8"].Value.ToString(),
+                        eWorksheet.Range["C5"].Value.ToString(),
                         nameDate, // Наименование
-                        money[0].ToString(), // Сумма денег
+                        money, // Сумма денег
                         pages, // кол-во страниц на листе
                         objectiveFiles[i],
-                        code));
+                        ShortCode));
+                    money = null;
+                    pages = 0;
                     nameDate = null;
                     date = null;
                     eWorkbook.Save();
@@ -337,12 +350,14 @@ namespace ExcelAPP
                     string filePath = $"{rootFolder}\\{localFiles[j]}";
                     eWorkbook = app.Workbooks.Open($@"{filePath}");
                     eWorksheet = (Excel.Worksheet)eWorkbook.Sheets[1];
+                    eWorksheet.PageSetup.Orientation = XlPageOrientation.xlLandscape;
 
                     Regex regex = new Regex(@"(\w*)-(\w*)-(\w*)");
                     MatchCollection match = regex.Matches(eWorksheet.Range["A18"].Value.ToString());
 
                     regex = new Regex(@"(\w*)-(\w*)");
                     string shortCode = regex.Matches(match[0].Value.ToString())[0].ToString(); // TODO сделать шорт-код
+
 
 
                     string money = eWorksheet.Range["C28"].Value.ToString().Replace("(", "").Replace(")", "");
@@ -363,24 +378,33 @@ namespace ExcelAPP
                                Excel.XlSearchOrder.xlByRows, Excel.XlSearchDirection.xlPrevious,
                                false, System.Reflection.Missing.Value, System.Reflection.Missing.Value).Row;
                     int rowsCount = 43; // кол-во строк на странице
+
+
                     while (((lastUsedRow) % rowsCount) < 13)
                     {
+
                         rowsCount--;
 
                         eWorksheet.ResetAllPageBreaks();
 
-                        eWorksheet.HPageBreaks.Add(eWorksheet.Range[$"A35"]);
-                        int i = 2;
+                        //eWorksheet.HPageBreaks.Add(eWorksheet.Range[$"A35"]);
+                        int i = 1;
                         while (rowsCount * i < lastUsedRow)
                         {
                             eWorksheet.HPageBreaks.Add(eWorksheet.Range[$"A{rowsCount * i}"]);
                             i++;
+
                         }
                     }
+                    //Thread.Sleep(7000);
 
 
+                    int pages = eWorksheet.PageSetup.Pages.Count; /// кол-во страниц на листе
+                    //MessageBox.Show(pages.ToString());
+                    
 
-                    pages = eWorkbook.Sheets[1].PageSetup.Pages.Count;// кол-во страниц на листе
+
+                    //
                     //-----------
 
 
@@ -392,6 +416,8 @@ namespace ExcelAPP
                         pages, // кол-во страниц на листе
                         localFiles[j],
                         shortCode));
+                    money = null;
+                    pages = 0;
                     nameDate = null;
                     date = null;
                     eWorkbook.Save();
@@ -407,7 +433,7 @@ namespace ExcelAPP
                 app.Quit();
                 eWorkbook = null;
                 eWorksheet = null;
-                pages = 0;
+                //pages = 0;
                 GC.Collect();
 
                 return true;
@@ -425,7 +451,7 @@ namespace ExcelAPP
                 app.Quit();
                 eWorkbook = null;
                 eWorksheet = null;
-                pages = 0;
+                //pages = 0;
                 GC.Collect();
 
                 backgroundWorker.ReportProgress(1, "Сборка остановлена...");
@@ -439,6 +465,10 @@ namespace ExcelAPP
 
         protected bool ExcelConverter()
         {
+            //foreach (var i in localData)
+            //{
+            //    MessageBox.Show(i.PageCount.ToString());
+            //}
 
             Excel.Application app = new Excel.Application
             {
@@ -917,7 +947,7 @@ namespace ExcelAPP
                     List<Pair> pairs = new List<Pair>();
                     foreach (var data in objectiveData)
                     {
-                        pairs.Add(new Pair() { Key = data.Code, Value = data.Name });
+                        pairs.Add(new Pair() { Key = data.ShortCode, Value = data.Name });
                     }
                     var setDict = pairs.GroupBy(x => x.Key.Trim()).Select(y => y.FirstOrDefault());
 
@@ -1042,7 +1072,7 @@ namespace ExcelAPP
 
                         foreach (var lData in localData)
                         {
-                            if (lData.ShortCode == oData.Key) 
+                            if (lData.ShortCode == oData.Key)
                             {
                                 wTable1.Cell(row, 5).Range.Text = countPages.ToString();
                                 countPages += lData.PageCount;
@@ -1292,6 +1322,7 @@ namespace ExcelAPP
         }
 
 
+
         protected void DeleteTempFiles()
         {
             if (Directory.Exists($"{_path}\\TEMPdf"))
@@ -1314,6 +1345,9 @@ namespace ExcelAPP
             localData = new List<SmetaFile>(); ;
             objectiveData = new List<SmetaFile>(); ;
         }
+
+
+        
 
     }
 }
