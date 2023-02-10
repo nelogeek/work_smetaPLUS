@@ -126,6 +126,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Code_Warehouse.txt" />
+    <Compile Include="Controls\ToggleSwitch.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
