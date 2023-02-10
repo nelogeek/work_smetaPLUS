@@ -274,9 +274,6 @@ namespace ExcelAPP
             this.SplitBookContentCheckBox.Enabled = true;
         }
 
-        protected void PageCounterFunc() {
-        }
-
         private bool ExcelParser()
         {
 
@@ -770,6 +767,7 @@ namespace ExcelAPP
                             {
                                 iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + startPageNumber).ToString(), blackFont), 565f, 15f, 0);
                             }
+                            //Нумерация страниц книги
                             for (int i = 1 + titlePages; i <= pages; i++)
                             {
                                 if (flag)
@@ -791,6 +789,7 @@ namespace ExcelAPP
                             {
                                 iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + startPageNumber).ToString(), blackFont), 565f, 15f, 0);
                             }
+                            //Нумерация страниц книги
                             for (int i = titlePages + 1; i <= pages; i++)
                             {
                                 iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + afterTitleNumericPages + startPageNumber + pagesPzCount).ToString(), blackFont), 810f, 15f, 0);
