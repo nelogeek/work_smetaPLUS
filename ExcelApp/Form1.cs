@@ -255,33 +255,33 @@ namespace ExcelAPP
 
         protected Excel.Worksheet PageBreaker(Excel.Worksheet eWorksheet, int rowsCount)
         {
-            //// разделение (разрыв) страниц
-            //var lastUsedRow = eWorksheet.Cells.Find("*", System.Reflection.Missing.Value,
-            //           System.Reflection.Missing.Value, System.Reflection.Missing.Value,
-            //           Excel.XlSearchOrder.xlByRows, Excel.XlSearchDirection.xlPrevious,
-            //           false, System.Reflection.Missing.Value, System.Reflection.Missing.Value).Row;
+            // разделение (разрыв) страниц
+            var lastUsedRow = eWorksheet.Cells.Find("*", System.Reflection.Missing.Value,
+                       System.Reflection.Missing.Value, System.Reflection.Missing.Value,
+                       Excel.XlSearchOrder.xlByRows, Excel.XlSearchDirection.xlPrevious,
+                       false, System.Reflection.Missing.Value, System.Reflection.Missing.Value).Row;
 
-            //eWorksheet.PageSetup.Zoom = false;
-            //eWorksheet.PageSetup.FitToPagesTall = (int)(lastUsedRow / rowsCount);
+            eWorksheet.PageSetup.Zoom = false;
+            eWorksheet.PageSetup.FitToPagesTall = (int)(lastUsedRow / rowsCount);
 
-            //eWorksheet.ResetAllPageBreaks();
+            eWorksheet.ResetAllPageBreaks();
 
-            //for (int i = 1; i <= (int)(lastUsedRow / rowsCount); i++)
+            for (int i = 1; i <= (int)(lastUsedRow / rowsCount); i++)
+            {
+                eWorksheet.HPageBreaks.Add(eWorksheet.Range[$"A2"]);
+            }
+
+
+            //eWorksheet.HPageBreaks.Add(eWorksheet.Range[$"A{lastUsedRow-13}"]);
+
+
+            var arr = eWorksheet.HPageBreaks;
+            int lastPageBreake = arr[arr.Count].Location.Row;
+
+            //if (Math.Abs(lastUsedRow - lastPageBreake) < 13)
             //{
-            //    eWorksheet.HPageBreaks.Add(eWorksheet.Range[$"A2"]);
+            //    return PageBreaker(eWorksheet, rowsCount - 1);
             //}
-
-
-            ////eWorksheet.HPageBreaks.Add(eWorksheet.Range[$"A{lastUsedRow-13}"]);
-
-
-            //var arr = eWorksheet.HPageBreaks;
-            //int lastPageBreake = arr[arr.Count].Location.Row;
-
-            ////if (Math.Abs(lastUsedRow - lastPageBreake) < 13)
-            ////{
-            ////    return PageBreaker(eWorksheet, rowsCount - 1);
-            ////}
 
             return eWorksheet;
         }
