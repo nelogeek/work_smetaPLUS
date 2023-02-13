@@ -253,6 +253,39 @@ namespace ExcelAPP
             this.SplitBookContentCheckBox.Enabled = true;
         }
 
+        protected Excel.Worksheet PageBreaker(Excel.Worksheet eWorksheet, int rowsCount)
+        {
+            //// разделение (разрыв) страниц
+            //var lastUsedRow = eWorksheet.Cells.Find("*", System.Reflection.Missing.Value,
+            //           System.Reflection.Missing.Value, System.Reflection.Missing.Value,
+            //           Excel.XlSearchOrder.xlByRows, Excel.XlSearchDirection.xlPrevious,
+            //           false, System.Reflection.Missing.Value, System.Reflection.Missing.Value).Row;
+
+            //eWorksheet.PageSetup.Zoom = false;
+            //eWorksheet.PageSetup.FitToPagesTall = (int)(lastUsedRow / rowsCount);
+
+            //eWorksheet.ResetAllPageBreaks();
+
+            //for (int i = 1; i <= (int)(lastUsedRow / rowsCount); i++)
+            //{
+            //    eWorksheet.HPageBreaks.Add(eWorksheet.Range[$"A2"]);
+            //}
+
+
+            ////eWorksheet.HPageBreaks.Add(eWorksheet.Range[$"A{lastUsedRow-13}"]);
+
+
+            //var arr = eWorksheet.HPageBreaks;
+            //int lastPageBreake = arr[arr.Count].Location.Row;
+
+            ////if (Math.Abs(lastUsedRow - lastPageBreake) < 13)
+            ////{
+            ////    return PageBreaker(eWorksheet, rowsCount - 1);
+            ////}
+
+            return eWorksheet;
+        }
+
         private bool ExcelParser()
         {
 
@@ -318,9 +351,11 @@ namespace ExcelAPP
 
                     //}
 
+                    eWorksheet = PageBreaker(eWorksheet, 35);
 
 
-                    int pages = eWorkbook.Sheets[1].PageSetup.Pages.Count; /// кол-во страниц на листе
+
+                    int pages = eWorksheet.PageSetup.Pages.Count; /// кол-во страниц на листе
 
 
                     //Thread.Sleep(8000);
@@ -1348,8 +1383,31 @@ namespace ExcelAPP
             objectiveData = new List<SmetaFile>(); ;
         }
 
+        private void button2_Click(object sender, EventArgs e)
+        {
+            Excel.Application app = new Excel.Application
+            {
+                DisplayAlerts = false,
+                Visible = true,
+                ScreenUpdating = true
+            };
 
-        
+            Excel.Workbook eWorkbook;
+            Excel.Worksheet eWorksheet;
 
+            eWorkbook = app.Workbooks.Open($@"C:\Users\lokot\Desktop\test.xlsx");
+            eWorksheet = (Excel.Worksheet)eWorkbook.Sheets[1];
+
+            var lastUsedRow = eWorksheet.Cells.Find("*", System.Reflection.Missing.Value,
+                       System.Reflection.Missing.Value, System.Reflection.Missing.Value,
+                       Excel.XlSearchOrder.xlByRows, Excel.XlSearchDirection.xlPrevious,
+                       false, System.Reflection.Missing.Value, System.Reflection.Missing.Value).Row;
+
+
+            //eWorksheet.HPageBreaks.Add("");
+            //eWorksheet.PageSetup.FitToPagesWide = 8;
+            PageBreaker(eWorksheet, 35);
+
+        }
     }
 }
