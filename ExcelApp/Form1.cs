@@ -253,7 +253,7 @@ namespace ExcelAPP
             this.SplitBookContentCheckBox.Enabled = true;
         }
 
-        protected Excel.Worksheet PageBreaker(Excel.Worksheet eWorksheet, int rowsCount)
+        protected Excel.Worksheet PageBreaker(Excel.Worksheet eWorksheet, int rowsCount, bool local)
         {
             // разделение (разрыв) страниц
             var lastUsedRow = eWorksheet.Cells.Find("*", System.Reflection.Missing.Value,
@@ -266,17 +266,22 @@ namespace ExcelAPP
 
             eWorksheet.ResetAllPageBreaks();
 
-            for (int i = 1; i <= (int)(lastUsedRow / rowsCount); i++)
+            //for (int i = 0; i < (int)(lastUsedRow / rowsCount); i++)
+            //{
+            //    eWorksheet.HPageBreaks.Add(eWorksheet.Range[$"A2"]);
+            //}
+
+            if (local)
             {
-                eWorksheet.HPageBreaks.Add(eWorksheet.Range[$"A2"]);
+                eWorksheet.HPageBreaks.Add(eWorksheet.Range[$"A35"]);
             }
+            
+
+            eWorksheet.HPageBreaks.Add(eWorksheet.Range[$"A{lastUsedRow-13}"]);
 
 
-            //eWorksheet.HPageBreaks.Add(eWorksheet.Range[$"A{lastUsedRow-13}"]);
-
-
-            var arr = eWorksheet.HPageBreaks;
-            int lastPageBreake = arr[arr.Count].Location.Row;
+            //var arr = eWorksheet.HPageBreaks;
+            //int lastPageBreake = arr[arr.Count].Location.Row;
 
             //if (Math.Abs(lastUsedRow - lastPageBreake) < 13)
             //{
@@ -351,7 +356,7 @@ namespace ExcelAPP
 
                     //}
 
-                    eWorksheet = PageBreaker(eWorksheet, 35);
+                    eWorksheet = PageBreaker(eWorksheet, 35, false);
 
 
 
@@ -407,6 +412,8 @@ namespace ExcelAPP
 
 
 
+
+
                     //// разделение (разрыв) страниц
                     //var lastUsedRow = eWorksheet.Cells.Find("*", System.Reflection.Missing.Value,
                     //           System.Reflection.Missing.Value, System.Reflection.Missing.Value,
@@ -431,8 +438,8 @@ namespace ExcelAPP
 
                     //    }
                     //}
-                    
 
+                    eWorksheet = PageBreaker(eWorksheet, 27, true);
 
 
                     int pages = eWorksheet.PageSetup.Pages.Count; /// кол-во страниц на листе
@@ -1406,7 +1413,7 @@ namespace ExcelAPP
 
             //eWorksheet.HPageBreaks.Add("");
             //eWorksheet.PageSetup.FitToPagesWide = 8;
-            PageBreaker(eWorksheet, 35);
+            //PageBreaker(eWorksheet, 35);
 
         }
     }
