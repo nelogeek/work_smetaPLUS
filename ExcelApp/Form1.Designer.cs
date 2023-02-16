@@ -56,7 +56,7 @@
             // btnSelectFolder
             // 
             this.btnSelectFolder.Location = new System.Drawing.Point(493, 351);
-            this.btnSelectFolder.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btnSelectFolder.Margin = new System.Windows.Forms.Padding(4);
             this.btnSelectFolder.Name = "btnSelectFolder";
             this.btnSelectFolder.Size = new System.Drawing.Size(195, 28);
             this.btnSelectFolder.TabIndex = 3;
@@ -76,7 +76,7 @@
             // btnBuild
             // 
             this.btnBuild.Location = new System.Drawing.Point(740, 351);
-            this.btnBuild.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btnBuild.Margin = new System.Windows.Forms.Padding(4);
             this.btnBuild.Name = "btnBuild";
             this.btnBuild.Size = new System.Drawing.Size(100, 28);
             this.btnBuild.TabIndex = 5;
@@ -178,7 +178,7 @@
             // 
             this.TwoSidedPrintCheckBox.AutoSize = true;
             this.TwoSidedPrintCheckBox.Location = new System.Drawing.Point(21, 260);
-            this.TwoSidedPrintCheckBox.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.TwoSidedPrintCheckBox.Margin = new System.Windows.Forms.Padding(4);
             this.TwoSidedPrintCheckBox.Name = "TwoSidedPrintCheckBox";
             this.TwoSidedPrintCheckBox.Size = new System.Drawing.Size(163, 20);
             this.TwoSidedPrintCheckBox.TabIndex = 19;
@@ -220,7 +220,7 @@
             // button1
             // 
             this.button1.Location = new System.Drawing.Point(461, 58);
-            this.button1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.button1.Margin = new System.Windows.Forms.Padding(4);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(11, 10);
             this.button1.TabIndex = 22;
@@ -231,7 +231,7 @@
             // 
             this.toggleButton1.AutoSize = true;
             this.toggleButton1.Location = new System.Drawing.Point(22, 323);
-            this.toggleButton1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.toggleButton1.Margin = new System.Windows.Forms.Padding(4);
             this.toggleButton1.MinimumSize = new System.Drawing.Size(60, 27);
             this.toggleButton1.Name = "toggleButton1";
             this.toggleButton1.OffBackColor = System.Drawing.Color.Gray;
@@ -245,7 +245,7 @@
             // button2
             // 
             this.button2.Location = new System.Drawing.Point(131, 196);
-            this.button2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.button2.Margin = new System.Windows.Forms.Padding(4);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(100, 28);
             this.button2.TabIndex = 24;
@@ -276,7 +276,7 @@
             this.Controls.Add(this.btnSelectFolder);
             this.Controls.Add(this.labelNameFolder);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Smeta++";
