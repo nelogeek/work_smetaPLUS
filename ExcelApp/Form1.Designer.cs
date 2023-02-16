@@ -93,11 +93,16 @@
             0,
             0,
             0});
+            this.StartNumberNumeric.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
             this.StartNumberNumeric.Name = "StartNumberNumeric";
             this.StartNumberNumeric.Size = new System.Drawing.Size(76, 22);
             this.StartNumberNumeric.TabIndex = 10;
             this.StartNumberNumeric.Value = new decimal(new int[] {
-            3,
+            1,
             0,
             0,
             0});
@@ -134,11 +139,6 @@
             this.afterTitleNumeric.Name = "afterTitleNumeric";
             this.afterTitleNumeric.Size = new System.Drawing.Size(76, 22);
             this.afterTitleNumeric.TabIndex = 14;
-            this.afterTitleNumeric.Value = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
             // 
             // label4
             // 
@@ -156,6 +156,11 @@
             this.CountPagePZNumeric.Margin = new System.Windows.Forms.Padding(4, 4, 13, 12);
             this.CountPagePZNumeric.Maximum = new decimal(new int[] {
             999999999,
+            0,
+            0,
+            0});
+            this.CountPagePZNumeric.Minimum = new decimal(new int[] {
+            1,
             0,
             0,
             0});
