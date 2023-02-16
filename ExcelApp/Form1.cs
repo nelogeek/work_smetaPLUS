@@ -1100,6 +1100,7 @@ namespace ExcelAPP
 
         protected void pageBreaker() //Регулировка разрывов страниц
         {
+
             //var lastUsedRow = eWorksheet.Cells.Find("*", System.Reflection.Missing.Value,
             //           System.Reflection.Missing.Value, System.Reflection.Missing.Value,
             //           XlSearchOrder.xlByRows, XlSearchDirection.xlPrevious,
