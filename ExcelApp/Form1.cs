@@ -608,18 +608,7 @@ namespace ExcelAPP
                 tempFilesArray.AddRange(localData);
 
                 //Объединение PDF
-                PdfDocument outputPdfDocument = new PdfDocument();
-                int countCompleted = 0;
-
-                // add title
-                PdfDocument inputPdfDocument = PdfReader.Open(fileNameTitlePdf, PdfDocumentOpenMode.Import);
-                for (int i = 0; i < inputPdfDocument.PageCount; i++)
-                {
-                    PdfPage page = inputPdfDocument.Pages[i];
-                    outputPdfDocument.AddPage(page);
-                }
-                countCompleted++;
-                //labelCompleted.Text = $"Кол-во обработанных файлов: {countCompleted} из {localFiles.Length + objectiveFiles.Length + 1}";
+                PdfDocument inputPdfDocument;
 
                 if (SplitBookContentCheckBox.Checked)
                 {
@@ -627,37 +616,38 @@ namespace ExcelAPP
                     foreach (var file in tempFilesArray)
                     {
                         inputPdfDocument = PdfReader.Open($"{pdfFolder}\\{file.FolderInfo}.pdf", PdfDocumentOpenMode.Import);
-
                         for (int i = 0; i < inputPdfDocument.PageCount; i++)
                         {
                             PdfPage page = inputPdfDocument.Pages[i];
-                            outputPdfDocument.AddPage(page);
                             outputSmetaPdfDocument.AddPage(page);
                         }
-                        countCompleted++;
-                        //labelCompleted.Text = $"Кол-во обработанных файлов: {countCompleted} из {localFiles.Length + objectiveFiles.Length + 1}";
+                        inputPdfDocument.Close();
                     }
                     outputSmetaPdfDocument.Save(fileNameSmetaPdf);
-                    outputPdfDocument.Save(fileNameConcatPdf);
                     outputSmetaPdfDocument.Close();
-                    outputPdfDocument.Close();
                 }
                 else
                 {
+                    PdfDocument outputPdfDocument = new PdfDocument();
+                    //Добавляем содержание
+                    inputPdfDocument = PdfReader.Open(fileNameTitlePdf, PdfDocumentOpenMode.Import);
+                    for (int i = 0; i < inputPdfDocument.PageCount; i++)
+                    {
+                        PdfPage page = inputPdfDocument.Pages[i];
+                        outputPdfDocument.AddPage(page);
+                    }
+                    //Добавляем сметы
                     foreach (var file in tempFilesArray)
                     {
                         inputPdfDocument = PdfReader.Open($"{pdfFolder}\\{file.FolderInfo}.pdf", PdfDocumentOpenMode.Import);
-
                         for (int i = 0; i < inputPdfDocument.PageCount; i++)
                         {
                             PdfPage page = inputPdfDocument.Pages[i];
                             outputPdfDocument.AddPage(page);
                         }
-                        countCompleted++;
-                        //labelCompleted.Text = $"Кол-во обработанных файлов: {countCompleted} из {localFiles.Length + objectiveFiles.Length + 1}";
-
                     }
                     outputPdfDocument.Save(fileNameConcatPdf);
+                    inputPdfDocument.Close();
                     outputPdfDocument.Close();
                 }
                 //Добавление правильной нумерации страниц книги по отдельности
@@ -693,19 +683,24 @@ namespace ExcelAPP
                 using (MemoryStream stream = new MemoryStream())
                 {
                     iTextSharp.text.pdf.PdfReader readerTitle = new iTextSharp.text.pdf.PdfReader(bytesTitle);
-                    int pages = readerTitle.NumberOfPages;
+                    int pagesTitle = readerTitle.NumberOfPages;
 
                     using (iTextSharp.text.pdf.PdfStamper stamper = new iTextSharp.text.pdf.PdfStamper(readerTitle, stream))
                     {
                         int startPageNumber = Convert.ToInt32(StartNumberNumeric.Value) - 1;
-                        int pagesPzCount = Convert.ToInt32(CountPagePZNumeric.Value);
 
                         //Нумерация страниц содержания
-                        for (int i = 1; i <= pages; i++)
-                        {
-                            iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + startPageNumber).ToString(), blackFont), 565f, 15f, 0);
-                        }
-
+                        if(TwoSidedPrintCheckBox.Checked)
+                            for (int i = 1; i <= pagesTitle; i++)
+                            {
+                                if ((i + startPageNumber) % 2 == 0)
+                                    iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + startPageNumber).ToString(), blackFont), 30f, 810f, 0);
+                                else
+                                    iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + startPageNumber).ToString(), blackFont), 565f, 810f, 0);
+                            }
+                        else
+                            for (int i = 1; i <= pagesTitle; i++)
+                                iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + startPageNumber).ToString(), blackFont), 565f, 15f, 0);
                     }
                     bytesTitle = stream.ToArray();
                     readerTitle.Close();
@@ -718,10 +713,8 @@ namespace ExcelAPP
                 DeleteTempFiles();
                 DeleteTempVar();
                 backgroundWorker.ReportProgress(1, "Сборка остановлена...");
-
                 backgroundWorker.CancelAsync();
             }
-
         }
 
         protected void AddPageNumberSmetaITextSharp(string filePath)
@@ -729,15 +722,14 @@ namespace ExcelAPP
             try
             {
                 byte[] bytes = File.ReadAllBytes(filePath);
-                byte[] bytesTitle = File.ReadAllBytes($"{_path}\\TEMPdf\\Содержание.pdf");
+                PdfDocument titleDocument = PdfReader.Open($"{_path}\\TEMPdf\\Содержание.pdf");
 
                 iTextSharp.text.Font blackFont = FontFactory.GetFont("Arial", 8, iTextSharp.text.Font.NORMAL, BaseColor.BLACK);
                 using (MemoryStream stream = new MemoryStream())
                 {
                     iTextSharp.text.pdf.PdfReader reader = new iTextSharp.text.pdf.PdfReader(bytes);
-                    iTextSharp.text.pdf.PdfReader readerOnlyTitle = new iTextSharp.text.pdf.PdfReader(bytesTitle);
-                    int titlePages = readerOnlyTitle.NumberOfPages;
-                    int pages = reader.NumberOfPages;
+                    int titlePages = titleDocument.PageCount;
+                    int pagesBook = reader.NumberOfPages;
                     int afterTitleNumericPages = Convert.ToInt32(afterTitleNumeric.Value);
 
                     using (iTextSharp.text.pdf.PdfStamper stamper = new iTextSharp.text.pdf.PdfStamper(reader, stream))
@@ -747,29 +739,24 @@ namespace ExcelAPP
 
                         if (TwoSidedPrintCheckBox.Checked)
                         {
-                            bool flag = false;
-                            for (int i = 1; i <= pages; i++)
+                            if((startPageNumber + titlePages) % 2 == 1)
+                                titlePages++;
+                            if (pagesPzCount % 2 == 1)
+                                pagesPzCount++;
+
+                            for (int i = 1; i <= pagesBook; i++)
                             {
-                                if (flag)
-                                {
+                                if ((startPageNumber + titlePages + pagesPzCount + i) % 2 == 0)
                                     iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + afterTitleNumericPages + startPageNumber + pagesPzCount + titlePages).ToString(), blackFont), 810f, 575f, 0);
-                                    flag = false;
-                                }
                                 else
-                                {
                                     iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + afterTitleNumericPages + startPageNumber + pagesPzCount + titlePages).ToString(), blackFont), 810f, 15f, 0);
-                                    flag = true;
-                                }
                             }
                         }
                         else
-                        {
-                            for (int i = 1; i <= pages; i++)
-                            {
+                            for (int i = 1; i <= pagesBook; i++)
                                 iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + afterTitleNumericPages + startPageNumber + pagesPzCount + titlePages).ToString(), blackFont), 810f, 15f, 0);
-                            }
-                        }
                     }
+                    titleDocument.Close();
                     bytes = stream.ToArray();
                     reader.Close();
 
@@ -782,10 +769,8 @@ namespace ExcelAPP
                 DeleteTempFiles();
                 DeleteTempVar();
                 backgroundWorker.ReportProgress(1, "Сборка остановлена...");
-
                 backgroundWorker.CancelAsync();
             }
-
         }
 
         protected void AddPageNumberITextSharp(string filePath)
@@ -814,9 +799,7 @@ namespace ExcelAPP
                             bool flag = true;
                             //Нумерация страниц содержания
                             for (int i = 1; i <= titlePages; i++)
-                            {
                                 iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + startPageNumber).ToString(), blackFont), 565f, 15f, 0);
-                            }
                             for (int i = 1 + titlePages; i <= pages; i++)
                             {
                                 if (flag)
@@ -835,18 +818,13 @@ namespace ExcelAPP
                         {
                             //Нумерация страниц содержания
                             for (int i = 1; i <= titlePages; i++)
-                            {
                                 iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + startPageNumber).ToString(), blackFont), 565f, 15f, 0);
-                            }
                             for (int i = titlePages + 1; i <= pages; i++)
-                            {
                                 iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + afterTitleNumericPages + startPageNumber + pagesPzCount).ToString(), blackFont), 810f, 15f, 0);
-                            }
                         }
                     }
                     bytes = stream.ToArray();
                     reader.Close();
-
                 }
                 File.WriteAllBytes(filePath, bytes);
             }
@@ -858,11 +836,7 @@ namespace ExcelAPP
                 backgroundWorker.ReportProgress(1, "Сборка остановлена...");
                 backgroundWorker.CancelAsync();
             }
-
-
         }
-
-
 
         protected bool TitleGeneration()
         {
