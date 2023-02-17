@@ -28,8 +28,6 @@
             this.btnBuild = new System.Windows.Forms.Button();
             this.StartNumberNumeric = new System.Windows.Forms.NumericUpDown();
             this.label1 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
-            this.afterTitleNumeric = new System.Windows.Forms.NumericUpDown();
             this.label4 = new System.Windows.Forms.Label();
             this.CountPagePZNumeric = new System.Windows.Forms.NumericUpDown();
             this.TwoSidedPrintCheckBox = new System.Windows.Forms.CheckBox();
@@ -37,10 +35,11 @@
             this.SplitBookContentCheckBox = new System.Windows.Forms.CheckBox();
             this.infoTextBox = new System.Windows.Forms.TextBox();
             this.button1 = new System.Windows.Forms.Button();
-            this.toggleButton1 = new ExcelApp.Controls.ToggleButton();
+            this.RdPdToggle = new ExcelApp.Controls.ToggleButton();
             this.button2 = new System.Windows.Forms.Button();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.StartNumberNumeric)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.afterTitleNumeric)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.CountPagePZNumeric)).BeginInit();
             this.SuspendLayout();
             // 
@@ -117,34 +116,10 @@
             this.label1.TabIndex = 11;
             this.label1.Text = "Номер первой страницы";
             // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(17, 110);
-            this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(158, 16);
-            this.label3.TabIndex = 15;
-            this.label3.Text = "Стр. после содержания";
-            // 
-            // afterTitleNumeric
-            // 
-            this.afterTitleNumeric.Enabled = false;
-            this.afterTitleNumeric.Location = new System.Drawing.Point(201, 108);
-            this.afterTitleNumeric.Margin = new System.Windows.Forms.Padding(4, 4, 13, 12);
-            this.afterTitleNumeric.Maximum = new decimal(new int[] {
-            999999999,
-            0,
-            0,
-            0});
-            this.afterTitleNumeric.Name = "afterTitleNumeric";
-            this.afterTitleNumeric.Size = new System.Drawing.Size(76, 22);
-            this.afterTitleNumeric.TabIndex = 14;
-            // 
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(19, 148);
+            this.label4.Location = new System.Drawing.Point(17, 110);
             this.label4.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(96, 16);
@@ -153,7 +128,7 @@
             // 
             // CountPagePZNumeric
             // 
-            this.CountPagePZNumeric.Location = new System.Drawing.Point(201, 146);
+            this.CountPagePZNumeric.Location = new System.Drawing.Point(201, 108);
             this.CountPagePZNumeric.Margin = new System.Windows.Forms.Padding(4, 4, 13, 12);
             this.CountPagePZNumeric.Maximum = new decimal(new int[] {
             999999999,
@@ -177,7 +152,7 @@
             // TwoSidedPrintCheckBox
             // 
             this.TwoSidedPrintCheckBox.AutoSize = true;
-            this.TwoSidedPrintCheckBox.Location = new System.Drawing.Point(21, 260);
+            this.TwoSidedPrintCheckBox.Location = new System.Drawing.Point(20, 212);
             this.TwoSidedPrintCheckBox.Margin = new System.Windows.Forms.Padding(4);
             this.TwoSidedPrintCheckBox.Name = "TwoSidedPrintCheckBox";
             this.TwoSidedPrintCheckBox.Size = new System.Drawing.Size(163, 20);
@@ -197,7 +172,7 @@
             this.SplitBookContentCheckBox.AutoSize = true;
             this.SplitBookContentCheckBox.Checked = true;
             this.SplitBookContentCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.SplitBookContentCheckBox.Location = new System.Drawing.Point(21, 288);
+            this.SplitBookContentCheckBox.Location = new System.Drawing.Point(20, 238);
             this.SplitBookContentCheckBox.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.SplitBookContentCheckBox.Name = "SplitBookContentCheckBox";
             this.SplitBookContentCheckBox.Size = new System.Drawing.Size(176, 20);
@@ -227,24 +202,24 @@
             this.button1.Text = "button1";
             this.button1.UseVisualStyleBackColor = true;
             // 
-            // toggleButton1
+            // RdPdToggle
             // 
-            this.toggleButton1.AutoSize = true;
-            this.toggleButton1.Location = new System.Drawing.Point(22, 323);
-            this.toggleButton1.Margin = new System.Windows.Forms.Padding(4);
-            this.toggleButton1.MinimumSize = new System.Drawing.Size(60, 27);
-            this.toggleButton1.Name = "toggleButton1";
-            this.toggleButton1.OffBackColor = System.Drawing.Color.Gray;
-            this.toggleButton1.OffToggleColor = System.Drawing.Color.Gainsboro;
-            this.toggleButton1.OnBackColor = System.Drawing.Color.MediumSlateBlue;
-            this.toggleButton1.OnToggleColor = System.Drawing.Color.WhiteSmoke;
-            this.toggleButton1.Size = new System.Drawing.Size(60, 27);
-            this.toggleButton1.TabIndex = 23;
-            this.toggleButton1.UseVisualStyleBackColor = true;
+            this.RdPdToggle.AutoSize = true;
+            this.RdPdToggle.Location = new System.Drawing.Point(103, 158);
+            this.RdPdToggle.Margin = new System.Windows.Forms.Padding(4);
+            this.RdPdToggle.MinimumSize = new System.Drawing.Size(60, 27);
+            this.RdPdToggle.Name = "RdPdToggle";
+            this.RdPdToggle.OffBackColor = System.Drawing.Color.Gray;
+            this.RdPdToggle.OffToggleColor = System.Drawing.Color.Gainsboro;
+            this.RdPdToggle.OnBackColor = System.Drawing.Color.MediumSlateBlue;
+            this.RdPdToggle.OnToggleColor = System.Drawing.Color.WhiteSmoke;
+            this.RdPdToggle.Size = new System.Drawing.Size(60, 27);
+            this.RdPdToggle.TabIndex = 23;
+            this.RdPdToggle.UseVisualStyleBackColor = true;
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(131, 196);
+            this.button2.Location = new System.Drawing.Point(177, 351);
             this.button2.Margin = new System.Windows.Forms.Padding(4);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(100, 28);
@@ -253,22 +228,42 @@
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.label2.Location = new System.Drawing.Point(60, 160);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(35, 20);
+            this.label2.TabIndex = 25;
+            this.label2.Text = "ПД";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.label3.Location = new System.Drawing.Point(169, 160);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(33, 20);
+            this.label3.TabIndex = 26;
+            this.label3.Text = "РД";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.ClientSize = new System.Drawing.Size(862, 398);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.label2);
             this.Controls.Add(this.button2);
-            this.Controls.Add(this.toggleButton1);
+            this.Controls.Add(this.RdPdToggle);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.infoTextBox);
             this.Controls.Add(this.SplitBookContentCheckBox);
             this.Controls.Add(this.TwoSidedPrintCheckBox);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.CountPagePZNumeric);
-            this.Controls.Add(this.label3);
-            this.Controls.Add(this.afterTitleNumeric);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.StartNumberNumeric);
             this.Controls.Add(this.labelCompleted);
@@ -281,7 +276,6 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Smeta++";
             ((System.ComponentModel.ISupportInitialize)(this.StartNumberNumeric)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.afterTitleNumeric)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.CountPagePZNumeric)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -296,8 +290,6 @@
         private System.Windows.Forms.Label labelCompleted;
         private System.Windows.Forms.NumericUpDown StartNumberNumeric;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.NumericUpDown afterTitleNumeric;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.NumericUpDown CountPagePZNumeric;
         private System.Windows.Forms.CheckBox TwoSidedPrintCheckBox;
@@ -305,7 +297,9 @@
         private System.Windows.Forms.CheckBox SplitBookContentCheckBox;
         private System.Windows.Forms.TextBox infoTextBox;
         private System.Windows.Forms.Button button1;
-        private ExcelApp.Controls.ToggleButton toggleButton1;
+        private ExcelApp.Controls.ToggleButton RdPdToggle;
         private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label label3;
     }
 }

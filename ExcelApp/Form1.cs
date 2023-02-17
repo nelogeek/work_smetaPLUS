@@ -80,6 +80,8 @@ namespace ExcelAPP
                         childFolder = new DirectoryInfo(dir[0]);
                         objectiveFiles = childFolder.GetFiles(".", SearchOption.TopDirectoryOnly);
 
+                        infoTextBox.Clear(); // очистка TextBox
+
                         infoTextBox.AppendText($"Общее количество страниц: {fullBookPageCounter()}" + Environment.NewLine +
                             $"Кол-во всех файлов: {localFiles.Length + objectiveFiles.Length}\n" + Environment.NewLine +
                             $"Кол-во папок: {dir.Length}" + Environment.NewLine +
@@ -647,7 +649,6 @@ namespace ExcelAPP
                     Object defaultTableBehavior = Word.WdDefaultTableBehavior.wdWord9TableBehavior;
                     Object autoFitBehavior = Word.WdAutoFitBehavior.wdAutoFitWindow;
 
-
                     var wDocument = wordApp.Documents.Add();
 
                     // настройка полей документа
@@ -713,7 +714,7 @@ namespace ExcelAPP
                     Table.Columns[4].PreferredWidth = 9f;
                     Table.Columns[5].PreferredWidth = 8f;
                     Table.Columns[6].PreferredWidth = 5f;
-
+                    //---
                     Table.Range.Rows[row].Range.Font.Name = "Times New Roman";
                     Table.Rows[row].Range.Font.Size = 10;
                     Table.Cell(row, 1).Range.Font.Size = 9;
@@ -727,7 +728,6 @@ namespace ExcelAPP
                     Table.Cell(row, 6).Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
                     Table.Rows[row].Cells.VerticalAlignment = Word.WdCellVerticalAlignment.wdCellAlignVerticalTop;
                     Table.Borders.Enable = 0;
-
                     // заполнение таблицы
                     Table.Rows.Add();
                     row++;
@@ -814,7 +814,7 @@ namespace ExcelAPP
 
                     //нумерация страниц
                     int pagesInTitle = wDocument.ComputeStatistics(WdStatistic.wdStatisticPages, false) - 1; // кол-во страниц в содержании
-                    int pageNumber = (int)StartNumberNumeric.Value + pagesInTitle; // + (int)afterTitleNumeric.Value + (int)CountPagePZNumeric.Value + pagesInTitle; // TODO  2 переделать
+                    int pageNumber = (int)StartNumberNumeric.Value + pagesInTitle; // номер страницы
 
                     row = 2;
 
@@ -836,7 +836,7 @@ namespace ExcelAPP
                         row += 2;
 
                         // нумерация сметы
-                        if((pageNumber % 2) == 0)
+                        if ((pageNumber % 2) == 0)
                         {
                             pageNumber += 1;
                         }
@@ -870,9 +870,9 @@ namespace ExcelAPP
                             }
                         }
 
-                        
+
                     }
-                    else 
+                    else
                     {
                         // добавление страниц после содержания TODO
 
@@ -907,192 +907,224 @@ namespace ExcelAPP
                         }
                     }
 
-                    //------------------
-
                     wDocument.SaveAs2($"{pdfFolder}\\Содержание.docx");
                     wDocument.ExportAsFixedFormat($"{pdfFolder}\\Содержание.pdf", Word.WdExportFormat.wdExportFormatPDF);
                     wDocument.Close(Word.WdSaveOptions.wdDoNotSaveChanges, Word.WdOriginalFormat.wdOriginalDocumentFormat, false);
-                    wordApp.Quit();
-
-
-
-
 
                 }
                 else // TODO двуст и обыч печать для смет без ОС
                 {
 
-                    var wDocument = wordApp.Documents.Add();
-
                     object oMissing = Type.Missing;
                     Object defaultTableBehavior = Word.WdDefaultTableBehavior.wdWord9TableBehavior;
                     Object autoFitBehavior = Word.WdAutoFitBehavior.wdAutoFitWindow;
 
+                    var wDocument = wordApp.Documents.Add();
+
+                    // настройка полей документа
+                    wDocument.PageSetup.TopMargin = wordApp.InchesToPoints(0.5f);
+                    wDocument.PageSetup.BottomMargin = wordApp.InchesToPoints(0.5f);
+                    wDocument.PageSetup.LeftMargin = wordApp.InchesToPoints(0.65f);
+                    wDocument.PageSetup.RightMargin = wordApp.InchesToPoints(0.4f);
+
+                    // Верхний колонтитул - текст
+                    Word.Range headerRange = wDocument.Sections[1].Headers[Word.WdHeaderFooterIndex.wdHeaderFooterPrimary].Range;
+                    headerRange.Paragraphs.Add(ref oMissing);
+                    Word.Paragraph headerParagraph = headerRange.Paragraphs[1];
+                    Word.Range paragraphRange = headerParagraph.Range;
+                    headerParagraph.SpaceAfter = 0; // межстрочный интервал
+                    paragraphRange.Text = "Содержание";
+                    paragraphRange.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
+                    paragraphRange.Font.Name = "Times New Roman";
+                    paragraphRange.Font.Size = 12;
+                    paragraphRange.Font.Italic = 1;
+                    paragraphRange.Font.Bold = 1;
+                    paragraphRange.Font.Color = Word.WdColor.wdColorBlack;
+
+                    // Верхний колонтитул - таблица
+                    headerRange.Paragraphs.Add(ref oMissing);
+                    headerParagraph = headerRange.Paragraphs[2];
+                    paragraphRange = headerParagraph.Range;
+                    headerParagraph.SpaceAfter = 0; // межстрочный интервал
+
+                    Word.Table headerTable = wDocument.Tables.Add(paragraphRange, 1, 6, ref defaultTableBehavior, ref autoFitBehavior);
+                    // заполнение таблицы
+                    headerTable.Cell(row, 1).Range.Text = "N п/п";
+                    headerTable.Cell(row, 2).Range.Text = "N сметы";
+                    headerTable.Cell(row, 3).Range.Text = "Наименование";
+                    headerTable.Cell(row, 4).Range.Text = "Всего тыс.руб.";
+                    headerTable.Cell(row, 5).Range.Text = "Стр.";
+                    headerTable.Cell(row, 6).Range.Text = "Часть";
+                    // изменение параметров таблицы
+                    headerTable.Range.Rows[row].Cells.VerticalAlignment = Word.WdCellVerticalAlignment.wdCellAlignVerticalCenter;
+                    headerTable.Range.Rows[row].Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
+                    headerTable.Range.Rows[row].Range.Font.Name = "Times New Roman";
+                    headerTable.Rows[row].Range.Font.Bold = 1;
+                    headerTable.Rows[row].Range.Font.Color = Word.WdColor.wdColorBlack;
+                    // ширина ячеек таблицы
+                    headerTable.Columns[1].PreferredWidth = 6f;
+                    headerTable.Columns[2].PreferredWidth = 9f;
+                    headerTable.Columns[3].PreferredWidth = 30f;
+                    headerTable.Columns[4].PreferredWidth = 9f;
+                    headerTable.Columns[5].PreferredWidth = 8f;
+                    headerTable.Columns[6].PreferredWidth = 5f;
+
+                    // основная часть
                     wDocument.Paragraphs.Add(ref oMissing);
-                    wDocument.Paragraphs.Add(ref oMissing);
-
-                    var wParagraph = wDocument.Paragraphs[1];
-                    var wRange = wParagraph.Range;
-                    wParagraph.SpaceAfter = 0; // межстрочный интервал
-                    wRange.Text = "Содержание";
-                    wRange.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
-                    wRange.Font.Name = "Times New Roman";
-                    wRange.Font.Size = 12;
-                    wRange.Font.Italic = 1;
-                    wRange.Font.Bold = 1;
-                    wRange.Font.Color = Word.WdColor.wdColorGray55;
-
-                    wParagraph = wDocument.Paragraphs[2];
-                    wRange = wParagraph.Range;
-                    var wTable1 = wDocument.Tables.Add(wRange, 1, 6, ref defaultTableBehavior, ref autoFitBehavior);
-
-                    NumberDocument = 1;
-
-                    // Шапка
-                    wTable1.Cell(row, 1).Range.Text = "N п/п";
-                    wTable1.Cell(row, 2).Range.Text = "N сметы";
-                    wTable1.Cell(row, 3).Range.Text = "Наименование";
-                    wTable1.Cell(row, 4).Range.Text = "Всего тыс.руб.";
-                    wTable1.Cell(row, 5).Range.Text = "Стр.";
-                    wTable1.Cell(row, 6).Range.Text = "Часть";
-                    // изменение параметров шапки
-                    wTable1.Range.Rows[row].Cells.VerticalAlignment = Word.WdCellVerticalAlignment.wdCellAlignVerticalCenter;
-                    wTable1.Range.Rows[row].Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
-                    wTable1.Range.Rows[row].Range.Font.Name = "Times New Roman";
-                    wTable1.Range.Rows[row].Cells.Borders.Enable = 0; // отключение границ в содержании
-                    wTable1.Rows[row].Range.Font.Color = Word.WdColor.wdColorGray55;
-                    wTable1.Rows[row].Range.Font.Bold = 1;
-                    row++;
-
-
-
-                    wTable1.Rows.Add();
-                    row++;
-
-
-                    // пояснительная записка
-                    wTable1.Rows.Add();
-                    wTable1.Cell(row, 1).Range.Text = NumberDocument.ToString();
-                    wTable1.Cell(row, 3).Range.Text = "Пояснительная записка" + "\n";
-
-                    // изменение параметров строки
-                    wTable1.Cell(row, 1).Range.Font.Size = 9;
-                    wTable1.Cell(row, 3).Range.Font.Size = 10;
-                    wTable1.Rows[row].Range.Font.Bold = 0;
-                    wTable1.Rows[row].Range.Font.Color = Word.WdColor.wdColorBlack;
-                    wTable1.Cell(row, 3).Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphLeft;
-                    wTable1.Rows[row].Cells.VerticalAlignment = Word.WdCellVerticalAlignment.wdCellAlignVerticalTop;
-
+                    var Paragraph = wDocument.Paragraphs[1];
+                    var Range = Paragraph.Range;
+                    var Table = wDocument.Tables.Add(Range, 1, 6, ref defaultTableBehavior, ref autoFitBehavior);
+                    // ширина ячеек таблицы
+                    Table.Columns[1].PreferredWidth = 6f;
+                    Table.Columns[2].PreferredWidth = 9f;
+                    Table.Columns[3].PreferredWidth = 30f;
+                    Table.Columns[4].PreferredWidth = 9f;
+                    Table.Columns[5].PreferredWidth = 8f;
+                    Table.Columns[6].PreferredWidth = 5f;
                     //---
+                    Table.Range.Rows[row].Range.Font.Name = "Times New Roman";
+                    Table.Rows[row].Range.Font.Size = 10;
+                    Table.Cell(row, 1).Range.Font.Size = 9;
+                    Table.Rows[row].Range.Font.Bold = 0;
+                    Table.Rows[row].Range.Font.Color = Word.WdColor.wdColorBlack;
+                    Table.Cell(row, 1).Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
+                    Table.Cell(row, 2).Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
+                    Table.Cell(row, 3).Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphLeft;
+                    Table.Cell(row, 4).Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphRight;
+                    Table.Cell(row, 5).Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
+                    Table.Cell(row, 6).Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
+                    Table.Rows[row].Cells.VerticalAlignment = Word.WdCellVerticalAlignment.wdCellAlignVerticalTop;
+                    Table.Borders.Enable = 0;
+                    // заполнение таблицы
+                    Table.Rows.Add();
                     row++;
-
-
-
-
+                    // пояснительная записка
+                    Table.Rows.Add();
+                    Table.Cell(row, 1).Range.Text = NumberDocument.ToString();
+                    Table.Cell(row, 3).Range.Text = "Пояснительная записка" + "\n";
+                    row++;
                     // шапка локальных смет
-                    wTable1.Rows.Add();
-                    wTable1.Cell(row, 3).Range.Text = "ЛОКАЛЬНЫЕ СМЕТЫ" + "\n";
+                    Table.Rows.Add();
+                    Table.Cell(row, 3).Range.Text = "ЛОКАЛЬНЫЕ СМЕТЫ" + "\n";
                     // изменение параметров строки
-                    wTable1.Cell(row, 3).Range.Font.Bold = 1;
-                    wTable1.Cell(row, 3).Range.Font.Size = 14;
-                    wTable1.Cell(row, 3).Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
+                    Table.Cell(row, 3).Range.Font.Bold = 1;
+                    Table.Cell(row, 3).Range.Font.Size = 14;
+                    Table.Cell(row, 3).Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
                     row++;
-
-
-                    // вывод соответствующих локальных смет
+                    // вывод локальных смет
                     foreach (var lData in localData)
                     {
-
                         NumberDocument++;
-                        wTable1.Rows.Add();
-                        wTable1.Cell(row, 1).Range.Text = NumberDocument.ToString();
-                        wTable1.Cell(row, 2).Range.Text = lData.Code;
-                        wTable1.Cell(row, 3).Range.Text = lData.NameDate + "\n";
-                        wTable1.Cell(row, 4).Range.Text = lData.Price;
-
+                        Table.Rows.Add();
+                        Table.Cell(row, 1).Range.Text = NumberDocument.ToString();
+                        Table.Cell(row, 2).Range.Text = lData.Code;
+                        Table.Cell(row, 3).Range.Text = lData.NameDate + "\n";
+                        Table.Cell(row, 4).Range.Text = lData.Price;
                         // изменение параметров строки
-                        wTable1.Cell(row, 3).Range.Font.Size = 10;
-                        wTable1.Cell(row, 3).Range.Font.Italic = 0;
-                        wTable1.Cell(row, 3).Range.Font.Bold = 0;
-                        wTable1.Cell(row, 3).Range.Font.Underline = Word.WdUnderline.wdUnderlineNone;
-                        wTable1.Cell(row, 3).Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphLeft;
-                        wTable1.Cell(row, 4).Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphRight;
-                        wTable1.Cell(row, 4).Range.Font.Size = 10;
-
+                        Table.Cell(row, 3).Range.Font.Size = 10;
+                        Table.Cell(row, 3).Range.Font.Italic = 0;
+                        Table.Cell(row, 3).Range.Font.Bold = 0;
+                        Table.Cell(row, 3).Range.Font.Underline = Word.WdUnderline.wdUnderlineNone;
+                        Table.Cell(row, 3).Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphLeft;
+                        Table.Cell(row, 4).Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphRight;
+                        Table.Cell(row, 4).Range.Font.Size = 10;
                         row++;
 
                     }
 
 
-                    wTable1.Columns[1].PreferredWidth = 6f;
-                    wTable1.Columns[2].PreferredWidth = 9f;
-                    wTable1.Columns[3].PreferredWidth = 30f;
-                    wTable1.Columns[4].PreferredWidth = 9f;
-                    wTable1.Columns[5].PreferredWidth = 8f;
-                    wTable1.Columns[6].PreferredWidth = 5f;
-
-                    wTable1.Range.Rows[1].Cells.Borders.Enable = 1; // добавление границ в шапке
-                    wTable1.Rows[1].Cells[1].Borders[Word.WdBorderType.wdBorderTop].Color = Word.WdColor.wdColorGray30;
-                    wTable1.Rows[1].Cells[1].Borders[Word.WdBorderType.wdBorderRight].Color = Word.WdColor.wdColorGray30;
-                    wTable1.Rows[1].Cells[1].Borders[Word.WdBorderType.wdBorderBottom].Color = Word.WdColor.wdColorGray30;
-                    wTable1.Rows[1].Cells[1].Borders[Word.WdBorderType.wdBorderLeft].Color = Word.WdColor.wdColorGray30;
-
-                    wTable1.Rows[1].Cells[2].Borders[Word.WdBorderType.wdBorderTop].Color = Word.WdColor.wdColorGray30;
-                    wTable1.Rows[1].Cells[2].Borders[Word.WdBorderType.wdBorderRight].Color = Word.WdColor.wdColorGray30;
-                    wTable1.Rows[1].Cells[2].Borders[Word.WdBorderType.wdBorderBottom].Color = Word.WdColor.wdColorGray30;
-                    wTable1.Rows[1].Cells[2].Borders[Word.WdBorderType.wdBorderLeft].Color = Word.WdColor.wdColorGray30;
-
-                    wTable1.Rows[1].Cells[3].Borders[Word.WdBorderType.wdBorderTop].Color = Word.WdColor.wdColorGray30;
-                    wTable1.Rows[1].Cells[3].Borders[Word.WdBorderType.wdBorderRight].Color = Word.WdColor.wdColorGray30;
-                    wTable1.Rows[1].Cells[3].Borders[Word.WdBorderType.wdBorderBottom].Color = Word.WdColor.wdColorGray30;
-                    wTable1.Rows[1].Cells[3].Borders[Word.WdBorderType.wdBorderLeft].Color = Word.WdColor.wdColorGray30;
-
-                    wTable1.Rows[1].Cells[4].Borders[Word.WdBorderType.wdBorderTop].Color = Word.WdColor.wdColorGray30;
-                    wTable1.Rows[1].Cells[4].Borders[Word.WdBorderType.wdBorderRight].Color = Word.WdColor.wdColorGray30;
-                    wTable1.Rows[1].Cells[4].Borders[Word.WdBorderType.wdBorderBottom].Color = Word.WdColor.wdColorGray30;
-                    wTable1.Rows[1].Cells[4].Borders[Word.WdBorderType.wdBorderLeft].Color = Word.WdColor.wdColorGray30;
-
-                    wTable1.Rows[1].Cells[5].Borders[Word.WdBorderType.wdBorderTop].Color = Word.WdColor.wdColorGray30;
-                    wTable1.Rows[1].Cells[5].Borders[Word.WdBorderType.wdBorderRight].Color = Word.WdColor.wdColorGray30;
-                    wTable1.Rows[1].Cells[5].Borders[Word.WdBorderType.wdBorderBottom].Color = Word.WdColor.wdColorGray30;
-                    wTable1.Rows[1].Cells[5].Borders[Word.WdBorderType.wdBorderLeft].Color = Word.WdColor.wdColorGray30;
-
-                    wTable1.Rows[1].Cells[6].Borders[Word.WdBorderType.wdBorderTop].Color = Word.WdColor.wdColorGray30;
-                    wTable1.Rows[1].Cells[6].Borders[Word.WdBorderType.wdBorderRight].Color = Word.WdColor.wdColorGray30;
-                    wTable1.Rows[1].Cells[6].Borders[Word.WdBorderType.wdBorderBottom].Color = Word.WdColor.wdColorGray30;
-                    wTable1.Rows[1].Cells[6].Borders[Word.WdBorderType.wdBorderLeft].Color = Word.WdColor.wdColorGray30;
 
 
                     //нумерация страниц
-
-                    int pagesInTitle = wDocument.ComputeStatistics(WdStatistic.wdStatisticPages, false);
-                    //MessageBox.Show(pagesInTitle.ToString());
-                    int countPages = (int)StartNumberNumeric.Value + (int)afterTitleNumeric.Value + (int)CountPagePZNumeric.Value + pagesInTitle - 1;
-
-                    row = 3;
-
-                    wTable1.Cell(row, 5).Range.Text = countPages.ToString();
-                    countPages += (int)CountPagePZNumeric.Value;
-
-                    row += 2;
-
-                    foreach (var lData in localData) // локальные сметы
+                    int pagesInTitle = wDocument.ComputeStatistics(WdStatistic.wdStatisticPages, false) - 1;
+                    int pageNumber = (int)StartNumberNumeric.Value + pagesInTitle;
+                    row = 2;
+                    if (TwoSidedPrintCheckBox.Checked)
                     {
-                        wTable1.Cell(row, 5).Range.Text = countPages.ToString();
-                        countPages += lData.PageCount;
+                        // добавление страниц после содержания TODO
+
+                        // нумерация ПЗ
+                        if ((pageNumber % 2) == 0)
+                        {
+                            pageNumber += 1;
+                        }
+                        else
+                        {
+                            pageNumber += 2;
+                        }
+                        Table.Cell(row, 5).Range.Text = pageNumber.ToString();
+                        pageNumber += (int)CountPagePZNumeric.Value;
                         row++;
+
+                        // нумерация сметы
+                        if ((pageNumber % 2) == 0)
+                        {
+                            pageNumber += 1;
+                        }
+                        else
+                        {
+                            pageNumber += 2;
+                        }
+
+                        foreach (var data in objectiveData) // объектные сметы
+                        {
+                            Table.Cell(row, 5).Range.Text = pageNumber.ToString();
+                            pageNumber += data.PageCount;
+                            row++;
+                        }
+
+
+                        row++;
+
+
+
+                        foreach (var lData in localData)
+                        {
+
+                            Table.Cell(row, 5).Range.Text = pageNumber.ToString();
+                            pageNumber += lData.PageCount;
+                            row++;
+
+                        }
+
+
+
+                    }
+                    else
+                    {
+                        // добавление страниц после содержания TODO
+
+                        // нумерация ПЗ
+                        pageNumber++;
+                        Table.Cell(row, 5).Range.Text = pageNumber.ToString();
+                        pageNumber += (int)CountPagePZNumeric.Value;
+                        row++;
+
+                        // нумерация сметы
+                        foreach (var data in objectiveData) // объектные сметы
+                        {
+                            Table.Cell(row, 5).Range.Text = pageNumber.ToString();
+                            pageNumber += data.PageCount;
+                            row++;
+                        }
+                        row++;
+
+
+
+                        foreach (var lData in localData)
+                        {
+
+                            Table.Cell(row, 5).Range.Text = pageNumber.ToString();
+                            pageNumber += lData.PageCount;
+                            row++;
+
+                        }
+
                     }
 
-                    //------------------
-
-
-
-                    // ---
-                    //wDocument.SaveAs2($"{pdfFolder}\\Содержание.pdf", WdSaveFormat.wdFormatPDF);
+                    wDocument.SaveAs2($"{pdfFolder}\\Содержание.docx");
                     wDocument.ExportAsFixedFormat($"{pdfFolder}\\Содержание.pdf", Word.WdExportFormat.wdExportFormatPDF);
                     wDocument.Close(Word.WdSaveOptions.wdDoNotSaveChanges, Word.WdOriginalFormat.wdOriginalDocumentFormat, false);
-
-                    wordApp.Quit();
                 }
                 return true;
             }
@@ -1103,8 +1135,12 @@ namespace ExcelAPP
                 MessageBox.Show("Ошибка генерации содержания");
                 backgroundWorker.CancelAsync();
                 backgroundWorker.ReportProgress(1, "Сборка остановлена...");
-                wordApp.Quit();
+
                 return false;
+            }
+            finally
+            {
+                wordApp.Quit();
             }
 
 
@@ -1132,7 +1168,7 @@ namespace ExcelAPP
         }
 
         protected void PageBreaker(Excel.Worksheet eWorksheet, int rowsCount, bool local) //Регулировка разрывов страниц
-        { 
+        {
             //разделение(разрыв) страниц
             //var lastUsedRow = eWorksheet.Cells.Find(, System.Reflection.Missing.Value,
             //           System.Reflection.Missing.Value, System.Reflection.Missing.Value,
@@ -1187,9 +1223,6 @@ namespace ExcelAPP
                     numberPagesInBooks += eWorkbook.Sheets[1].PageSetup.Pages.Count;
                     eWorkbook.Close();
                 }
-                app.Quit();
-                eWorkbook = null;
-                GC.Collect();
                 return numberPagesInBooks;
             }
             catch (Exception ex)
@@ -1199,10 +1232,13 @@ namespace ExcelAPP
                 Console.WriteLine(ex.Message.ToString());
                 DeleteTempFiles();
                 DeleteTempVar();
+                return 0;
+            }
+            finally
+            {
                 app.Quit();
                 eWorkbook = null;
                 GC.Collect();
-                return 0;
             }
         }
 
@@ -1260,8 +1296,9 @@ namespace ExcelAPP
             localFiles = null;
             childFolder = null;
             objectiveFiles = null;
-            localData = new List<SmetaFile>(); ;
-            objectiveData = new List<SmetaFile>(); ;
+            localData = new List<SmetaFile>(); 
+            objectiveData = new List<SmetaFile>();
+            GC.Collect();
         }
 
         private void button2_Click(object sender, EventArgs e)
