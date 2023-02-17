@@ -176,7 +176,7 @@ namespace ExcelAPP
         {
             this.StartNumberNumeric.Enabled = false;
             //this.numericUpDown1.Enabled = false;
-            this.afterTitleNumeric.Enabled = false;
+            //this.afterTitleNumeric.Enabled = false;
             this.CountPagePZNumeric.Enabled = false;
             this.btnBuild.Enabled = false;
             this.btnSelectFolder.Enabled = false;
@@ -187,7 +187,7 @@ namespace ExcelAPP
         {
             this.StartNumberNumeric.Enabled = true;
             //this.numericUpDown1.Enabled = true;
-            this.afterTitleNumeric.Enabled = true;
+            //this.afterTitleNumeric.Enabled = true;
             this.CountPagePZNumeric.Enabled = true;
             this.btnBuild.Enabled = true;
             this.btnSelectFolder.Enabled = true;
@@ -517,7 +517,7 @@ namespace ExcelAPP
                     iTextSharp.text.pdf.PdfReader reader = new iTextSharp.text.pdf.PdfReader(bytes);
                     int titlePages = titleDocument.PageCount;
                     int pagesBook = reader.NumberOfPages;
-                    int afterTitleNumericPages = Convert.ToInt32(afterTitleNumeric.Value);
+                    //int afterTitleNumericPages = Convert.ToInt32(afterTitleNumeric.Value);
 
                     using (iTextSharp.text.pdf.PdfStamper stamper = new iTextSharp.text.pdf.PdfStamper(reader, stream))
                     {
@@ -534,14 +534,14 @@ namespace ExcelAPP
                             for (int i = 1; i <= pagesBook; i++)
                             {
                                 if ((startPageNumber + titlePages + pagesPzCount + i) % 2 == 0)
-                                    iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + afterTitleNumericPages + startPageNumber + pagesPzCount + titlePages).ToString(), blackFont), 810f, 575f, 0);
+                                    iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + startPageNumber + pagesPzCount + titlePages).ToString(), blackFont), 810f, 575f, 0);
                                 else
-                                    iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + afterTitleNumericPages + startPageNumber + pagesPzCount + titlePages).ToString(), blackFont), 810f, 15f, 0);
+                                    iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + startPageNumber + pagesPzCount + titlePages).ToString(), blackFont), 810f, 15f, 0);
                             }
                         }
                         else
                             for (int i = 1; i <= pagesBook; i++)
-                                iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + afterTitleNumericPages + startPageNumber + pagesPzCount + titlePages).ToString(), blackFont), 810f, 15f, 0);
+                                iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + startPageNumber + pagesPzCount + titlePages).ToString(), blackFont), 810f, 15f, 0);
                     }
                     titleDocument.Close();
                     bytes = stream.ToArray();
@@ -573,7 +573,7 @@ namespace ExcelAPP
                     iTextSharp.text.pdf.PdfReader readerOnlyTitle = new iTextSharp.text.pdf.PdfReader(bytesTitle);
                     int titlePages = readerOnlyTitle.NumberOfPages;
                     int pages = reader.NumberOfPages;
-                    int afterTitleNumericPages = Convert.ToInt32(afterTitleNumeric.Value);
+                    //int afterTitleNumericPages = Convert.ToInt32(afterTitleNumeric.Value);
 
                     using (iTextSharp.text.pdf.PdfStamper stamper = new iTextSharp.text.pdf.PdfStamper(reader, stream))
                     {
@@ -590,12 +590,12 @@ namespace ExcelAPP
                             {
                                 if (flag)
                                 {
-                                    iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + afterTitleNumericPages + startPageNumber + pagesPzCount).ToString(), blackFont), 810f, 15f, 0);
+                                    iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + startPageNumber + pagesPzCount).ToString(), blackFont), 810f, 15f, 0);
                                     flag = false;
                                 }
                                 else
                                 {
-                                    iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + afterTitleNumericPages + startPageNumber + pagesPzCount).ToString(), blackFont), 810f, 575f, 0);
+                                    iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + startPageNumber + pagesPzCount).ToString(), blackFont), 810f, 575f, 0);
                                     flag = true;
                                 }
                             }
@@ -606,7 +606,7 @@ namespace ExcelAPP
                             for (int i = 1; i <= titlePages; i++)
                                 iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + startPageNumber).ToString(), blackFont), 565f, 15f, 0);
                             for (int i = titlePages + 1; i <= pages; i++)
-                                iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + afterTitleNumericPages + startPageNumber + pagesPzCount).ToString(), blackFont), 810f, 15f, 0);
+                                iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + startPageNumber + pagesPzCount).ToString(), blackFont), 810f, 15f, 0);
                         }
                     }
                     bytes = stream.ToArray();
@@ -1167,40 +1167,27 @@ namespace ExcelAPP
             backgroundWorker.ReportProgress(1, Time);
         }
 
-        protected void PageBreaker(Excel.Worksheet eWorksheet, int rowsCount, bool local) //Регулировка разрывов страниц
+        protected void PageBreaker(Excel.Worksheet eWorksheet, int rowsCount, bool local)
         {
-            //разделение(разрыв) страниц
-            //var lastUsedRow = eWorksheet.Cells.Find(, System.Reflection.Missing.Value,
-            //           System.Reflection.Missing.Value, System.Reflection.Missing.Value,
-            //           Excel.XlSearchOrder.xlByRows, Excel.XlSearchDirection.xlPrevious,
-            //           false, System.Reflection.Missing.Value, System.Reflection.Missing.Value).Row;
+            // разделение (разрыв) страниц
+            var lastUsedRow = eWorksheet.Cells.Find("*", System.Reflection.Missing.Value,
+                       System.Reflection.Missing.Value, System.Reflection.Missing.Value,
+                       Excel.XlSearchOrder.xlByRows, Excel.XlSearchDirection.xlPrevious,
+                       false, System.Reflection.Missing.Value, System.Reflection.Missing.Value).Row;
 
-            //eWorksheet.PageSetup.Zoom = false;
-            //eWorksheet.PageSetup.FitToPagesTall = (int)(lastUsedRow  rowsCount);
+            eWorksheet.PageSetup.Zoom = false;
+            eWorksheet.PageSetup.FitToPagesTall = (int)(lastUsedRow / rowsCount);
 
-            //eWorksheet.ResetAllPageBreaks();
+            eWorksheet.ResetAllPageBreaks();
 
-            //for (int i = 0; i(int)(lastUsedRow  rowsCount); i++)
-            //{
-            //    eWorksheet.HPageBreaks.Add(eWorksheet.Range[$A2]);
-            //}
-
-            //if (local)
-            //{
-            //    eWorksheet.HPageBreaks.Add(eWorksheet.Range[$A35]);
-            //}
+            if (local)
+            {
+                eWorksheet.HPageBreaks.Add(eWorksheet.Range[$"A35"]);
+            }
 
 
-            //eWorksheet.HPageBreaks.Add(eWorksheet.Range[$A{ lastUsedRow - 13}]);
-
-
-            //var arr = eWorksheet.HPageBreaks;
-            //int lastPageBreake = arr[arr.Count].Location.Row;
-
-            //if (Math.Abs(lastUsedRow - lastPageBreake)  13)
-            //{
-            //    return PageBreaker(eWorksheet, rowsCount - 1);
-            //}
+            eWorksheet.HPageBreaks.Add(eWorksheet.Range[$"A{lastUsedRow - 13}"]);
+           
         }
 
         protected int fullBookPageCounter() //Счетчик общего количества страниц
