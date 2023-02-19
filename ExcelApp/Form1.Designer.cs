@@ -36,7 +36,6 @@
             this.infoTextBox = new System.Windows.Forms.TextBox();
             this.button1 = new System.Windows.Forms.Button();
             this.RdPdToggle = new ExcelApp.Controls.ToggleButton();
-            this.button2 = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.StartNumberNumeric)).BeginInit();
@@ -217,17 +216,6 @@
             this.RdPdToggle.TabIndex = 23;
             this.RdPdToggle.UseVisualStyleBackColor = true;
             // 
-            // button2
-            // 
-            this.button2.Location = new System.Drawing.Point(177, 351);
-            this.button2.Margin = new System.Windows.Forms.Padding(4);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(100, 28);
-            this.button2.TabIndex = 24;
-            this.button2.Text = "button2";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
-            // 
             // label2
             // 
             this.label2.AutoSize = true;
@@ -256,7 +244,6 @@
             this.ClientSize = new System.Drawing.Size(862, 398);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
-            this.Controls.Add(this.button2);
             this.Controls.Add(this.RdPdToggle);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.infoTextBox);
@@ -298,7 +285,6 @@
         private System.Windows.Forms.TextBox infoTextBox;
         private System.Windows.Forms.Button button1;
         private ExcelApp.Controls.ToggleButton RdPdToggle;
-        private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
     }

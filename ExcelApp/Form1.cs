@@ -82,7 +82,9 @@ namespace ExcelAPP
 
                         infoTextBox.Clear(); // очистка TextBox
 
-                        infoTextBox.AppendText($"Общее количество страниц: {fullBookPageCounter()}" + Environment.NewLine +
+                        infoTextBox.Text = $"Общее количество страниц: {fullBookPageCounter()}" + Environment.NewLine;
+
+                        infoTextBox.AppendText(
                             $"Кол-во всех файлов: {localFiles.Length + objectiveFiles.Length}\n" + Environment.NewLine +
                             $"Кол-во папок: {dir.Length}" + Environment.NewLine +
                             $"Кол-во объектных файлов: {objectiveFiles.Length}\n" + Environment.NewLine +
@@ -214,27 +216,33 @@ namespace ExcelAPP
                     string filePath = $"{childFolder}\\{objectiveFiles[i]}";
                     eWorkbook = app.Workbooks.Open($@"{filePath}");
                     eWorksheet = (Excel.Worksheet)eWorkbook.Sheets[1];
-                    eWorksheet.PageSetup.Orientation = XlPageOrientation.xlLandscape; // TODO
-                    Regex regex = new Regex(@"(\w*)-(\d*)-(\d*)");
-                    string code = regex.Matches(eWorksheet.Range["E8"].Value.ToString())[0].ToString() + "p"; // TODO переделать
-                    string ShortCode = code.Substring(3, 5);
+                    eWorksheet.PageSetup.Orientation = XlPageOrientation.xlLandscape; 
+                    Regex regex = new Regex(@"(\w*)-(\w*)-(\w*)");
+                    string code = regex.Matches(eWorksheet.Range["E8"].Value.ToString())[0].ToString(); 
+                    string ShortCode = code.Replace("p", "").Replace("р", "").Replace("OC-", "").Replace("ОС-", "");
                     string money = eWorksheet.Range["G12"].Value.ToString();
                     string nameDate = eWorksheet.Range["C5"].Value.ToString();
                     string date = eWorksheet.Range["C18"].Value.ToString().Split(new string[] { " цен " }, StringSplitOptions.None)[1];
                     nameDate += $"\n(в ценах на {date})";
 
+                    if (RdPdToggle.Checked)
+                    {
+                        eWorksheet.Range["E8"].Replace("ОБЪЕКТНЫЙ СМЕТНЫЙ РАСЧЕТ (СМЕТА)", "ОБЪЕКТНАЯ СМЕТА");
+                    }
+
                     int pages = eWorkbook.Sheets[1].PageSetup.Pages.Count; /// кол-во страниц на листе
 
                     objectiveData.Add(new SmetaFile(
                         code, // код сметы
-                        eWorksheet.Range["C5"].Value.ToString(),
+                        eWorksheet.Range["C5"].Value.ToString(), // наименование
                         nameDate, // Наименование
                         money, // Сумма денег
                         pages, // кол-во страниц на листе
                         objectiveFiles[i],
                         ShortCode));
 
-                    PageBreaker(eWorksheet, 33, false);
+                    // TODO pageBreaker
+                    //PageBreaker(eWorksheet, 33, false); 
 
                     money = null;
                     pages = 0;
@@ -255,7 +263,7 @@ namespace ExcelAPP
                     MatchCollection match = regex.Matches(eWorksheet.Range["A18"].Value.ToString());
 
                     regex = new Regex(@"(\w*)-(\w*)");
-                    string shortCode = regex.Matches(match[0].Value.ToString())[0].ToString(); // TODO сделать шорт-код
+                    string shortCode = regex.Matches(match[0].Value.ToString())[0].ToString(); 
 
                     string money = eWorksheet.Range["C28"].Value.ToString().Replace("(", "").Replace(")", "");
                     if (money == "0")
@@ -265,9 +273,16 @@ namespace ExcelAPP
                     string date = eWorksheet.Range["D26"].Value.ToString();
                     nameDate += $"\n(в ценах на {date})";
 
+                    if (RdPdToggle.Checked)
+                    {
+                        eWorksheet.Range["A18"].Replace("ЛОКАЛЬНЫЙ СМЕТНЫЙ РАСЧЕТ (СМЕТА)", "ЛОКАЛЬНАЯ СМЕТА");
+                    }
+                    
+
                     int pages = eWorksheet.PageSetup.Pages.Count; /// кол-во страниц на листе
 
-                    PageBreaker(eWorksheet, 33, true);
+                    // TODO pageBreaker
+                    //PageBreaker(eWorksheet, 33, true); 
 
                     localData.Add(new SmetaFile(
                         match[0].ToString(), // код сметы
@@ -744,7 +759,7 @@ namespace ExcelAPP
                     Table.Cell(row, 3).Range.Font.Bold = 1;
                     Table.Cell(row, 3).Range.Font.Size = 14;
                     Table.Cell(row, 3).Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
-                    row++; // TODO
+                    row++; 
 
                     // вывод объектной сметы
                     foreach (var data in objectiveData)
@@ -913,7 +928,7 @@ namespace ExcelAPP
                     wDocument.Close(Word.WdSaveOptions.wdDoNotSaveChanges, Word.WdOriginalFormat.wdOriginalDocumentFormat, false);
 
                 }
-                else // TODO двуст и обыч печать для смет без ОС
+                else 
                 {
 
                     object oMissing = Type.Missing;
@@ -1289,9 +1304,6 @@ namespace ExcelAPP
             GC.Collect();
         }
 
-        private void button2_Click(object sender, EventArgs e)
-        {
-
-        }
+        
     }
 }
