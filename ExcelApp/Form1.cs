@@ -32,10 +32,8 @@ namespace ExcelAPP
 
         List<SmetaFile> localData = new List<SmetaFile>();
         List<SmetaFile> objectiveData = new List<SmetaFile>();
-
-        Stopwatch stopWatch = new Stopwatch();
-
-        string DesktopFolder = $@"{Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)}\Книга смет";
+        readonly Stopwatch stopWatch = new Stopwatch();
+        readonly string DesktopFolder = $@"{Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)}\Книга смет";
 
         public Form1()
         {
@@ -82,7 +80,7 @@ namespace ExcelAPP
 
                         infoTextBox.Clear(); // очистка TextBox
 
-                        infoTextBox.Text = $"Общее количество страниц: {fullBookPageCounter()}" + Environment.NewLine;
+                        infoTextBox.Text = $"Общее количество страниц: {FullBookPageCounter}" + Environment.NewLine;
 
                         infoTextBox.AppendText(
                             $"Кол-во всех файлов: {localFiles.Length + objectiveFiles.Length}\n" + Environment.NewLine +
@@ -120,7 +118,7 @@ namespace ExcelAPP
             }
         }
 
-        private void backgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             if (e.Cancelled == true)
             {
@@ -139,14 +137,13 @@ namespace ExcelAPP
             }
         }
 
-        private void backgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        private void BackgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             labelCompleted.Text = e.UserState.ToString();
         }
 
-        private void backgroundWorker_DoWork(object sender, DoWorkEventArgs e)
+        private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            BackgroundWorker worker = sender as BackgroundWorker;
             if (_path != null)
             {
                 if (Directory.Exists($"{DesktopFolder}"))
@@ -156,7 +153,7 @@ namespace ExcelAPP
                     {
                         Directory.Delete(DesktopFolder, true);
 
-                        runBackgroundWorker_DoWork();
+                        RunBackgroundWorker_DoWork();
                     }
                     else if (dialogResult == DialogResult.No)
                     {
@@ -165,7 +162,7 @@ namespace ExcelAPP
                     }
                 }
                 else
-                    runBackgroundWorker_DoWork();
+                    RunBackgroundWorker_DoWork();
             }
             else
             {
@@ -554,8 +551,14 @@ namespace ExcelAPP
                             }
                         }
                         else
+                        {
+                            if ((startPageNumber + titlePages) % 2 == 1)
+                                titlePages++;
+                            if (pagesPzCount % 2 == 1)
+                                pagesPzCount++;
                             for (int i = 1; i <= pagesBook; i++)
                                 iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + startPageNumber + pagesPzCount + titlePages).ToString(), blackFont), 810f, 15f, 0);
+                        }
                     }
                     titleDocument.Close();
                     bytes = stream.ToArray();
@@ -1161,7 +1164,7 @@ namespace ExcelAPP
 
 
         }
-        protected void runBackgroundWorker_DoWork()
+        protected void RunBackgroundWorker_DoWork()
         {
             backgroundWorker.ReportProgress(1, "Сборка начата...");
             stopWatch.Start(); //Запуск секундомера (Время сборки)
@@ -1206,42 +1209,45 @@ namespace ExcelAPP
            
         }
 
-        protected int fullBookPageCounter() //Счетчик общего количества страниц
+        protected int FullBookPageCounter //Счетчик общего количества страниц
         {
-            int numberPagesInBooks = 0;
-            Excel.Application app = new Excel.Application { DisplayAlerts = false, Visible = false, ScreenUpdating = false };
-            Workbook eWorkbook;
-            try
+            get
             {
-                infoTextBox.Text = "Идет подсчет страниц...";
-                for (int i = 0; i < objectiveFiles.Length; i++)
+                int numberPagesInBooks = 0;
+                Excel.Application app = new Excel.Application { DisplayAlerts = false, Visible = false, ScreenUpdating = false };
+                Workbook eWorkbook;
+                try
                 {
-                    eWorkbook = app.Workbooks.Open($"{childFolder}\\{objectiveFiles[i]}");
-                    numberPagesInBooks += eWorkbook.Sheets[1].PageSetup.Pages.Count;
-                    eWorkbook.Close();
+                    infoTextBox.Text = "Идет подсчет страниц...";
+                    for (int i = 0; i < objectiveFiles.Length; i++)
+                    {
+                        eWorkbook = app.Workbooks.Open($"{childFolder}\\{objectiveFiles[i]}");
+                        numberPagesInBooks += eWorkbook.Sheets[1].PageSetup.Pages.Count;
+                        eWorkbook.Close();
+                    }
+                    for (int j = 0; j < localFiles.Length; j++)
+                    {
+                        eWorkbook = app.Workbooks.Open($"{rootFolder}\\{localFiles[j]}");
+                        numberPagesInBooks += eWorkbook.Sheets[1].PageSetup.Pages.Count;
+                        eWorkbook.Close();
+                    }
+                    return numberPagesInBooks;
                 }
-                for (int j = 0; j < localFiles.Length; j++)
+                catch (Exception ex)
                 {
-                    eWorkbook = app.Workbooks.Open($"{rootFolder}\\{localFiles[j]}");
-                    numberPagesInBooks += eWorkbook.Sheets[1].PageSetup.Pages.Count;
-                    eWorkbook.Close();
+                    MessageBox.Show("Ошибка!");
+                    Console.WriteLine(ex.StackTrace);
+                    Console.WriteLine(ex.Message.ToString());
+                    DeleteTempFiles();
+                    DeleteTempVar();
+                    return 0;
                 }
-                return numberPagesInBooks;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Ошибка!");
-                Console.WriteLine(ex.StackTrace);
-                Console.WriteLine(ex.Message.ToString());
-                DeleteTempFiles();
-                DeleteTempVar();
-                return 0;
-            }
-            finally
-            {
-                app.Quit();
-                eWorkbook = null;
-                GC.Collect();
+                finally
+                {
+                    app.Quit();
+                    eWorkbook = null;
+                    GC.Collect();
+                }
             }
         }
 
@@ -1303,7 +1309,5 @@ namespace ExcelAPP
             objectiveData = new List<SmetaFile>();
             GC.Collect();
         }
-
-        
     }
 }
