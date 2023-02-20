@@ -35,9 +35,9 @@
             this.SplitBookContentCheckBox = new System.Windows.Forms.CheckBox();
             this.infoTextBox = new System.Windows.Forms.TextBox();
             this.button1 = new System.Windows.Forms.Button();
-            this.RdPdToggle = new ExcelApp.Controls.ToggleButton();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
+            this.RdPdToggle = new ExcelApp.Controls.ToggleButton();
             ((System.ComponentModel.ISupportInitialize)(this.StartNumberNumeric)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.CountPagePZNumeric)).BeginInit();
             this.SuspendLayout();
@@ -53,10 +53,10 @@
             // 
             // btnSelectFolder
             // 
-            this.btnSelectFolder.Location = new System.Drawing.Point(493, 351);
+            this.btnSelectFolder.Location = new System.Drawing.Point(491, 351);
             this.btnSelectFolder.Margin = new System.Windows.Forms.Padding(4);
             this.btnSelectFolder.Name = "btnSelectFolder";
-            this.btnSelectFolder.Size = new System.Drawing.Size(195, 28);
+            this.btnSelectFolder.Size = new System.Drawing.Size(180, 28);
             this.btnSelectFolder.TabIndex = 3;
             this.btnSelectFolder.Text = "Выбрать папку";
             this.btnSelectFolder.UseVisualStyleBackColor = true;
@@ -65,20 +65,22 @@
             // labelCompleted
             // 
             this.labelCompleted.AutoSize = true;
-            this.labelCompleted.Location = new System.Drawing.Point(17, 357);
+            this.labelCompleted.Location = new System.Drawing.Point(13, 392);
             this.labelCompleted.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelCompleted.MaximumSize = new System.Drawing.Size(832, 16);
+            this.labelCompleted.MinimumSize = new System.Drawing.Size(0, 16);
             this.labelCompleted.Name = "labelCompleted";
             this.labelCompleted.Size = new System.Drawing.Size(0, 16);
             this.labelCompleted.TabIndex = 7;
             // 
             // btnBuild
             // 
-            this.btnBuild.Location = new System.Drawing.Point(740, 351);
+            this.btnBuild.Location = new System.Drawing.Point(711, 351);
             this.btnBuild.Margin = new System.Windows.Forms.Padding(4);
             this.btnBuild.Name = "btnBuild";
-            this.btnBuild.Size = new System.Drawing.Size(100, 28);
+            this.btnBuild.Size = new System.Drawing.Size(129, 28);
             this.btnBuild.TabIndex = 5;
-            this.btnBuild.Text = "Собрать";
+            this.btnBuild.Text = "Собрать книгу";
             this.btnBuild.UseVisualStyleBackColor = true;
             this.btnBuild.Click += new System.EventHandler(this.BtnBuild_Click);
             // 
@@ -100,7 +102,7 @@
             this.StartNumberNumeric.Size = new System.Drawing.Size(76, 22);
             this.StartNumberNumeric.TabIndex = 10;
             this.StartNumberNumeric.Value = new decimal(new int[] {
-            1,
+            3,
             0,
             0,
             0});
@@ -111,9 +113,9 @@
             this.label1.Location = new System.Drawing.Point(17, 73);
             this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(167, 16);
+            this.label1.Size = new System.Drawing.Size(143, 16);
             this.label1.TabIndex = 11;
-            this.label1.Text = "Номер первой страницы";
+            this.label1.Text = "Начать нумерацию с";
             // 
             // label4
             // 
@@ -151,6 +153,8 @@
             // TwoSidedPrintCheckBox
             // 
             this.TwoSidedPrintCheckBox.AutoSize = true;
+            this.TwoSidedPrintCheckBox.Checked = true;
+            this.TwoSidedPrintCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
             this.TwoSidedPrintCheckBox.Location = new System.Drawing.Point(20, 212);
             this.TwoSidedPrintCheckBox.Margin = new System.Windows.Forms.Padding(4);
             this.TwoSidedPrintCheckBox.Name = "TwoSidedPrintCheckBox";
@@ -201,21 +205,6 @@
             this.button1.Text = "button1";
             this.button1.UseVisualStyleBackColor = true;
             // 
-            // RdPdToggle
-            // 
-            this.RdPdToggle.AutoSize = true;
-            this.RdPdToggle.Location = new System.Drawing.Point(103, 158);
-            this.RdPdToggle.Margin = new System.Windows.Forms.Padding(4);
-            this.RdPdToggle.MinimumSize = new System.Drawing.Size(60, 27);
-            this.RdPdToggle.Name = "RdPdToggle";
-            this.RdPdToggle.OffBackColor = System.Drawing.Color.Gray;
-            this.RdPdToggle.OffToggleColor = System.Drawing.Color.Gainsboro;
-            this.RdPdToggle.OnBackColor = System.Drawing.Color.MediumSlateBlue;
-            this.RdPdToggle.OnToggleColor = System.Drawing.Color.WhiteSmoke;
-            this.RdPdToggle.Size = new System.Drawing.Size(60, 27);
-            this.RdPdToggle.TabIndex = 23;
-            this.RdPdToggle.UseVisualStyleBackColor = true;
-            // 
             // label2
             // 
             this.label2.AutoSize = true;
@@ -236,12 +225,27 @@
             this.label3.TabIndex = 26;
             this.label3.Text = "РД";
             // 
+            // RdPdToggle
+            // 
+            this.RdPdToggle.AutoSize = true;
+            this.RdPdToggle.Location = new System.Drawing.Point(103, 158);
+            this.RdPdToggle.Margin = new System.Windows.Forms.Padding(4);
+            this.RdPdToggle.MinimumSize = new System.Drawing.Size(60, 27);
+            this.RdPdToggle.Name = "RdPdToggle";
+            this.RdPdToggle.OffBackColor = System.Drawing.Color.Gray;
+            this.RdPdToggle.OffToggleColor = System.Drawing.Color.Gainsboro;
+            this.RdPdToggle.OnBackColor = System.Drawing.Color.RoyalBlue;
+            this.RdPdToggle.OnToggleColor = System.Drawing.Color.WhiteSmoke;
+            this.RdPdToggle.Size = new System.Drawing.Size(60, 27);
+            this.RdPdToggle.TabIndex = 23;
+            this.RdPdToggle.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ClientSize = new System.Drawing.Size(862, 398);
+            this.ClientSize = new System.Drawing.Size(862, 417);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.RdPdToggle);
@@ -274,7 +278,6 @@
         private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog;
         private System.Windows.Forms.Button btnSelectFolder;
         private System.Windows.Forms.Button btnBuild;
-        private System.Windows.Forms.Label labelCompleted;
         private System.Windows.Forms.NumericUpDown StartNumberNumeric;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label4;
@@ -287,5 +290,6 @@
         private ExcelApp.Controls.ToggleButton RdPdToggle;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
+        public System.Windows.Forms.Label labelCompleted;
     }
 }

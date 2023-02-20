@@ -135,6 +135,7 @@ namespace ExcelAPP
             else
             {
                 EnabledButton();
+                infoTextBox.Clear();
             }
         }
 
@@ -836,7 +837,8 @@ namespace ExcelAPP
 
                     if (TwoSidedPrintCheckBox.Checked)
                     {
-                        // добавление страниц после содержания TODO
+                        //TODO
+                        // добавление страниц после содержания 
 
                         // нумерация ПЗ
                         if ((pageNumber % 2) == 0)
@@ -848,7 +850,7 @@ namespace ExcelAPP
                             pageNumber += 2;
                         }
                         Table.Cell(row, 5).Range.Text = pageNumber.ToString();
-                        pageNumber += (int)CountPagePZNumeric.Value;
+                        pageNumber += (int)CountPagePZNumeric.Value - 1;
                         row += 2;
 
                         // нумерация сметы
@@ -895,7 +897,7 @@ namespace ExcelAPP
                         // нумерация ПЗ
                         pageNumber++;
                         Table.Cell(row, 5).Range.Text = pageNumber.ToString();
-                        pageNumber += (int)CountPagePZNumeric.Value;
+                        pageNumber += (int)CountPagePZNumeric.Value - 1; 
                         row += 2;
 
                         // нумерация сметы
@@ -1069,7 +1071,7 @@ namespace ExcelAPP
                             pageNumber += 2;
                         }
                         Table.Cell(row, 5).Range.Text = pageNumber.ToString();
-                        pageNumber += (int)CountPagePZNumeric.Value;
+                        pageNumber += (int)CountPagePZNumeric.Value - 1;
                         row++;
 
                         // нумерация сметы
@@ -1113,7 +1115,7 @@ namespace ExcelAPP
                         // нумерация ПЗ
                         pageNumber++;
                         Table.Cell(row, 5).Range.Text = pageNumber.ToString();
-                        pageNumber += (int)CountPagePZNumeric.Value;
+                        pageNumber += (int)CountPagePZNumeric.Value - 1;
                         row++;
 
                         // нумерация сметы
