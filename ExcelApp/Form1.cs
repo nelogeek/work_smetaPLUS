@@ -240,8 +240,12 @@ namespace ExcelAPP
                         objectiveFiles[i],
                         ShortCode));
 
-                    // TODO pageBreaker
-                    //PageBreaker(eWorksheet, 33, false); 
+                    if (AutoPageBreakeToolStripMenuItem.Checked)
+                    {
+                        // TODO pageBreaker
+                        PageBreaker(eWorksheet);
+                    }
+                    
 
                     money = null;
                     pages = 0;
@@ -280,8 +284,11 @@ namespace ExcelAPP
 
                     int pages = eWorksheet.PageSetup.Pages.Count; /// кол-во страниц на листе
 
-                    // TODO pageBreaker
-                    //PageBreaker(eWorksheet, 33, true); 
+                    if (AutoPageBreakeToolStripMenuItem.Checked)
+                    {
+                        // TODO pageBreaker
+                        PageBreaker(eWorksheet);
+                    }
 
                     localData.Add(new SmetaFile(
                         match[0].ToString(), // код сметы
@@ -309,7 +316,7 @@ namespace ExcelAPP
                 GC.Collect();
 
                 return true;
-            }
+        }
             catch (Exception ex)
             {
                 MessageBox.Show("Ошибка! Неверный шаблон сметы");
@@ -318,8 +325,8 @@ namespace ExcelAPP
                 Console.WriteLine(ex.Message.ToString());
                 backgroundWorker.CancelAsync();
                 DeleteTempFiles();
-                DeleteTempVar();
-                app.Quit();
+        DeleteTempVar();
+        app.Quit();
                 eWorkbook = null;
                 eWorksheet = null;
                 GC.Collect();
@@ -328,7 +335,7 @@ namespace ExcelAPP
 
                 return false;
             }
-        }
+}
 
         protected bool ExcelConverter()
         {
@@ -1183,7 +1190,7 @@ namespace ExcelAPP
             backgroundWorker.ReportProgress(1, Time);
         }
 
-        protected void PageBreaker(Excel.Worksheet eWorksheet, int rowsCount, bool local)
+        protected void PageBreaker(Excel.Worksheet eWorksheet)
         {
             // разделение (разрыв) страниц
             var lastUsedRow = eWorksheet.Cells.Find("*", System.Reflection.Missing.Value,
@@ -1192,17 +1199,26 @@ namespace ExcelAPP
                        false, System.Reflection.Missing.Value, System.Reflection.Missing.Value).Row;
 
             eWorksheet.PageSetup.Zoom = false;
-            eWorksheet.PageSetup.FitToPagesTall = (int)(lastUsedRow / rowsCount);
+            eWorksheet.PageSetup.FitToPagesTall = (int)(lastUsedRow / 29);
 
             eWorksheet.ResetAllPageBreaks();
+            //eWorksheet.HPageBreaks.Add(eWorksheet.Range[$"A34"]);
+            //if (local)
+            //{
+                
+            //}
+            //else
+            //{
+            //    // TODO
+            //}
 
-            if (local)
-            {
-                eWorksheet.HPageBreaks.Add(eWorksheet.Range[$"A35"]);
-            }
-
-
-            eWorksheet.HPageBreaks.Add(eWorksheet.Range[$"A{lastUsedRow - 13}"]);
+            //var lastPageBreake = eWorksheet.HPageBreaks[eWorksheet.HPageBreaks.Count].Location.Row.ToString();
+            //MessageBox.Show(lastPageBreake.ToString());
+            //if ((Convert.ToInt32(lastUsedRow) - Convert.ToInt32(lastPageBreake)) < 13)
+            //{
+            //    eWorksheet.HPageBreaks.Add(eWorksheet.Range[$"A{lastUsedRow - 13}"]);
+            //}
+            
            
         }
 
@@ -1304,6 +1320,23 @@ namespace ExcelAPP
             GC.Collect();
         }
 
-        
+        private void button2_Click(object sender, EventArgs e)
+        {
+            Excel.Application app = new Excel.Application
+            {
+                DisplayAlerts = false,
+                Visible = true,
+                ScreenUpdating = true
+            };
+
+            Excel.Workbook eWorkbook;
+            Excel.Worksheet eWorksheet;
+
+            eWorkbook = app.Workbooks.Open($@"C:\Users\lokot\Desktop\test.xlsx");
+            eWorksheet = (Excel.Worksheet)eWorkbook.Sheets[1];
+            PageBreaker(eWorksheet);
+
+
+        }
     }
 }
