@@ -34,10 +34,8 @@
             this.backgroundWorker = new System.ComponentModel.BackgroundWorker();
             this.SplitBookContentCheckBox = new System.Windows.Forms.CheckBox();
             this.infoTextBox = new System.Windows.Forms.TextBox();
-            this.button1 = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
-            this.button2 = new System.Windows.Forms.Button();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.настройкиToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.AutoPageBreakeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -50,10 +48,12 @@
             // labelNameFolder
             // 
             this.labelNameFolder.AutoSize = true;
-            this.labelNameFolder.Location = new System.Drawing.Point(17, 23);
+            this.labelNameFolder.Location = new System.Drawing.Point(17, 41);
             this.labelNameFolder.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelNameFolder.MaximumSize = new System.Drawing.Size(832, 16);
+            this.labelNameFolder.MinimumSize = new System.Drawing.Size(16, 16);
             this.labelNameFolder.Name = "labelNameFolder";
-            this.labelNameFolder.Size = new System.Drawing.Size(0, 16);
+            this.labelNameFolder.Size = new System.Drawing.Size(16, 16);
             this.labelNameFolder.TabIndex = 1;
             // 
             // btnSelectFolder
@@ -73,9 +73,9 @@
             this.labelCompleted.Location = new System.Drawing.Point(13, 392);
             this.labelCompleted.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.labelCompleted.MaximumSize = new System.Drawing.Size(832, 16);
-            this.labelCompleted.MinimumSize = new System.Drawing.Size(0, 16);
+            this.labelCompleted.MinimumSize = new System.Drawing.Size(16, 16);
             this.labelCompleted.Name = "labelCompleted";
-            this.labelCompleted.Size = new System.Drawing.Size(0, 16);
+            this.labelCompleted.Size = new System.Drawing.Size(16, 16);
             this.labelCompleted.TabIndex = 7;
             // 
             // btnBuild
@@ -200,16 +200,6 @@
             this.infoTextBox.Size = new System.Drawing.Size(547, 260);
             this.infoTextBox.TabIndex = 21;
             // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(461, 58);
-            this.button1.Margin = new System.Windows.Forms.Padding(4);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(11, 10);
-            this.button1.TabIndex = 22;
-            this.button1.Text = "button1";
-            this.button1.UseVisualStyleBackColor = true;
-            // 
             // label2
             // 
             this.label2.AutoSize = true;
@@ -229,16 +219,6 @@
             this.label3.Size = new System.Drawing.Size(33, 20);
             this.label3.TabIndex = 26;
             this.label3.Text = "РД";
-            // 
-            // button2
-            // 
-            this.button2.Location = new System.Drawing.Point(20, 293);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(75, 23);
-            this.button2.TabIndex = 27;
-            this.button2.Text = "TEST";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
             // menuStrip1
             // 
@@ -289,11 +269,9 @@
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
             this.ClientSize = new System.Drawing.Size(862, 417);
-            this.Controls.Add(this.button2);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.RdPdToggle);
-            this.Controls.Add(this.button1);
             this.Controls.Add(this.infoTextBox);
             this.Controls.Add(this.SplitBookContentCheckBox);
             this.Controls.Add(this.TwoSidedPrintCheckBox);
@@ -334,12 +312,10 @@
         private System.ComponentModel.BackgroundWorker backgroundWorker;
         private System.Windows.Forms.CheckBox SplitBookContentCheckBox;
         private System.Windows.Forms.TextBox infoTextBox;
-        private System.Windows.Forms.Button button1;
         private ExcelApp.Controls.ToggleButton RdPdToggle;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
         public System.Windows.Forms.Label labelCompleted;
-        private System.Windows.Forms.Button button2;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem настройкиToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem AutoPageBreakeToolStripMenuItem;
