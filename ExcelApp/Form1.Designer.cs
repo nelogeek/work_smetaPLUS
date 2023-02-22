@@ -50,7 +50,7 @@
             this.labelNameFolder.AutoSize = true;
             this.labelNameFolder.Location = new System.Drawing.Point(17, 41);
             this.labelNameFolder.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            this.labelNameFolder.MaximumSize = new System.Drawing.Size(1109, 20);
+            this.labelNameFolder.MaximumSize = new System.Drawing.Size(821, 20);
             this.labelNameFolder.MinimumSize = new System.Drawing.Size(21, 20);
             this.labelNameFolder.Name = "labelNameFolder";
             this.labelNameFolder.Size = new System.Drawing.Size(21, 20);
@@ -72,7 +72,7 @@
             this.labelCompleted.AutoSize = true;
             this.labelCompleted.Location = new System.Drawing.Point(14, 385);
             this.labelCompleted.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            this.labelCompleted.MaximumSize = new System.Drawing.Size(1109, 20);
+            this.labelCompleted.MaximumSize = new System.Drawing.Size(821, 20);
             this.labelCompleted.MinimumSize = new System.Drawing.Size(21, 20);
             this.labelCompleted.Name = "labelCompleted";
             this.labelCompleted.Size = new System.Drawing.Size(21, 20);
@@ -228,7 +228,7 @@
             this.настройкиToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(864, 28);
+            this.menuStrip1.Size = new System.Drawing.Size(864, 30);
             this.menuStrip1.TabIndex = 28;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -237,7 +237,7 @@
             this.настройкиToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.AutoPageBreakeToolStripMenuItem});
             this.настройкиToolStripMenuItem.Name = "настройкиToolStripMenuItem";
-            this.настройкиToolStripMenuItem.Size = new System.Drawing.Size(98, 24);
+            this.настройкиToolStripMenuItem.Size = new System.Drawing.Size(98, 26);
             this.настройкиToolStripMenuItem.Text = "Настройки";
             // 
             // AutoPageBreakeToolStripMenuItem
