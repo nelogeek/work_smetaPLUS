@@ -40,7 +40,6 @@
             this.настройкиToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.AutoPageBreakeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.RdPdToggle = new ExcelApp.Controls.ToggleButton();
-            this.button1 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.StartNumberNumeric)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.CountPagePZNumeric)).BeginInit();
             this.menuStrip1.SuspendLayout();
@@ -60,7 +59,7 @@
             // btnSelectFolder
             // 
             this.btnSelectFolder.Location = new System.Drawing.Point(491, 351);
-            this.btnSelectFolder.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btnSelectFolder.Margin = new System.Windows.Forms.Padding(4);
             this.btnSelectFolder.Name = "btnSelectFolder";
             this.btnSelectFolder.Size = new System.Drawing.Size(180, 28);
             this.btnSelectFolder.TabIndex = 3;
@@ -82,7 +81,7 @@
             // btnBuild
             // 
             this.btnBuild.Location = new System.Drawing.Point(711, 351);
-            this.btnBuild.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btnBuild.Margin = new System.Windows.Forms.Padding(4);
             this.btnBuild.Name = "btnBuild";
             this.btnBuild.Size = new System.Drawing.Size(129, 28);
             this.btnBuild.TabIndex = 5;
@@ -162,7 +161,7 @@
             this.TwoSidedPrintCheckBox.Checked = true;
             this.TwoSidedPrintCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
             this.TwoSidedPrintCheckBox.Location = new System.Drawing.Point(20, 212);
-            this.TwoSidedPrintCheckBox.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.TwoSidedPrintCheckBox.Margin = new System.Windows.Forms.Padding(4);
             this.TwoSidedPrintCheckBox.Name = "TwoSidedPrintCheckBox";
             this.TwoSidedPrintCheckBox.Size = new System.Drawing.Size(163, 20);
             this.TwoSidedPrintCheckBox.TabIndex = 19;
@@ -263,16 +262,6 @@
             this.RdPdToggle.TabIndex = 23;
             this.RdPdToggle.UseVisualStyleBackColor = true;
             // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(50, 286);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 29;
-            this.button1.Text = "button1";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -280,7 +269,6 @@
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
             this.ClientSize = new System.Drawing.Size(864, 423);
-            this.Controls.Add(this.button1);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.RdPdToggle);
@@ -298,7 +286,7 @@
             this.Controls.Add(this.menuStrip1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStrip1;
-            this.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.Margin = new System.Windows.Forms.Padding(5);
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Smeta++";
@@ -331,6 +319,5 @@
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem настройкиToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem AutoPageBreakeToolStripMenuItem;
-        private System.Windows.Forms.Button button1;
     }
 }
