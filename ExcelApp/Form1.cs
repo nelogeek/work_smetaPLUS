@@ -461,7 +461,7 @@ namespace ExcelAPP
                 //Нумерация страниц
                 if (SplitBookContentCheckBox.Checked)
                 {
-                    AddPageNumberTitleITextSharp(fileNameTitlePdf);
+                    //AddPageNumberTitleITextSharp(fileNameTitlePdf);
                     AddPageNumberSmetaITextSharp(fileNameSmetaPdf);
                 }
                 else
@@ -599,7 +599,7 @@ namespace ExcelAPP
                     iTextSharp.text.pdf.PdfReader reader = new iTextSharp.text.pdf.PdfReader(bytes);
                     iTextSharp.text.pdf.PdfReader readerOnlyTitle = new iTextSharp.text.pdf.PdfReader(bytesTitle);
                     int titlePages = readerOnlyTitle.NumberOfPages;
-                    int pages = reader.NumberOfPages;
+                    int pagesBook = reader.NumberOfPages;
                     //int afterTitleNumericPages = Convert.ToInt32(afterTitleNumeric.Value);
 
                     using (iTextSharp.text.pdf.PdfStamper stamper = new iTextSharp.text.pdf.PdfStamper(reader, stream))
@@ -609,32 +609,30 @@ namespace ExcelAPP
 
                         if (TwoSidedPrintCheckBox.Checked)
                         {
-                            bool flag = true;
                             //Нумерация страниц содержания
-                            for (int i = 1; i <= titlePages; i++)
-                                iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + startPageNumber).ToString(), blackFont), 565f, 15f, 0);
-                            for (int i = 1 + titlePages; i <= pages; i++)
+                            //for (int i = 1; i <= titlePages; i++)
+                            //    iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + startPageNumber).ToString(), blackFont), 565f, 15f, 0);
+                            if ((startPageNumber + titlePages) % 2 == 1)
+                                titlePages++;
+                            if (pagesPzCount % 2 == 1)
+                                pagesPzCount++;
+
+                            for (int i = 1; i <= pagesBook; i++)
                             {
-                                if (flag)
-                                {
-                                    iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + startPageNumber + pagesPzCount).ToString(), blackFont), 810f, 15f, 0);
-                                    flag = false;
-                                }
+                                if ((startPageNumber + titlePages + pagesPzCount + i) % 2 == 0)
+                                    iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + startPageNumber + pagesPzCount + titlePages).ToString(), blackFont), 810f, 575f, 0);
                                 else
-                                {
-                                    iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + startPageNumber + pagesPzCount).ToString(), blackFont), 810f, 575f, 0);
-                                    flag = true;
-                                }
+                                    iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + startPageNumber + pagesPzCount + titlePages).ToString(), blackFont), 810f, 15f, 0);
                             }
                         }
-
                         else
                         {
-                            //Нумерация страниц содержания
-                            for (int i = 1; i <= titlePages; i++)
-                                iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + startPageNumber).ToString(), blackFont), 565f, 15f, 0);
-                            for (int i = titlePages + 1; i <= pages; i++)
-                                iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + startPageNumber + pagesPzCount).ToString(), blackFont), 810f, 15f, 0);
+                            if ((startPageNumber + titlePages) % 2 == 1)
+                                titlePages++;
+                            if (pagesPzCount % 2 == 1)
+                                pagesPzCount++;
+                            for (int i = 1; i <= pagesBook; i++)
+                                iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + startPageNumber + pagesPzCount + titlePages).ToString(), blackFont), 810f, 15f, 0);
                         }
                     }
                     bytes = stream.ToArray();
