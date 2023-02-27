@@ -679,119 +679,181 @@ namespace ExcelAPP
 
                     var wDocument = wordApp.Documents.Add();
 
-
                     // настройка полей документа
-                    wDocument.PageSetup.TopMargin = wordApp.InchesToPoints(0.5f);
-                    wDocument.PageSetup.BottomMargin = wordApp.InchesToPoints(0.5f);
+                    wDocument.PageSetup.TopMargin = wordApp.InchesToPoints(0.4f);
+                    wDocument.PageSetup.BottomMargin = wordApp.InchesToPoints(0.4f);
                     wDocument.PageSetup.LeftMargin = wordApp.InchesToPoints(0.4f);
                     wDocument.PageSetup.RightMargin = wordApp.InchesToPoints(0.4f);
                     wDocument.PageSetup.HeaderDistance = 20f;
 
-                    wDocument.Sections[1].PageSetup.OddAndEvenPagesHeaderFooter = -1; // -1 = true  - настройка: четные-нечетные страницы
+                    if (TwoSidedPrintCheckBox.Checked)
+                    {
+                        wDocument.Sections[1].PageSetup.OddAndEvenPagesHeaderFooter = -1; // -1 = true  - настройка: четные-нечетные страницы
 
-                    Word.Range headerRange = wDocument.Sections[1].Headers[Word.WdHeaderFooterIndex.wdHeaderFooterPrimary].Range;
+                        Word.Range headerRange = wDocument.Sections[1].Headers[Word.WdHeaderFooterIndex.wdHeaderFooterPrimary].Range;
 
-                    wDocument.Sections[1].Headers[Word.WdHeaderFooterIndex.wdHeaderFooterPrimary].LinkToPrevious = false;
-                    wDocument.Sections[1].Headers[Word.WdHeaderFooterIndex.wdHeaderFooterPrimary].PageNumbers.RestartNumberingAtSection = true;
-                    wDocument.Sections[1].Headers[Word.WdHeaderFooterIndex.wdHeaderFooterPrimary].PageNumbers.StartingNumber = (int)StartNumberNumeric.Value; // номер первой страницы
+                        wDocument.Sections[1].Headers[Word.WdHeaderFooterIndex.wdHeaderFooterPrimary].LinkToPrevious = false;
+                        wDocument.Sections[1].Headers[Word.WdHeaderFooterIndex.wdHeaderFooterPrimary].PageNumbers.RestartNumberingAtSection = true;
+                        wDocument.Sections[1].Headers[Word.WdHeaderFooterIndex.wdHeaderFooterPrimary].PageNumbers.StartingNumber = (int)StartNumberNumeric.Value; // номер первой страницы
 
-                    // колонтитул нечетной страницы
-                    wDocument.Tables.Add(headerRange, 1, 6, ref defaultTableBehavior, ref autoFitBehavior);
-                    Word.Table headerTable = headerRange.Tables[1];
+                        // колонтитул нечетной страницы
+                        wDocument.Tables.Add(headerRange, 1, 6, ref defaultTableBehavior, ref autoFitBehavior);
+                        Word.Table headerTable = headerRange.Tables[1];
 
-                    headerTable.Borders.Enable = 0;
-                    Word.Range rangePageNum = headerTable.Range.Cells[headerTable.Range.Cells.Count].Range;
-                    rangePageNum.Collapse(Word.WdCollapseDirection.wdCollapseStart);
-                    Word.Field fld = rangePageNum.Document.Fields.Add(rangePageNum, oMissing, "Page", false);
-                    Word.Range rangeFieldPageNum = fld.Result;
-                    rangeFieldPageNum.Collapse(Word.WdCollapseDirection.wdCollapseEnd);
+                        headerTable.Borders.Enable = 0;
+                        Word.Range rangePageNum = headerTable.Range.Cells[headerTable.Range.Cells.Count].Range;
+                        rangePageNum.Collapse(Word.WdCollapseDirection.wdCollapseStart);
+                        Word.Field fld = rangePageNum.Document.Fields.Add(rangePageNum, oMissing, "Page", false);
+                        Word.Range rangeFieldPageNum = fld.Result;
+                        rangeFieldPageNum.Collapse(Word.WdCollapseDirection.wdCollapseEnd);
 
-                    headerTable.Cell(1, 6).Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphRight;
-                    headerTable.Cell(1, 6).Range.Font.Size = 12;
+                        headerTable.Cell(1, 6).Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphRight;
+                        headerTable.Cell(1, 6).Range.Font.Size = 10;
 
-                    headerTable.Rows.Add();
-                    headerTable.Cell(2, 3).Range.Text = "Содержание";
-                    headerTable.Cell(2, 3).Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
-                    headerTable.Cell(2, 3).Range.Font.Name = "Times New Roman";
-                    headerTable.Cell(2, 3).Range.Font.Size = 12;
-                    headerTable.Cell(2, 3).Range.Font.Italic = 1;
-                    headerTable.Cell(2, 3).Range.Font.Bold = 1;
-                    headerTable.Cell(2, 3).Range.Font.Color = Word.WdColor.wdColorBlack;
+                        headerTable.Rows.Add();
+                        headerTable.Cell(2, 3).Range.Text = "Содержание";
+                        headerTable.Cell(2, 3).Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
+                        headerTable.Cell(2, 3).Range.Font.Name = "Times New Roman";
+                        headerTable.Cell(2, 3).Range.Font.Size = 12;
+                        headerTable.Cell(2, 3).Range.Font.Italic = 1;
+                        headerTable.Cell(2, 3).Range.Font.Bold = 1;
+                        headerTable.Cell(2, 3).Range.Font.Color = Word.WdColor.wdColorBlack;
+                        headerTable.Rows[2].Height = 0.93f;
 
-                    // заполнение таблицы
-                    headerTable.Rows.Add();
-                    headerTable.Rows[3].Borders.Enable = 1;
-                    headerTable.Cell(3, 1).Range.Text = "N п/п";
-                    headerTable.Cell(3, 2).Range.Text = "N сметы";
-                    headerTable.Cell(3, 3).Range.Text = "Наименование";
-                    headerTable.Cell(3, 4).Range.Text = "Всего тыс.руб.";
-                    headerTable.Cell(3, 5).Range.Text = "Стр.";
-                    headerTable.Cell(3, 6).Range.Text = "Часть";
-                    // изменение параметров таблицы
-                    headerTable.Rows[3].Cells.VerticalAlignment = Word.WdCellVerticalAlignment.wdCellAlignVerticalCenter;
-                    headerTable.Rows[3].Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
-                    headerTable.Rows[3].Range.Font.Name = "Times New Roman";
-                    headerTable.Rows[3].Range.Font.Italic = 0;
-                    headerTable.Rows[3].Range.Font.Bold = 1;
-                    headerTable.Rows[3].Range.Font.Size = 10;
-                    headerTable.Rows[3].Range.Font.Color = Word.WdColor.wdColorBlack;
-                    // ширина ячеек таблицы
-                    headerTable.Columns[1].PreferredWidth = 6f;
-                    headerTable.Columns[2].PreferredWidth = 9f;
-                    headerTable.Columns[3].PreferredWidth = 30f;
-                    headerTable.Columns[4].PreferredWidth = 9f;
-                    headerTable.Columns[5].PreferredWidth = 4f;
-                    headerTable.Columns[6].PreferredWidth = 4f;
+                        // заполнение таблицы
+                        headerTable.Rows.Add();
+                        headerTable.Rows[3].Borders.Enable = 1;
+                        headerTable.Cell(3, 1).Range.Text = "N п/п";
+                        headerTable.Cell(3, 2).Range.Text = "N сметы";
+                        headerTable.Cell(3, 3).Range.Text = "Наименование";
+                        headerTable.Cell(3, 4).Range.Text = "Всего тыс.руб.";
+                        headerTable.Cell(3, 5).Range.Text = "Стр.";
+                        headerTable.Cell(3, 6).Range.Text = "Часть";
+                        // изменение параметров таблицы
+                        headerTable.Rows[3].Cells.VerticalAlignment = Word.WdCellVerticalAlignment.wdCellAlignVerticalCenter;
+                        headerTable.Rows[3].Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
+                        headerTable.Rows[3].Range.Font.Name = "Times New Roman";
+                        headerTable.Rows[3].Range.Font.Italic = 0;
+                        headerTable.Rows[3].Range.Font.Bold = 1;
+                        headerTable.Rows[3].Range.Font.Size = 10;
+                        headerTable.Rows[3].Range.Font.Color = Word.WdColor.wdColorBlack;
+                        // ширина ячеек таблицы
+                        headerTable.Columns[1].PreferredWidth = 6f;
+                        headerTable.Columns[2].PreferredWidth = 9f;
+                        headerTable.Columns[3].PreferredWidth = 32f;
+                        headerTable.Columns[4].PreferredWidth = 9f;
+                        headerTable.Columns[5].PreferredWidth = 4f;
+                        headerTable.Columns[6].PreferredWidth = 4f;
 
-                    // колонтитул четных страниц
-                    headerRange = wDocument.Sections[1].Headers[Word.WdHeaderFooterIndex.wdHeaderFooterEvenPages].Range;
+                        // колонтитул четных страниц
+                        headerRange = wDocument.Sections[1].Headers[Word.WdHeaderFooterIndex.wdHeaderFooterEvenPages].Range;
 
-                    wDocument.Tables.Add(headerRange, 1, 6, ref defaultTableBehavior, ref autoFitBehavior);
-                    headerTable = headerRange.Tables[1];
+                        wDocument.Tables.Add(headerRange, 1, 6, ref defaultTableBehavior, ref autoFitBehavior);
+                        headerTable = headerRange.Tables[1];
 
-                    headerTable.Borders.Enable = 0;
-                    rangePageNum = headerTable.Range.Cells[1].Range;
-                    rangePageNum.Collapse(Word.WdCollapseDirection.wdCollapseStart);
-                    fld = rangePageNum.Document.Fields.Add(rangePageNum, oMissing, "Page", false);
-                    rangeFieldPageNum = fld.Result;
-                    rangeFieldPageNum.Collapse(Word.WdCollapseDirection.wdCollapseEnd);
+                        headerTable.Borders.Enable = 0;
+                        rangePageNum = headerTable.Range.Cells[1].Range;
+                        rangePageNum.Collapse(Word.WdCollapseDirection.wdCollapseStart);
+                        fld = rangePageNum.Document.Fields.Add(rangePageNum, oMissing, "Page", false);
+                        rangeFieldPageNum = fld.Result;
+                        rangeFieldPageNum.Collapse(Word.WdCollapseDirection.wdCollapseEnd);
 
-                    headerTable.Cell(1, 6).Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphRight;
-                    headerTable.Cell(1, 6).Range.Font.Size = 12;
+                        headerTable.Cell(1, 6).Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphRight;
+                        headerTable.Cell(1, 1).Range.Font.Size = 10;
 
-                    headerTable.Rows.Add();
-                    headerTable.Cell(2, 3).Range.Text = "Содержание";
-                    headerTable.Cell(2, 3).Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
-                    headerTable.Cell(2, 3).Range.Font.Name = "Times New Roman";
-                    headerTable.Cell(2, 3).Range.Font.Size = 12;
-                    headerTable.Cell(2, 3).Range.Font.Italic = 1;
-                    headerTable.Cell(2, 3).Range.Font.Bold = 1;
-                    headerTable.Cell(2, 3).Range.Font.Color = Word.WdColor.wdColorBlack;
+                        headerTable.Rows.Add();
+                        headerTable.Cell(2, 3).Range.Text = "Содержание";
+                        headerTable.Cell(2, 3).Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
+                        headerTable.Cell(2, 3).Range.Font.Name = "Times New Roman";
+                        headerTable.Cell(2, 3).Range.Font.Size = 12;
+                        headerTable.Cell(2, 3).Range.Font.Italic = 1;
+                        headerTable.Cell(2, 3).Range.Font.Bold = 1;
+                        headerTable.Cell(2, 3).Range.Font.Color = Word.WdColor.wdColorBlack;
 
-                    // заполнение таблицы
-                    headerTable.Rows.Add();
-                    headerTable.Rows[3].Borders.Enable = 1;
-                    headerTable.Cell(3, 1).Range.Text = "N п/п";
-                    headerTable.Cell(3, 2).Range.Text = "N сметы";
-                    headerTable.Cell(3, 3).Range.Text = "Наименование";
-                    headerTable.Cell(3, 4).Range.Text = "Всего тыс.руб.";
-                    headerTable.Cell(3, 5).Range.Text = "Стр.";
-                    headerTable.Cell(3, 6).Range.Text = "Часть";
-                    // изменение параметров таблицы
-                    headerTable.Rows[3].Cells.VerticalAlignment = Word.WdCellVerticalAlignment.wdCellAlignVerticalCenter;
-                    headerTable.Rows[3].Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
-                    headerTable.Rows[3].Range.Font.Name = "Times New Roman";
-                    headerTable.Rows[3].Range.Font.Italic = 0;
-                    headerTable.Rows[3].Range.Font.Bold = 1;
-                    headerTable.Rows[3].Range.Font.Size = 10;
-                    headerTable.Rows[3].Range.Font.Color = Word.WdColor.wdColorBlack;
-                    // ширина ячеек таблицы
-                    headerTable.Columns[1].PreferredWidth = 6f;
-                    headerTable.Columns[2].PreferredWidth = 9f;
-                    headerTable.Columns[3].PreferredWidth = 30f;
-                    headerTable.Columns[4].PreferredWidth = 9f;
-                    headerTable.Columns[5].PreferredWidth = 4f;
-                    headerTable.Columns[6].PreferredWidth = 4f;
+                        // заполнение таблицы
+                        headerTable.Rows.Add();
+                        headerTable.Rows[3].Borders.Enable = 1;
+                        headerTable.Cell(3, 1).Range.Text = "N п/п";
+                        headerTable.Cell(3, 2).Range.Text = "N сметы";
+                        headerTable.Cell(3, 3).Range.Text = "Наименование";
+                        headerTable.Cell(3, 4).Range.Text = "Всего тыс.руб.";
+                        headerTable.Cell(3, 5).Range.Text = "Стр.";
+                        headerTable.Cell(3, 6).Range.Text = "Часть";
+                        // изменение параметров таблицы
+                        headerTable.Rows[3].Cells.VerticalAlignment = Word.WdCellVerticalAlignment.wdCellAlignVerticalCenter;
+                        headerTable.Rows[3].Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
+                        headerTable.Rows[3].Range.Font.Name = "Times New Roman";
+                        headerTable.Rows[3].Range.Font.Italic = 0;
+                        headerTable.Rows[3].Range.Font.Bold = 1;
+                        headerTable.Rows[3].Range.Font.Size = 10;
+                        headerTable.Rows[3].Range.Font.Color = Word.WdColor.wdColorBlack;
+                        // ширина ячеек таблицы
+                        headerTable.Columns[1].PreferredWidth = 6f;
+                        headerTable.Columns[2].PreferredWidth = 9f;
+                        headerTable.Columns[3].PreferredWidth = 32f;
+                        headerTable.Columns[4].PreferredWidth = 9f;
+                        headerTable.Columns[5].PreferredWidth = 4f;
+                        headerTable.Columns[6].PreferredWidth = 4f;
+                    }
+                    else
+                    {
+
+                        Word.HeaderFooter header = wDocument.Sections[1].Headers[Word.WdHeaderFooterIndex.wdHeaderFooterPrimary];
+
+                        Word.Range headerRange = header.Range;
+
+                        header.LinkToPrevious = false;
+                        header.PageNumbers.RestartNumberingAtSection = true;
+                        header.PageNumbers.StartingNumber = (int)StartNumberNumeric.Value; // номер первой страницы
+
+                        // колонтитул страницы
+                        wDocument.Tables.Add(headerRange, 1, 6, ref defaultTableBehavior, ref autoFitBehavior);
+                        Word.Table headerTable = headerRange.Tables[1];
+
+                        headerTable.Borders.Enable = 0;
+                        Word.Range rangePageNum = headerTable.Range.Cells[headerTable.Range.Cells.Count].Range;
+                        rangePageNum.Collapse(Word.WdCollapseDirection.wdCollapseStart);
+                        Word.Field fld = rangePageNum.Document.Fields.Add(rangePageNum, oMissing, "Page", false);
+                        Word.Range rangeFieldPageNum = fld.Result;
+                        rangeFieldPageNum.Collapse(Word.WdCollapseDirection.wdCollapseEnd);
+
+                        headerTable.Cell(1, 6).Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphRight;
+                        headerTable.Cell(1, 6).Range.Font.Size = 10;
+
+                        headerTable.Rows.Add();
+                        headerTable.Cell(2, 3).Range.Text = "Содержание";
+                        headerTable.Cell(2, 3).Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
+                        headerTable.Cell(2, 3).Range.Font.Name = "Times New Roman";
+                        headerTable.Cell(2, 3).Range.Font.Size = 12;
+                        headerTable.Cell(2, 3).Range.Font.Italic = 1;
+                        headerTable.Cell(2, 3).Range.Font.Bold = 1;
+                        headerTable.Cell(2, 3).Range.Font.Color = Word.WdColor.wdColorBlack;
+
+                        // заполнение таблицы
+                        headerTable.Rows.Add();
+                        headerTable.Rows[3].Borders.Enable = 1;
+                        headerTable.Cell(3, 1).Range.Text = "N п/п";
+                        headerTable.Cell(3, 2).Range.Text = "N сметы";
+                        headerTable.Cell(3, 3).Range.Text = "Наименование";
+                        headerTable.Cell(3, 4).Range.Text = "Всего тыс.руб.";
+                        headerTable.Cell(3, 5).Range.Text = "Стр.";
+                        headerTable.Cell(3, 6).Range.Text = "Часть";
+                        // изменение параметров таблицы
+                        headerTable.Rows[3].Cells.VerticalAlignment = Word.WdCellVerticalAlignment.wdCellAlignVerticalCenter;
+                        headerTable.Rows[3].Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
+                        headerTable.Rows[3].Range.Font.Name = "Times New Roman";
+                        headerTable.Rows[3].Range.Font.Italic = 0;
+                        headerTable.Rows[3].Range.Font.Bold = 1;
+                        headerTable.Rows[3].Range.Font.Size = 10;
+                        headerTable.Rows[3].Range.Font.Color = Word.WdColor.wdColorBlack;
+                        // ширина ячеек таблицы
+                        headerTable.Columns[1].PreferredWidth = 6f;
+                        headerTable.Columns[2].PreferredWidth = 9f;
+                        headerTable.Columns[3].PreferredWidth = 32f;
+                        headerTable.Columns[4].PreferredWidth = 9f;
+                        headerTable.Columns[5].PreferredWidth = 4f;
+                        headerTable.Columns[6].PreferredWidth = 4f;
+                    }
 
                     // основная часть
                     wDocument.Paragraphs.Add(ref oMissing);
@@ -801,7 +863,7 @@ namespace ExcelAPP
                     // ширина ячеек таблицы
                     Table.Columns[1].PreferredWidth = 6f;
                     Table.Columns[2].PreferredWidth = 9f;
-                    Table.Columns[3].PreferredWidth = 30f;
+                    Table.Columns[3].PreferredWidth = 32f;
                     Table.Columns[4].PreferredWidth = 9f;
                     Table.Columns[5].PreferredWidth = 4f;
                     Table.Columns[6].PreferredWidth = 4f;
@@ -961,8 +1023,6 @@ namespace ExcelAPP
                                 }
                             }
                         }
-
-
                     }
                     else
                     {
@@ -1014,60 +1074,180 @@ namespace ExcelAPP
                     var wDocument = wordApp.Documents.Add();
 
                     // настройка полей документа
-                    wDocument.PageSetup.TopMargin = wordApp.InchesToPoints(0.5f);
-                    wDocument.PageSetup.BottomMargin = wordApp.InchesToPoints(0.5f);
-                    wDocument.PageSetup.LeftMargin = wordApp.InchesToPoints(0.65f);
+                    wDocument.PageSetup.TopMargin = wordApp.InchesToPoints(0.4f);
+                    wDocument.PageSetup.BottomMargin = wordApp.InchesToPoints(0.4f);
+                    wDocument.PageSetup.LeftMargin = wordApp.InchesToPoints(0.4f);
                     wDocument.PageSetup.RightMargin = wordApp.InchesToPoints(0.4f);
                     wDocument.PageSetup.HeaderDistance = 20f;
 
-                    Word.Range headerRange = wDocument.Sections[1].Headers[Word.WdHeaderFooterIndex.wdHeaderFooterPrimary].Range;
+                    if (TwoSidedPrintCheckBox.Checked)
+                    {
+                        wDocument.Sections[1].PageSetup.OddAndEvenPagesHeaderFooter = -1; // -1 = true  - настройка: четные-нечетные страницы
 
-                    wDocument.Tables.Add(headerRange, 1, 6, ref defaultTableBehavior, ref autoFitBehavior);
-                    Word.Table headerTable = headerRange.Tables[1];
+                        Word.Range headerRange = wDocument.Sections[1].Headers[Word.WdHeaderFooterIndex.wdHeaderFooterPrimary].Range;
 
-                    headerTable.Borders.Enable = 0;
-                    Word.Range rangePageNum = headerTable.Range.Cells[headerTable.Range.Cells.Count].Range;
-                    object oCollapseStart = Word.WdCollapseDirection.wdCollapseStart;
-                    rangePageNum.Collapse(Word.WdCollapseDirection.wdCollapseStart);
-                    Word.Field fld = rangePageNum.Document.Fields.Add(rangePageNum, oMissing, "Page", false);
-                    Word.Range rangeFieldPageNum = fld.Result;
-                    rangeFieldPageNum.Collapse(Word.WdCollapseDirection.wdCollapseEnd);
-                    headerTable.Cell(1, 6).Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphRight;
-                    headerTable.Cell(1, 6).Range.Font.Size = 12;
+                        wDocument.Sections[1].Headers[Word.WdHeaderFooterIndex.wdHeaderFooterPrimary].LinkToPrevious = false;
+                        wDocument.Sections[1].Headers[Word.WdHeaderFooterIndex.wdHeaderFooterPrimary].PageNumbers.RestartNumberingAtSection = true;
+                        wDocument.Sections[1].Headers[Word.WdHeaderFooterIndex.wdHeaderFooterPrimary].PageNumbers.StartingNumber = (int)StartNumberNumeric.Value; // номер первой страницы
 
-                    headerTable.Rows.Add();
-                    headerTable.Cell(2, 3).Range.Text = "Содержание";
-                    headerTable.Cell(2, 3).Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
-                    headerTable.Cell(2, 3).Range.Font.Name = "Times New Roman";
-                    headerTable.Cell(2, 3).Range.Font.Size = 12;
-                    headerTable.Cell(2, 3).Range.Font.Italic = 1;
-                    headerTable.Cell(2, 3).Range.Font.Bold = 1;
-                    headerTable.Cell(2, 3).Range.Font.Color = Word.WdColor.wdColorBlack;
+                        // колонтитул нечетной страницы
+                        wDocument.Tables.Add(headerRange, 1, 6, ref defaultTableBehavior, ref autoFitBehavior);
+                        Word.Table headerTable = headerRange.Tables[1];
 
-                    // заполнение таблицы
-                    headerTable.Rows.Add();
-                    headerTable.Rows[3].Borders.Enable = 1;
-                    headerTable.Cell(3, 1).Range.Text = "N п/п";
-                    headerTable.Cell(3, 2).Range.Text = "N сметы";
-                    headerTable.Cell(3, 3).Range.Text = "Наименование";
-                    headerTable.Cell(3, 4).Range.Text = "Всего тыс.руб.";
-                    headerTable.Cell(3, 5).Range.Text = "Стр.";
-                    headerTable.Cell(3, 6).Range.Text = "Часть";
-                    // изменение параметров таблицы
-                    headerTable.Rows[3].Cells.VerticalAlignment = Word.WdCellVerticalAlignment.wdCellAlignVerticalCenter;
-                    headerTable.Rows[3].Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
-                    headerTable.Rows[3].Range.Font.Name = "Times New Roman";
-                    headerTable.Rows[3].Range.Font.Italic = 0;
-                    headerTable.Rows[3].Range.Font.Bold = 1;
-                    headerTable.Rows[3].Range.Font.Size = 10;
-                    headerTable.Rows[3].Range.Font.Color = Word.WdColor.wdColorBlack;
-                    // ширина ячеек таблицы
-                    headerTable.Columns[1].PreferredWidth = 6f;
-                    headerTable.Columns[2].PreferredWidth = 9f;
-                    headerTable.Columns[3].PreferredWidth = 30f;
-                    headerTable.Columns[4].PreferredWidth = 9f;
-                    headerTable.Columns[5].PreferredWidth = 4f;
-                    headerTable.Columns[6].PreferredWidth = 4f;
+                        headerTable.Borders.Enable = 0;
+                        Word.Range rangePageNum = headerTable.Range.Cells[headerTable.Range.Cells.Count].Range;
+                        rangePageNum.Collapse(Word.WdCollapseDirection.wdCollapseStart);
+                        Word.Field fld = rangePageNum.Document.Fields.Add(rangePageNum, oMissing, "Page", false);
+                        Word.Range rangeFieldPageNum = fld.Result;
+                        rangeFieldPageNum.Collapse(Word.WdCollapseDirection.wdCollapseEnd);
+
+                        headerTable.Cell(1, 6).Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphRight;
+                        headerTable.Cell(1, 6).Range.Font.Size = 10;
+
+                        headerTable.Rows.Add();
+                        headerTable.Cell(2, 3).Range.Text = "Содержание";
+                        headerTable.Cell(2, 3).Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
+                        headerTable.Cell(2, 3).Range.Font.Name = "Times New Roman";
+                        headerTable.Cell(2, 3).Range.Font.Size = 12;
+                        headerTable.Cell(2, 3).Range.Font.Italic = 1;
+                        headerTable.Cell(2, 3).Range.Font.Bold = 1;
+                        headerTable.Cell(2, 3).Range.Font.Color = Word.WdColor.wdColorBlack;
+                        
+
+                        // заполнение таблицы
+                        headerTable.Rows.Add();
+                        headerTable.Rows[3].Borders.Enable = 1;
+                        headerTable.Cell(3, 1).Range.Text = "N п/п";
+                        headerTable.Cell(3, 2).Range.Text = "N сметы";
+                        headerTable.Cell(3, 3).Range.Text = "Наименование";
+                        headerTable.Cell(3, 4).Range.Text = "Всего тыс.руб.";
+                        headerTable.Cell(3, 5).Range.Text = "Стр.";
+                        headerTable.Cell(3, 6).Range.Text = "Часть";
+                        // изменение параметров таблицы
+                        headerTable.Rows[3].Cells.VerticalAlignment = Word.WdCellVerticalAlignment.wdCellAlignVerticalCenter;
+                        headerTable.Rows[3].Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
+                        headerTable.Rows[3].Range.Font.Name = "Times New Roman";
+                        headerTable.Rows[3].Range.Font.Italic = 0;
+                        headerTable.Rows[3].Range.Font.Bold = 1;
+                        headerTable.Rows[3].Range.Font.Size = 10;
+                        headerTable.Rows[3].Range.Font.Color = Word.WdColor.wdColorBlack;
+                        // ширина ячеек таблицы
+                        headerTable.Columns[1].PreferredWidth = 6f;
+                        headerTable.Columns[2].PreferredWidth = 9f;
+                        headerTable.Columns[3].PreferredWidth = 32f;
+                        headerTable.Columns[4].PreferredWidth = 9f;
+                        headerTable.Columns[5].PreferredWidth = 4f;
+                        headerTable.Columns[6].PreferredWidth = 4f;
+
+                        // колонтитул четных страниц
+                        headerRange = wDocument.Sections[1].Headers[Word.WdHeaderFooterIndex.wdHeaderFooterEvenPages].Range;
+
+                        wDocument.Tables.Add(headerRange, 1, 6, ref defaultTableBehavior, ref autoFitBehavior);
+                        headerTable = headerRange.Tables[1];
+
+                        headerTable.Borders.Enable = 0;
+                        rangePageNum = headerTable.Range.Cells[1].Range;
+                        rangePageNum.Collapse(Word.WdCollapseDirection.wdCollapseStart);
+                        fld = rangePageNum.Document.Fields.Add(rangePageNum, oMissing, "Page", false);
+                        rangeFieldPageNum = fld.Result;
+                        rangeFieldPageNum.Collapse(Word.WdCollapseDirection.wdCollapseEnd);
+
+                        headerTable.Cell(1, 6).Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphRight;
+                        headerTable.Cell(1, 1).Range.Font.Size = 10;
+
+                        headerTable.Rows.Add();
+                        headerTable.Cell(2, 3).Range.Text = "Содержание";
+                        headerTable.Cell(2, 3).Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
+                        headerTable.Cell(2, 3).Range.Font.Name = "Times New Roman";
+                        headerTable.Cell(2, 3).Range.Font.Size = 12;
+                        headerTable.Cell(2, 3).Range.Font.Italic = 1;
+                        headerTable.Cell(2, 3).Range.Font.Bold = 1;
+                        headerTable.Cell(2, 3).Range.Font.Color = Word.WdColor.wdColorBlack;
+
+                        // заполнение таблицы
+                        headerTable.Rows.Add();
+                        headerTable.Rows[3].Borders.Enable = 1;
+                        headerTable.Cell(3, 1).Range.Text = "N п/п";
+                        headerTable.Cell(3, 2).Range.Text = "N сметы";
+                        headerTable.Cell(3, 3).Range.Text = "Наименование";
+                        headerTable.Cell(3, 4).Range.Text = "Всего тыс.руб.";
+                        headerTable.Cell(3, 5).Range.Text = "Стр.";
+                        headerTable.Cell(3, 6).Range.Text = "Часть";
+                        // изменение параметров таблицы
+                        headerTable.Rows[3].Cells.VerticalAlignment = Word.WdCellVerticalAlignment.wdCellAlignVerticalCenter;
+                        headerTable.Rows[3].Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
+                        headerTable.Rows[3].Range.Font.Name = "Times New Roman";
+                        headerTable.Rows[3].Range.Font.Italic = 0;
+                        headerTable.Rows[3].Range.Font.Bold = 1;
+                        headerTable.Rows[3].Range.Font.Size = 10;
+                        headerTable.Rows[3].Range.Font.Color = Word.WdColor.wdColorBlack;
+                        // ширина ячеек таблицы
+                        headerTable.Columns[1].PreferredWidth = 6f;
+                        headerTable.Columns[2].PreferredWidth = 9f;
+                        headerTable.Columns[3].PreferredWidth = 32f;
+                        headerTable.Columns[4].PreferredWidth = 9f;
+                        headerTable.Columns[5].PreferredWidth = 4f;
+                        headerTable.Columns[6].PreferredWidth = 4f;
+                    }
+                    else
+                    {
+
+                        Word.HeaderFooter header = wDocument.Sections[1].Headers[Word.WdHeaderFooterIndex.wdHeaderFooterPrimary];
+
+                        Word.Range headerRange = header.Range;
+
+                        header.LinkToPrevious = false;
+                        header.PageNumbers.RestartNumberingAtSection = true;
+                        header.PageNumbers.StartingNumber = (int)StartNumberNumeric.Value; // номер первой страницы
+
+                        // колонтитул страницы
+                        wDocument.Tables.Add(headerRange, 1, 6, ref defaultTableBehavior, ref autoFitBehavior);
+                        Word.Table headerTable = headerRange.Tables[1];
+
+                        headerTable.Borders.Enable = 0;
+                        Word.Range rangePageNum = headerTable.Range.Cells[headerTable.Range.Cells.Count].Range;
+                        rangePageNum.Collapse(Word.WdCollapseDirection.wdCollapseStart);
+                        Word.Field fld = rangePageNum.Document.Fields.Add(rangePageNum, oMissing, "Page", false);
+                        Word.Range rangeFieldPageNum = fld.Result;
+                        rangeFieldPageNum.Collapse(Word.WdCollapseDirection.wdCollapseEnd);
+
+                        headerTable.Cell(1, 6).Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphRight;
+                        headerTable.Cell(1, 6).Range.Font.Size = 10;
+
+                        headerTable.Rows.Add();
+                        headerTable.Cell(2, 3).Range.Text = "Содержание";
+                        headerTable.Cell(2, 3).Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
+                        headerTable.Cell(2, 3).Range.Font.Name = "Times New Roman";
+                        headerTable.Cell(2, 3).Range.Font.Size = 12;
+                        headerTable.Cell(2, 3).Range.Font.Italic = 1;
+                        headerTable.Cell(2, 3).Range.Font.Bold = 1;
+                        headerTable.Cell(2, 3).Range.Font.Color = Word.WdColor.wdColorBlack;
+
+                        // заполнение таблицы
+                        headerTable.Rows.Add();
+                        headerTable.Rows[3].Borders.Enable = 1;
+                        headerTable.Cell(3, 1).Range.Text = "N п/п";
+                        headerTable.Cell(3, 2).Range.Text = "N сметы";
+                        headerTable.Cell(3, 3).Range.Text = "Наименование";
+                        headerTable.Cell(3, 4).Range.Text = "Всего тыс.руб.";
+                        headerTable.Cell(3, 5).Range.Text = "Стр.";
+                        headerTable.Cell(3, 6).Range.Text = "Часть";
+                        // изменение параметров таблицы
+                        headerTable.Rows[3].Cells.VerticalAlignment = Word.WdCellVerticalAlignment.wdCellAlignVerticalCenter;
+                        headerTable.Rows[3].Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
+                        headerTable.Rows[3].Range.Font.Name = "Times New Roman";
+                        headerTable.Rows[3].Range.Font.Italic = 0;
+                        headerTable.Rows[3].Range.Font.Bold = 1;
+                        headerTable.Rows[3].Range.Font.Size = 10;
+                        headerTable.Rows[3].Range.Font.Color = Word.WdColor.wdColorBlack;
+                        // ширина ячеек таблицы
+                        headerTable.Columns[1].PreferredWidth = 6f;
+                        headerTable.Columns[2].PreferredWidth = 9f;
+                        headerTable.Columns[3].PreferredWidth = 32f;
+                        headerTable.Columns[4].PreferredWidth = 9f;
+                        headerTable.Columns[5].PreferredWidth = 4f;
+                        headerTable.Columns[6].PreferredWidth = 4f;
+                    }
 
                     // основная часть
                     wDocument.Paragraphs.Add(ref oMissing);
@@ -1077,7 +1257,7 @@ namespace ExcelAPP
                     // ширина ячеек таблицы
                     Table.Columns[1].PreferredWidth = 6f;
                     Table.Columns[2].PreferredWidth = 9f;
-                    Table.Columns[3].PreferredWidth = 30f;
+                    Table.Columns[3].PreferredWidth = 32f;
                     Table.Columns[4].PreferredWidth = 9f;
                     Table.Columns[5].PreferredWidth = 4f;
                     Table.Columns[6].PreferredWidth = 4f;
@@ -1420,9 +1600,9 @@ namespace ExcelAPP
             
 
             // настройка полей документа
-            wDocument.PageSetup.TopMargin = wordApp.InchesToPoints(0.5f);
-            wDocument.PageSetup.BottomMargin = wordApp.InchesToPoints(0.5f);
-            wDocument.PageSetup.LeftMargin = wordApp.InchesToPoints(0.65f);
+            wDocument.PageSetup.TopMargin = wordApp.InchesToPoints(0.4f);
+            wDocument.PageSetup.BottomMargin = wordApp.InchesToPoints(0.4f);
+            wDocument.PageSetup.LeftMargin = wordApp.InchesToPoints(0.4f);
             wDocument.PageSetup.RightMargin = wordApp.InchesToPoints(0.4f);
             wDocument.PageSetup.HeaderDistance = 20f;
 
@@ -1456,6 +1636,7 @@ namespace ExcelAPP
             headerTable.Cell(2, 3).Range.Font.Italic = 1;
             headerTable.Cell(2, 3).Range.Font.Bold = 1;
             headerTable.Cell(2, 3).Range.Font.Color = Word.WdColor.wdColorBlack;
+            
 
             // заполнение таблицы
             headerTable.Rows.Add();
@@ -1477,7 +1658,7 @@ namespace ExcelAPP
             // ширина ячеек таблицы
             headerTable.Columns[1].PreferredWidth = 6f;
             headerTable.Columns[2].PreferredWidth = 9f;
-            headerTable.Columns[3].PreferredWidth = 30f;
+            headerTable.Columns[3].PreferredWidth = 32f;
             headerTable.Columns[4].PreferredWidth = 9f;
             headerTable.Columns[5].PreferredWidth = 4f;
             headerTable.Columns[6].PreferredWidth = 4f;
@@ -1527,7 +1708,7 @@ namespace ExcelAPP
             // ширина ячеек таблицы
             headerTable.Columns[1].PreferredWidth = 6f;
             headerTable.Columns[2].PreferredWidth = 9f;
-            headerTable.Columns[3].PreferredWidth = 30f;
+            headerTable.Columns[3].PreferredWidth = 32f;
             headerTable.Columns[4].PreferredWidth = 9f;
             headerTable.Columns[5].PreferredWidth = 4f;
             headerTable.Columns[6].PreferredWidth = 4f;
