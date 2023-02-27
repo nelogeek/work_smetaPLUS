@@ -1352,7 +1352,7 @@ namespace ExcelAPP
             };
 
             var wDoc = wordApp.Documents.Open($@"C:\Users\lokot\Desktop\test2.docx");
-            wDoc.ActiveWindow.Selection.Sections[1].Headers[j].PageNumbers.StartingNumber = 1;
+            //wDoc.ActiveWindow.Selection.Sections[1].Headers[j].PageNumbers.StartingNumber = 1;
             // TODO нумерация страниц содержания
         }
     }
