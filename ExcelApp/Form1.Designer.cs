@@ -34,29 +34,34 @@
             this.backgroundWorker = new System.ComponentModel.BackgroundWorker();
             this.SplitBookContentCheckBox = new System.Windows.Forms.CheckBox();
             this.infoTextBox = new System.Windows.Forms.TextBox();
-            this.button1 = new System.Windows.Forms.Button();
-            this.RdPdToggle = new ExcelApp.Controls.ToggleButton();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
+            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
+            this.настройкиToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.AutoPageBreakeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.RdPdToggle = new ExcelApp.Controls.ToggleButton();
             ((System.ComponentModel.ISupportInitialize)(this.StartNumberNumeric)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.CountPagePZNumeric)).BeginInit();
+            this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // labelNameFolder
             // 
             this.labelNameFolder.AutoSize = true;
-            this.labelNameFolder.Location = new System.Drawing.Point(17, 23);
-            this.labelNameFolder.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelNameFolder.Location = new System.Drawing.Point(17, 41);
+            this.labelNameFolder.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
+            this.labelNameFolder.MaximumSize = new System.Drawing.Size(821, 20);
+            this.labelNameFolder.MinimumSize = new System.Drawing.Size(21, 20);
             this.labelNameFolder.Name = "labelNameFolder";
-            this.labelNameFolder.Size = new System.Drawing.Size(0, 16);
+            this.labelNameFolder.Size = new System.Drawing.Size(21, 20);
             this.labelNameFolder.TabIndex = 1;
             // 
             // btnSelectFolder
             // 
-            this.btnSelectFolder.Location = new System.Drawing.Point(493, 351);
+            this.btnSelectFolder.Location = new System.Drawing.Point(491, 351);
             this.btnSelectFolder.Margin = new System.Windows.Forms.Padding(4);
             this.btnSelectFolder.Name = "btnSelectFolder";
-            this.btnSelectFolder.Size = new System.Drawing.Size(195, 28);
+            this.btnSelectFolder.Size = new System.Drawing.Size(180, 28);
             this.btnSelectFolder.TabIndex = 3;
             this.btnSelectFolder.Text = "Выбрать папку";
             this.btnSelectFolder.UseVisualStyleBackColor = true;
@@ -65,20 +70,22 @@
             // labelCompleted
             // 
             this.labelCompleted.AutoSize = true;
-            this.labelCompleted.Location = new System.Drawing.Point(17, 357);
-            this.labelCompleted.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.labelCompleted.Location = new System.Drawing.Point(14, 385);
+            this.labelCompleted.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
+            this.labelCompleted.MaximumSize = new System.Drawing.Size(821, 20);
+            this.labelCompleted.MinimumSize = new System.Drawing.Size(21, 20);
             this.labelCompleted.Name = "labelCompleted";
-            this.labelCompleted.Size = new System.Drawing.Size(0, 16);
+            this.labelCompleted.Size = new System.Drawing.Size(21, 20);
             this.labelCompleted.TabIndex = 7;
             // 
             // btnBuild
             // 
-            this.btnBuild.Location = new System.Drawing.Point(740, 351);
+            this.btnBuild.Location = new System.Drawing.Point(711, 351);
             this.btnBuild.Margin = new System.Windows.Forms.Padding(4);
             this.btnBuild.Name = "btnBuild";
-            this.btnBuild.Size = new System.Drawing.Size(100, 28);
+            this.btnBuild.Size = new System.Drawing.Size(129, 28);
             this.btnBuild.TabIndex = 5;
-            this.btnBuild.Text = "Собрать";
+            this.btnBuild.Text = "Собрать книгу";
             this.btnBuild.UseVisualStyleBackColor = true;
             this.btnBuild.Click += new System.EventHandler(this.BtnBuild_Click);
             // 
@@ -100,7 +107,7 @@
             this.StartNumberNumeric.Size = new System.Drawing.Size(76, 22);
             this.StartNumberNumeric.TabIndex = 10;
             this.StartNumberNumeric.Value = new decimal(new int[] {
-            1,
+            3,
             0,
             0,
             0});
@@ -111,9 +118,9 @@
             this.label1.Location = new System.Drawing.Point(17, 73);
             this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(167, 16);
+            this.label1.Size = new System.Drawing.Size(143, 16);
             this.label1.TabIndex = 11;
-            this.label1.Text = "Номер первой страницы";
+            this.label1.Text = "Начать нумерацию с";
             // 
             // label4
             // 
@@ -151,6 +158,8 @@
             // TwoSidedPrintCheckBox
             // 
             this.TwoSidedPrintCheckBox.AutoSize = true;
+            this.TwoSidedPrintCheckBox.Checked = true;
+            this.TwoSidedPrintCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
             this.TwoSidedPrintCheckBox.Location = new System.Drawing.Point(20, 212);
             this.TwoSidedPrintCheckBox.Margin = new System.Windows.Forms.Padding(4);
             this.TwoSidedPrintCheckBox.Name = "TwoSidedPrintCheckBox";
@@ -162,9 +171,9 @@
             // 
             // backgroundWorker
             // 
-            this.backgroundWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker_DoWork);
-            this.backgroundWorker.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.backgroundWorker_ProgressChanged);
-            this.backgroundWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.backgroundWorker_RunWorkerCompleted);
+            this.backgroundWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.BackgroundWorker_DoWork);
+            this.backgroundWorker.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.BackgroundWorker_ProgressChanged);
+            this.backgroundWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.BackgroundWorker_RunWorkerCompleted);
             // 
             // SplitBookContentCheckBox
             // 
@@ -191,31 +200,6 @@
             this.infoTextBox.Size = new System.Drawing.Size(547, 260);
             this.infoTextBox.TabIndex = 21;
             // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(461, 58);
-            this.button1.Margin = new System.Windows.Forms.Padding(4);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(11, 10);
-            this.button1.TabIndex = 22;
-            this.button1.Text = "button1";
-            this.button1.UseVisualStyleBackColor = true;
-            // 
-            // RdPdToggle
-            // 
-            this.RdPdToggle.AutoSize = true;
-            this.RdPdToggle.Location = new System.Drawing.Point(103, 158);
-            this.RdPdToggle.Margin = new System.Windows.Forms.Padding(4);
-            this.RdPdToggle.MinimumSize = new System.Drawing.Size(60, 27);
-            this.RdPdToggle.Name = "RdPdToggle";
-            this.RdPdToggle.OffBackColor = System.Drawing.Color.Gray;
-            this.RdPdToggle.OffToggleColor = System.Drawing.Color.Gainsboro;
-            this.RdPdToggle.OnBackColor = System.Drawing.Color.MediumSlateBlue;
-            this.RdPdToggle.OnToggleColor = System.Drawing.Color.WhiteSmoke;
-            this.RdPdToggle.Size = new System.Drawing.Size(60, 27);
-            this.RdPdToggle.TabIndex = 23;
-            this.RdPdToggle.UseVisualStyleBackColor = true;
-            // 
             // label2
             // 
             this.label2.AutoSize = true;
@@ -236,16 +220,58 @@
             this.label3.TabIndex = 26;
             this.label3.Text = "РД";
             // 
+            // menuStrip1
+            // 
+            this.menuStrip1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(219)))), ((int)(((byte)(219)))), ((int)(((byte)(219)))));
+            this.menuStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
+            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.настройкиToolStripMenuItem});
+            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
+            this.menuStrip1.Name = "menuStrip1";
+            this.menuStrip1.Size = new System.Drawing.Size(864, 28);
+            this.menuStrip1.TabIndex = 28;
+            this.menuStrip1.Text = "menuStrip1";
+            // 
+            // настройкиToolStripMenuItem
+            // 
+            this.настройкиToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.AutoPageBreakeToolStripMenuItem});
+            this.настройкиToolStripMenuItem.Name = "настройкиToolStripMenuItem";
+            this.настройкиToolStripMenuItem.Size = new System.Drawing.Size(98, 24);
+            this.настройкиToolStripMenuItem.Text = "Настройки";
+            // 
+            // AutoPageBreakeToolStripMenuItem
+            // 
+            this.AutoPageBreakeToolStripMenuItem.CheckOnClick = true;
+            this.AutoPageBreakeToolStripMenuItem.Name = "AutoPageBreakeToolStripMenuItem";
+            this.AutoPageBreakeToolStripMenuItem.Size = new System.Drawing.Size(268, 26);
+            this.AutoPageBreakeToolStripMenuItem.Text = "Авторазделение страниц";
+            // 
+            // RdPdToggle
+            // 
+            this.RdPdToggle.AutoSize = true;
+            this.RdPdToggle.Location = new System.Drawing.Point(103, 158);
+            this.RdPdToggle.Margin = new System.Windows.Forms.Padding(4);
+            this.RdPdToggle.MinimumSize = new System.Drawing.Size(60, 27);
+            this.RdPdToggle.Name = "RdPdToggle";
+            this.RdPdToggle.OffBackColor = System.Drawing.Color.Gray;
+            this.RdPdToggle.OffToggleColor = System.Drawing.Color.Gainsboro;
+            this.RdPdToggle.OnBackColor = System.Drawing.Color.RoyalBlue;
+            this.RdPdToggle.OnToggleColor = System.Drawing.Color.WhiteSmoke;
+            this.RdPdToggle.Size = new System.Drawing.Size(60, 27);
+            this.RdPdToggle.TabIndex = 23;
+            this.RdPdToggle.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ClientSize = new System.Drawing.Size(862, 398);
+            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
+            this.ClientSize = new System.Drawing.Size(864, 423);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.RdPdToggle);
-            this.Controls.Add(this.button1);
             this.Controls.Add(this.infoTextBox);
             this.Controls.Add(this.SplitBookContentCheckBox);
             this.Controls.Add(this.TwoSidedPrintCheckBox);
@@ -257,13 +283,17 @@
             this.Controls.Add(this.btnBuild);
             this.Controls.Add(this.btnSelectFolder);
             this.Controls.Add(this.labelNameFolder);
+            this.Controls.Add(this.menuStrip1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Margin = new System.Windows.Forms.Padding(4);
+            this.MainMenuStrip = this.menuStrip1;
+            this.Margin = new System.Windows.Forms.Padding(5);
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Smeta++";
             ((System.ComponentModel.ISupportInitialize)(this.StartNumberNumeric)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.CountPagePZNumeric)).EndInit();
+            this.menuStrip1.ResumeLayout(false);
+            this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -274,7 +304,6 @@
         private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog;
         private System.Windows.Forms.Button btnSelectFolder;
         private System.Windows.Forms.Button btnBuild;
-        private System.Windows.Forms.Label labelCompleted;
         private System.Windows.Forms.NumericUpDown StartNumberNumeric;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label4;
@@ -283,9 +312,12 @@
         private System.ComponentModel.BackgroundWorker backgroundWorker;
         private System.Windows.Forms.CheckBox SplitBookContentCheckBox;
         private System.Windows.Forms.TextBox infoTextBox;
-        private System.Windows.Forms.Button button1;
         private ExcelApp.Controls.ToggleButton RdPdToggle;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
+        public System.Windows.Forms.Label labelCompleted;
+        private System.Windows.Forms.MenuStrip menuStrip1;
+        private System.Windows.Forms.ToolStripMenuItem настройкиToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem AutoPageBreakeToolStripMenuItem;
     }
 }
