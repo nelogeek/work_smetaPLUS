@@ -697,6 +697,7 @@ namespace ExcelAPP
                     Word.Field fld = rangePageNum.Document.Fields.Add(rangePageNum, oMissing, "Page", false);
                     Word.Range rangeFieldPageNum = fld.Result;
                     rangeFieldPageNum.Collapse(Word.WdCollapseDirection.wdCollapseEnd);
+                    wDocument.Sections[1].Headers[Word.WdHeaderFooterIndex.wdHeaderFooterPrimary].PageNumbers.StartingNumber = (int)StartNumberNumeric.Value;
                     headerTable.Cell(1, 6).Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphRight;
                     headerTable.Cell(1, 6).Range.Font.Size = 12;
 
@@ -1339,6 +1340,20 @@ namespace ExcelAPP
             localData = new List<SmetaFile>();
             objectiveData = new List<SmetaFile>();
             GC.Collect();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            Word.Application wordApp = new Word.Application
+            {
+
+                Visible = true,
+                ScreenUpdating = true
+            };
+
+            var wDoc = wordApp.Documents.Open($@"C:\Users\lokot\Desktop\test2.docx");
+            wDoc.ActiveWindow.Selection.Sections[1].Headers[j].PageNumbers.StartingNumber = 1;
+            // TODO нумерация страниц содержания
         }
     }
 }

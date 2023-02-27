@@ -40,6 +40,7 @@
             this.настройкиToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.AutoPageBreakeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.RdPdToggle = new ExcelApp.Controls.ToggleButton();
+            this.button1 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.StartNumberNumeric)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.CountPagePZNumeric)).BeginInit();
             this.menuStrip1.SuspendLayout();
@@ -228,7 +229,7 @@
             this.настройкиToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(864, 30);
+            this.menuStrip1.Size = new System.Drawing.Size(864, 28);
             this.menuStrip1.TabIndex = 28;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -237,7 +238,7 @@
             this.настройкиToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.AutoPageBreakeToolStripMenuItem});
             this.настройкиToolStripMenuItem.Name = "настройкиToolStripMenuItem";
-            this.настройкиToolStripMenuItem.Size = new System.Drawing.Size(98, 26);
+            this.настройкиToolStripMenuItem.Size = new System.Drawing.Size(98, 24);
             this.настройкиToolStripMenuItem.Text = "Настройки";
             // 
             // AutoPageBreakeToolStripMenuItem
@@ -251,7 +252,7 @@
             // 
             this.RdPdToggle.AutoSize = true;
             this.RdPdToggle.Location = new System.Drawing.Point(103, 158);
-            this.RdPdToggle.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.RdPdToggle.Margin = new System.Windows.Forms.Padding(4);
             this.RdPdToggle.MinimumSize = new System.Drawing.Size(60, 27);
             this.RdPdToggle.Name = "RdPdToggle";
             this.RdPdToggle.OffBackColor = System.Drawing.Color.Gray;
@@ -262,6 +263,16 @@
             this.RdPdToggle.TabIndex = 23;
             this.RdPdToggle.UseVisualStyleBackColor = true;
             // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(50, 286);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(75, 23);
+            this.button1.TabIndex = 29;
+            this.button1.Text = "button1";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -269,6 +280,7 @@
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
             this.ClientSize = new System.Drawing.Size(864, 423);
+            this.Controls.Add(this.button1);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.RdPdToggle);
@@ -319,5 +331,6 @@
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem настройкиToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem AutoPageBreakeToolStripMenuItem;
+        private System.Windows.Forms.Button button1;
     }
 }
