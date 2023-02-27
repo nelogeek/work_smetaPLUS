@@ -1454,8 +1454,8 @@ namespace ExcelAPP
                        Excel.XlSearchOrder.xlByRows, Excel.XlSearchDirection.xlPrevious,
                        false, System.Reflection.Missing.Value, System.Reflection.Missing.Value).Row;
 
-            eWorksheet.PageSetup.Zoom = false;
-            eWorksheet.PageSetup.FitToPagesTall = (int)(lastUsedRow / 29);
+            //eWorksheet.PageSetup.Zoom = false;
+            //eWorksheet.PageSetup.FitToPagesTall = (int)(lastUsedRow / 29);
 
             eWorksheet.ResetAllPageBreaks();
             //eWorksheet.HPageBreaks.Add(eWorksheet.Range[$"A34"]);
@@ -1468,8 +1468,8 @@ namespace ExcelAPP
             //    // TODO
             //}
 
-            //var lastPageBreake = eWorksheet.HPageBreaks[eWorksheet.HPageBreaks.Count].Location.Row.ToString();
-            //MessageBox.Show(lastPageBreake.ToString());
+            var lastPageBreake = eWorksheet.HPageBreaks[eWorksheet.HPageBreaks.Count].Location.Row.ToString();
+            MessageBox.Show(lastPageBreake.ToString());
             //if ((Convert.ToInt32(lastUsedRow) - Convert.ToInt32(lastPageBreake)) < 13)
             //{
             //    eWorksheet.HPageBreaks.Add(eWorksheet.Range[$"A{lastUsedRow - 13}"]);
