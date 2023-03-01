@@ -136,7 +136,7 @@ namespace ExcelAPP
             }
             else
             {
-                EnabledButton();
+                //EnabledButton();
                 infoTextBox.Clear();
             }
         }
@@ -185,6 +185,9 @@ namespace ExcelAPP
             this.TwoSidedPrintCheckBox.Enabled = false;
             this.SplitBookContentCheckBox.Enabled = false;
             this.RdPdToggle.Enabled = false;
+            this.partsBookCheckBox.Enabled = false;
+            this.pagesInPartBookNumeric.Enabled = false;
+            this.settingsToolStripMenuItem.Enabled = false;
         }
         protected void EnabledButton()
         {
@@ -195,6 +198,9 @@ namespace ExcelAPP
             this.TwoSidedPrintCheckBox.Enabled = true;
             this.SplitBookContentCheckBox.Enabled = true;
             this.RdPdToggle.Enabled = true;
+            this.partsBookCheckBox.Enabled = true;
+            this.pagesInPartBookNumeric.Enabled = true;
+            this.settingsToolStripMenuItem.Enabled = true;
         }
 
         private bool ExcelParser()
@@ -1584,7 +1590,7 @@ namespace ExcelAPP
 
             
 
-        }
+        
 
        
     }
