@@ -1305,33 +1305,33 @@ namespace ExcelAPP
         protected void PageBreaker(Excel.Worksheet eWorksheet)
         {
             // разделение (разрыв) страниц
-            var lastUsedRow = eWorksheet.Cells.Find("*", System.Reflection.Missing.Value,
+            try
+            {
+                int lastUsedRow = eWorksheet.Cells.Find("*", System.Reflection.Missing.Value,
                        System.Reflection.Missing.Value, System.Reflection.Missing.Value,
                        Excel.XlSearchOrder.xlByRows, Excel.XlSearchDirection.xlPrevious,
                        false, System.Reflection.Missing.Value, System.Reflection.Missing.Value).Row;
+                var a = eWorksheet.HPageBreaks;
+                eWorksheet.ResetAllPageBreaks();
 
-            eWorksheet.PageSetup.Zoom = false;
-            eWorksheet.PageSetup.FitToPagesTall = (int)(lastUsedRow / 29);
-
-            eWorksheet.ResetAllPageBreaks();
-            //eWorksheet.HPageBreaks.Add(eWorksheet.Range[$"A34"]);
-            //if (local)
-            //{
-
-            //}
-            //else
-            //{
-            //    // TODO
-            //}
-
-            //var lastPageBreake = eWorksheet.HPageBreaks[eWorksheet.HPageBreaks.Count].Location.Row.ToString();
-            //MessageBox.Show(lastPageBreake.ToString());
-            //if ((Convert.ToInt32(lastUsedRow) - Convert.ToInt32(lastPageBreake)) < 13)
-            //{
-            //    eWorksheet.HPageBreaks.Add(eWorksheet.Range[$"A{lastUsedRow - 13}"]);
-            //}
-
-
+                for (int p = 1; p <= a.Count; p++)
+                {
+                    int i = a[p].Location.Row;
+                    a.Add(eWorksheet.Range[$"A{i}"]);
+                }
+                int lastPageBreak = a[a.Count].Location.Row;
+                if (lastUsedRow - lastPageBreak < 13)
+                {
+                    a[a.Count].Delete();
+                    a.Add(eWorksheet.Range[$"A{lastUsedRow - 13}"]);
+                }
+            }
+            catch (Exception ex)
+            {
+                //MessageBox.Show(ex.ToString());
+                Console.WriteLine(ex.StackTrace);
+                Console.WriteLine(ex.Message.ToString());
+            }
         }
 
         protected int FullBookPageCounter //Счетчик общего количества страниц
