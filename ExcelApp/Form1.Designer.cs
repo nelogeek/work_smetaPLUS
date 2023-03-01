@@ -242,7 +242,9 @@
             // 
             // AutoPageBreakeToolStripMenuItem
             // 
+            this.AutoPageBreakeToolStripMenuItem.Checked = true;
             this.AutoPageBreakeToolStripMenuItem.CheckOnClick = true;
+            this.AutoPageBreakeToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.AutoPageBreakeToolStripMenuItem.Name = "AutoPageBreakeToolStripMenuItem";
             this.AutoPageBreakeToolStripMenuItem.Size = new System.Drawing.Size(268, 26);
             this.AutoPageBreakeToolStripMenuItem.Text = "Авторазделение страниц";
@@ -287,6 +289,10 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStrip1;
             this.Margin = new System.Windows.Forms.Padding(5);
+            this.MaximizeBox = false;
+            this.MaximumSize = new System.Drawing.Size(882, 470);
+            this.MinimizeBox = false;
+            this.MinimumSize = new System.Drawing.Size(882, 470);
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Smeta++";
