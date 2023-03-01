@@ -1477,8 +1477,6 @@ namespace ExcelAPP
                 Console.WriteLine(ex.StackTrace);
                 Console.WriteLine(ex.Message.ToString());
             }
-
-
         }
 
         protected int FullBookPageCounter //Счетчик общего количества страниц
@@ -1540,7 +1538,8 @@ namespace ExcelAPP
                 if (SplitBookContentCheckBox.Checked)
                 {
                     File.Move($@"{_path}\TEMPdf\Содержание.pdf", $@"{DesktopFolder}\Содержание.pdf");
-                    File.Move($@"{_path}\TEMPdf\Сметы.pdf", $@"{DesktopFolder}\Сметы.pdf");
+                    if(!partsBookCheckBox.Checked)
+                        File.Move($@"{_path}\TEMPdf\Сметы.pdf", $@"{DesktopFolder}\Сметы.pdf");
                     File.Move($@"{_path}\TEMPdf\Содержание.docx", $@"{DesktopFolder}\Содержание.docx");
                 }
                 else
@@ -1582,26 +1581,6 @@ namespace ExcelAPP
             GC.Collect();
         }
 
-        private void button1_Click(object sender, EventArgs e)
-        {
-            Excel.Application app = new Excel.Application
-            {
-                DisplayAlerts = false,
-                Visible = true,
-                ScreenUpdating = true
-            };
-
-            Excel.Workbook eWorkbook;
-            Excel.Worksheet eWorksheet;
-
-            eWorkbook = app.Workbooks.Open($@"C:\Users\lokot\Desktop\test1.xlsx");
-            eWorksheet = (Excel.Worksheet)eWorkbook.Worksheets[1];
-            
-            app.ActiveWindow.View = XlWindowView.xlPageBreakPreview;
-
-            //eWorksheet.HPageBreaks.Add(eWorksheet.Range["A20"]);
-            //Thread.Sleep(2000);
-            PageBreaker(eWorksheet);
 
             
 
