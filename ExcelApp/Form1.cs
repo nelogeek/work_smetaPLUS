@@ -1,4 +1,3 @@
-
 using iTextSharp.text;
 using Microsoft.Office.Interop.Excel;
 using Microsoft.Office.Interop.Word;
@@ -13,7 +12,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using System.Threading;
 using System.Windows.Forms;
 using System.Xml.Linq;
 using Excel = Microsoft.Office.Interop.Excel;
@@ -136,7 +134,7 @@ namespace ExcelAPP
             }
             else
             {
-                //EnabledButton();
+                EnabledButton();
                 infoTextBox.Clear();
             }
         }
@@ -185,9 +183,9 @@ namespace ExcelAPP
             this.TwoSidedPrintCheckBox.Enabled = false;
             this.SplitBookContentCheckBox.Enabled = false;
             this.RdPdToggle.Enabled = false;
-            this.partsBookCheckBox.Enabled = false;
-            this.pagesInPartBookNumeric.Enabled = false;
             this.settingsToolStripMenuItem.Enabled = false;
+            this.pagesInPartBookNumeric.Enabled = false;
+            this.partsBookCheckBox.Enabled = false;
         }
         protected void EnabledButton()
         {
@@ -198,9 +196,9 @@ namespace ExcelAPP
             this.TwoSidedPrintCheckBox.Enabled = true;
             this.SplitBookContentCheckBox.Enabled = true;
             this.RdPdToggle.Enabled = true;
-            this.partsBookCheckBox.Enabled = true;
-            this.pagesInPartBookNumeric.Enabled = true;
             this.settingsToolStripMenuItem.Enabled = true;
+            this.pagesInPartBookNumeric.Enabled = true;
+            this.partsBookCheckBox.Enabled = true;
         }
 
         private bool ExcelParser()
@@ -418,63 +416,99 @@ namespace ExcelAPP
                 string fileNameSmetaPdf = $"{_path}\\TEMPdf\\Сметы.pdf";
                 string fileNameTitlePdf = $"{_path}\\TEMPdf\\Содержание.pdf";
 
-                List<SmetaFile> tempFilesArray = objectiveData;
-                tempFilesArray.AddRange(localData);
+                List<SmetaFile> tempFilesList = objectiveData;
+                tempFilesList.AddRange(localData);
+
+                SmetaFile lastUsedDocument = null;
 
                 //Объединение PDF
                 PdfDocument inputPdfDocument;
-
-                if (SplitBookContentCheckBox.Checked)
+                if (partsBookCheckBox.Checked)
                 {
-                    PdfDocument outputSmetaPdfDocument = new PdfDocument();
-                    foreach (var file in tempFilesArray)
+                    int bookNumber = 1;
+                    int i = 0;
+                    while (lastUsedDocument != tempFilesList[tempFilesList.Count - 1])
                     {
-                        inputPdfDocument = PdfReader.Open($"{pdfFolder}\\{file.FolderInfo}.pdf", PdfDocumentOpenMode.Import);
-                        for (int i = 0; i < inputPdfDocument.PageCount; i++)
+
+                        PdfDocument outputSmetaPdfDocument = new PdfDocument();
+                        for (; i < tempFilesList.Count; i++)
                         {
-                            PdfPage page = inputPdfDocument.Pages[i];
-                            outputSmetaPdfDocument.AddPage(page);
+                            var smetaFile = tempFilesList[i];
+                            inputPdfDocument = PdfReader.Open($"{pdfFolder}\\{smetaFile.FolderInfo}.pdf", PdfDocumentOpenMode.Import);
+                            int pageCountInputDocument = inputPdfDocument.PageCount;
+
+                            if (outputSmetaPdfDocument.PageCount + pageCountInputDocument < pagesInPartBookNumeric.Value + 50)
+                            {
+                                for (int j = 0; j < pageCountInputDocument; j++)
+                                {
+                                    PdfPage page = inputPdfDocument.Pages[j];
+                                    outputSmetaPdfDocument.AddPage(page);
+                                }
+                                lastUsedDocument = smetaFile;
+                                inputPdfDocument.Close();
+                            }
+                            else
+                                break;
                         }
-                        inputPdfDocument.Close();
+                        outputSmetaPdfDocument.Save($@"{DesktopFolder}\Сметы{bookNumber}.pdf");
+                        outputSmetaPdfDocument.Close();
+                        AddPageNumberSmetaITextSharp($@"{DesktopFolder}\Сметы{bookNumber}.pdf");
+                        bookNumber++;
                     }
-                    outputSmetaPdfDocument.Save(fileNameSmetaPdf);
-                    outputSmetaPdfDocument.Close();
                 }
                 else
                 {
-                    PdfDocument outputPdfDocument = new PdfDocument();
-                    //Добавляем содержание
-                    inputPdfDocument = PdfReader.Open(fileNameTitlePdf, PdfDocumentOpenMode.Import);
-                    for (int i = 0; i < inputPdfDocument.PageCount; i++)
+                    if (SplitBookContentCheckBox.Checked)
                     {
-                        PdfPage page = inputPdfDocument.Pages[i];
-                        outputPdfDocument.AddPage(page);
+                        PdfDocument outputSmetaPdfDocument = new PdfDocument();
+                        foreach (var file in tempFilesList)
+                        {
+                            inputPdfDocument = PdfReader.Open($"{pdfFolder}\\{file.FolderInfo}.pdf", PdfDocumentOpenMode.Import);
+                            for (int i = 0; i < inputPdfDocument.PageCount; i++)
+                            {
+                                PdfPage page = inputPdfDocument.Pages[i];
+                                outputSmetaPdfDocument.AddPage(page);
+                            }
+                            inputPdfDocument.Close();
+                        }
+                        outputSmetaPdfDocument.Save(fileNameSmetaPdf);
+                        outputSmetaPdfDocument.Close();
                     }
-                    //Добавляем сметы
-                    foreach (var file in tempFilesArray)
+                    else
                     {
-                        inputPdfDocument = PdfReader.Open($"{pdfFolder}\\{file.FolderInfo}.pdf", PdfDocumentOpenMode.Import);
+                        PdfDocument outputPdfDocument = new PdfDocument();
+                        //Добавляем содержание
+                        inputPdfDocument = PdfReader.Open(fileNameTitlePdf, PdfDocumentOpenMode.Import);
                         for (int i = 0; i < inputPdfDocument.PageCount; i++)
                         {
                             PdfPage page = inputPdfDocument.Pages[i];
                             outputPdfDocument.AddPage(page);
                         }
+                        //Добавляем сметы
+                        foreach (var file in tempFilesList)
+                        {
+                            inputPdfDocument = PdfReader.Open($"{pdfFolder}\\{file.FolderInfo}.pdf", PdfDocumentOpenMode.Import);
+                            for (int i = 0; i < inputPdfDocument.PageCount; i++)
+                            {
+                                PdfPage page = inputPdfDocument.Pages[i];
+                                outputPdfDocument.AddPage(page);
+                            }
+                        }
+                        outputPdfDocument.Save(fileNameConcatPdf);
+                        inputPdfDocument.Close();
+                        outputPdfDocument.Close();
                     }
-                    outputPdfDocument.Save(fileNameConcatPdf);
-                    inputPdfDocument.Close();
-                    outputPdfDocument.Close();
+                    if (SplitBookContentCheckBox.Checked) //Нумерация страниц
+                    {
+                        //AddPageNumberTitleITextSharp(fileNameTitlePdf);
+                        AddPageNumberSmetaITextSharp(fileNameSmetaPdf);
+                    }
+                    else
+                    {
+                        AddPageNumberITextSharp(fileNameConcatPdf);
+                    }
                 }
 
-                //Нумерация страниц
-                if (SplitBookContentCheckBox.Checked)
-                {
-                    //AddPageNumberTitleITextSharp(fileNameTitlePdf);
-                    AddPageNumberSmetaITextSharp(fileNameSmetaPdf);
-                }
-                else
-                {
-                    AddPageNumberITextSharp(fileNameConcatPdf);
-                }
                 return true;
             }
             catch (Exception)
@@ -656,6 +690,7 @@ namespace ExcelAPP
                 backgroundWorker.CancelAsync();
             }
         }
+
 
         protected bool TitleGeneration()
         {
@@ -1117,7 +1152,7 @@ namespace ExcelAPP
                         headerTable.Cell(2, 3).Range.Font.Italic = 1;
                         headerTable.Cell(2, 3).Range.Font.Bold = 1;
                         headerTable.Cell(2, 3).Range.Font.Color = Word.WdColor.wdColorBlack;
-                        
+
 
                         // заполнение таблицы
                         headerTable.Rows.Add();
@@ -1431,6 +1466,8 @@ namespace ExcelAPP
 
 
         }
+
+
         protected void RunBackgroundWorker_DoWork()
         {
             backgroundWorker.ReportProgress(1, "Сборка начата...");
@@ -1439,8 +1476,8 @@ namespace ExcelAPP
             if (!ExcelParser()) return;
             if (!ExcelConverter()) return;
             if (!TitleGeneration()) return;
-            if (!PdfMerge()) return;
             if (!CreateDesktopFolder()) return;
+            if (!PdfMerge()) return;
             if (!MoveFiles()) return;
 
             DeleteTempFiles();
@@ -1452,6 +1489,7 @@ namespace ExcelAPP
             string Time = $"Время сборки: {elapsedTime}";
             backgroundWorker.ReportProgress(1, Time);
         }
+
 
         protected void PageBreaker(Excel.Worksheet eWorksheet)
         {
@@ -1544,7 +1582,7 @@ namespace ExcelAPP
                 if (SplitBookContentCheckBox.Checked)
                 {
                     File.Move($@"{_path}\TEMPdf\Содержание.pdf", $@"{DesktopFolder}\Содержание.pdf");
-                    if(!partsBookCheckBox.Checked)
+                    if (!partsBookCheckBox.Checked)
                         File.Move($@"{_path}\TEMPdf\Сметы.pdf", $@"{DesktopFolder}\Сметы.pdf");
                     File.Move($@"{_path}\TEMPdf\Содержание.docx", $@"{DesktopFolder}\Содержание.docx");
                 }
@@ -1587,11 +1625,23 @@ namespace ExcelAPP
             GC.Collect();
         }
 
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            DialogResult dialogResult = MessageBox.Show("Вы точно хотите закрыть программу?", "Подтверждение закрытия программы", MessageBoxButtons.YesNo);
+            if (dialogResult == DialogResult.Yes)
+            {
 
-            
+                DeleteTempVar();
+                e.Cancel = false;
+                Environment.Exit(0);
 
-        
+            }
+            else
+            {
+                e.Cancel = true;
+            }
 
-       
+
+        }
     }
 }

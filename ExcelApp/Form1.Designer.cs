@@ -345,6 +345,7 @@
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Smeta++";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             ((System.ComponentModel.ISupportInitialize)(this.StartNumberNumeric)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.CountPagePZNumeric)).EndInit();
             this.menuStrip1.ResumeLayout(false);
