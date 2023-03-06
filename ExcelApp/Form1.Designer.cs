@@ -43,6 +43,7 @@
             this.partsBookCheckBox = new System.Windows.Forms.CheckBox();
             this.pagesInPartBookNumeric = new System.Windows.Forms.NumericUpDown();
             this.RdPdToggle = new ExcelApp.Controls.ToggleButton();
+            this.button1 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.StartNumberNumeric)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.CountPagePZNumeric)).BeginInit();
             this.menuStrip1.SuspendLayout();
@@ -312,6 +313,16 @@
             this.RdPdToggle.TabIndex = 23;
             this.RdPdToggle.UseVisualStyleBackColor = true;
             // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(19, 310);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(75, 23);
+            this.button1.TabIndex = 33;
+            this.button1.Text = "button1";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -319,6 +330,7 @@
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
             this.ClientSize = new System.Drawing.Size(864, 423);
+            this.Controls.Add(this.button1);
             this.Controls.Add(this.pagesInPartBookNumeric);
             this.Controls.Add(this.partsBookCheckBox);
             this.Controls.Add(this.PagesInPartBookLabel);
@@ -379,5 +391,6 @@
         private System.Windows.Forms.Label PagesInPartBookLabel;
         private System.Windows.Forms.CheckBox partsBookCheckBox;
         private System.Windows.Forms.NumericUpDown pagesInPartBookNumeric;
+        private System.Windows.Forms.Button button1;
     }
 }

@@ -4,6 +4,7 @@ using Microsoft.Office.Interop.Word;
 using PdfSharp.Pdf;
 using PdfSharp.Pdf.IO;
 using System;
+using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -36,6 +37,10 @@ namespace ExcelAPP
         List<SmetaFile> objectiveData = new List<SmetaFile>();
         readonly Stopwatch stopWatch = new Stopwatch();
         readonly string DesktopFolder = $@"{Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)}\Книга смет";
+
+        List<SmetaFile> partsSmeta = new List<SmetaFile>();
+        int pagesInTitle = 0;
+        IEnumerable<Pair> setDict;
 
         public Form1()
         {
@@ -247,7 +252,7 @@ namespace ExcelAPP
 
                     if (AutoPageBreakeToolStripMenuItem.Checked)
                     {
-                        // TODO pageBreaker
+
                         PageBreaker(eWorksheet);
                     }
 
@@ -291,7 +296,7 @@ namespace ExcelAPP
 
                     if (AutoPageBreakeToolStripMenuItem.Checked)
                     {
-                        // TODO pageBreaker
+
                         PageBreaker(eWorksheet);
                     }
 
@@ -437,7 +442,7 @@ namespace ExcelAPP
                             inputPdfDocument = PdfReader.Open($"{pdfFolder}\\{smetaFile.FolderInfo}.pdf", PdfDocumentOpenMode.Import);
                             int pageCountInputDocument = inputPdfDocument.PageCount;
 
-                            if (outputSmetaPdfDocument.PageCount + pageCountInputDocument < pagesInPartBookNumeric.Value + 50)
+                            if (outputSmetaPdfDocument.PageCount + pageCountInputDocument < (int)pagesInPartBookNumeric.Value + 50)
                             {
                                 for (int j = 0; j < pageCountInputDocument; j++)
                                 {
@@ -446,10 +451,14 @@ namespace ExcelAPP
                                 }
                                 lastUsedDocument = smetaFile;
                                 inputPdfDocument.Close();
+
+                                
                             }
                             else
                                 break;
+                            
                         }
+                        partsSmeta.Add(lastUsedDocument); //TODO 1
                         outputSmetaPdfDocument.Save($@"{DesktopFolder}\Сметы{bookNumber}.pdf");
                         outputSmetaPdfDocument.Close();
                         AddPageNumberSmetaITextSharp($@"{DesktopFolder}\Сметы{bookNumber}.pdf");
@@ -571,13 +580,13 @@ namespace ExcelAPP
             try
             {
                 byte[] bytes = File.ReadAllBytes(filePath);
-                PdfDocument titleDocument = PdfReader.Open($"{_path}\\TEMPdf\\Содержание.pdf");
+                //PdfDocument titleDocument = PdfReader.Open($"{_path}\\TEMPdf\\Содержание.pdf");
 
                 iTextSharp.text.Font blackFont = FontFactory.GetFont("Arial", 8, iTextSharp.text.Font.NORMAL, BaseColor.BLACK);
                 using (MemoryStream stream = new MemoryStream())
                 {
                     iTextSharp.text.pdf.PdfReader reader = new iTextSharp.text.pdf.PdfReader(bytes);
-                    int titlePages = titleDocument.PageCount;
+                    int titlePages = pagesInTitle; 
                     int pagesBook = reader.NumberOfPages;
                     //int afterTitleNumericPages = Convert.ToInt32(afterTitleNumeric.Value);
 
@@ -611,7 +620,7 @@ namespace ExcelAPP
                                 iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + startPageNumber + pagesPzCount + titlePages).ToString(), blackFont), 810f, 15f, 0);
                         }
                     }
-                    titleDocument.Close();
+                    //titleDocument.Close();
                     bytes = stream.ToArray();
                     reader.Close();
                 }
@@ -632,14 +641,14 @@ namespace ExcelAPP
             try
             {
                 byte[] bytes = File.ReadAllBytes(filePath);
-                byte[] bytesTitle = File.ReadAllBytes($"{_path}\\TEMPdf\\Содержание.pdf");
+                //byte[] bytesTitle = File.ReadAllBytes($"{_path}\\TEMPdf\\Содержание.pdf");
 
                 iTextSharp.text.Font blackFont = FontFactory.GetFont("Arial", 8, iTextSharp.text.Font.NORMAL, BaseColor.BLACK);
                 using (MemoryStream stream = new MemoryStream())
                 {
                     iTextSharp.text.pdf.PdfReader reader = new iTextSharp.text.pdf.PdfReader(bytes);
-                    iTextSharp.text.pdf.PdfReader readerOnlyTitle = new iTextSharp.text.pdf.PdfReader(bytesTitle);
-                    int titlePages = readerOnlyTitle.NumberOfPages;
+                    //iTextSharp.text.pdf.PdfReader readerOnlyTitle = new iTextSharp.text.pdf.PdfReader(bytesTitle);
+                    int titlePages = pagesInTitle;
                     int pagesBook = reader.NumberOfPages;
                     //int afterTitleNumericPages = Convert.ToInt32(afterTitleNumeric.Value);
 
@@ -691,6 +700,88 @@ namespace ExcelAPP
             }
         }
 
+        protected bool TitleNumOfPart() // TODO 2
+        {
+            Word.Application wordApp = new Word.Application
+            {
+                //Visible = true,
+                //ScreenUpdating = true
+                Visible = false,
+                ScreenUpdating = false
+            };
+
+            try
+            {
+                int num = 1;
+                int row = 2;
+                var wDocument = wordApp.Documents.Open($@"{pdfFolder}\Содержание.docx");
+                //var wDocument = wordApp.Documents.Open($@"C:\Users\lokot\Desktop\test2.docx");
+                var table = wDocument.Tables[1];
+
+                table.Cell(row, 6).Range.Text = $"{num}";
+                row += 2;
+                foreach (var objD in objectiveData)
+                {
+
+                    table.Cell(row, 6).Range.Text = $"{num}";
+                    for (var ind = 0; ind < partsSmeta.Count; ind++)
+                    {
+                        if (partsSmeta[ind] == objD)
+                        {
+                            num = ind + 1;
+                        }
+                    }
+
+                    
+
+                    row++;
+                }
+
+                int rowInTable = table.Rows.Count;
+
+                while (rowInTable > row)
+                {
+                    string code = table.Cell(row, 2).Range.Text;
+                    string price = table.Cell(row, 4).Range.Text;
+                    table.Cell(row, 6).Range.Text = $"{num}";
+                    for (var ind = 0; ind < partsSmeta.Count; ind++)
+                    {
+                        if (partsSmeta[ind].Price == price && partsSmeta[ind].Code == code)
+                        {
+                            num = ind + 1;
+                        }
+                    }
+
+                    
+                    row++;
+                }
+
+                foreach (var oData in setDict) // локальные сметы
+                {
+                    row++;
+
+                    foreach (var lData in localData)
+                    {
+                        if (lData.ShortCode == oData.Key)
+                        {
+                            
+                        }
+                    }
+                }
+
+
+
+                wDocument.SaveAs2($"{pdfFolder}\\Содержание.docx");
+                wDocument.ExportAsFixedFormat($"{pdfFolder}\\Содержание.pdf", Word.WdExportFormat.wdExportFormatPDF);
+                wDocument.Close(Word.WdSaveOptions.wdDoNotSaveChanges, Word.WdOriginalFormat.wdOriginalDocumentFormat, false);
+
+                return true;
+            }
+            catch (Exception) { }
+
+
+            return false;
+        }
 
         protected bool TitleGeneration()
         {
@@ -728,7 +819,7 @@ namespace ExcelAPP
 
                     if (TwoSidedPrintCheckBox.Checked)
                     {
-                        wDocument.Sections[1].PageSetup.OddAndEvenPagesHeaderFooter = -1; // -1 = true  - настройка: четные-нечетные страницы
+                        wDocument.Sections[1].PageSetup.OddAndEvenPagesHeaderFooter = -1; // -1 = true  -  настройка: четные-нечетные страницы
 
                         Word.Range headerRange = wDocument.Sections[1].Headers[Word.WdHeaderFooterIndex.wdHeaderFooterPrimary].Range;
 
@@ -944,7 +1035,7 @@ namespace ExcelAPP
                         NumberDocument++;
                         Table.Rows.Add();
                         Table.Cell(row, 1).Range.Text = NumberDocument.ToString();
-                        Table.Cell(row, 2).Range.Text = data.Code;
+                        Table.Cell(row, 2).Range.Text = data.ShortCode;
                         Table.Cell(row, 3).Range.Text = data.NameDate + "\n";
                         Table.Cell(row, 4).Range.Text = data.Price;
                         // изменение параметров строки
@@ -960,7 +1051,7 @@ namespace ExcelAPP
                     {
                         pairs.Add(new Pair() { Key = data.ShortCode, Value = data.Name });
                     }
-                    var setDict = pairs.GroupBy(x => x.Key.Trim()).Select(y => y.FirstOrDefault());
+                    setDict = pairs.GroupBy(x => x.Key.Trim()).Select(y => y.FirstOrDefault());
 
                     // шапка локальных смет
                     Table.Rows.Add();
@@ -1006,15 +1097,14 @@ namespace ExcelAPP
                     }
 
                     //нумерация страниц
-                    int pagesInTitle = wDocument.ComputeStatistics(WdStatistic.wdStatisticPages, false) - 1; // кол-во страниц в содержании
-                    int pageNumber = (int)StartNumberNumeric.Value + pagesInTitle; // номер страницы
+                    pagesInTitle = wDocument.ComputeStatistics(WdStatistic.wdStatisticPages, false); // кол-во страниц в содержании
+                    int pageNumber = (int)StartNumberNumeric.Value + pagesInTitle - 1; // номер страницы
 
                     row = 2;
 
                     if (TwoSidedPrintCheckBox.Checked)
                     {
-                        //TODO
-                        // добавление страниц после содержания 
+                        //TODO добавление страниц после содержания 
 
                         // нумерация ПЗ
                         if ((pageNumber % 2) == 0)
@@ -1100,7 +1190,7 @@ namespace ExcelAPP
                     }
 
                     wDocument.SaveAs2($"{pdfFolder}\\Содержание.docx");
-                    wDocument.ExportAsFixedFormat($"{pdfFolder}\\Содержание.pdf", Word.WdExportFormat.wdExportFormatPDF);
+                    //wDocument.ExportAsFixedFormat($"{pdfFolder}\\Содержание.pdf", Word.WdExportFormat.wdExportFormatPDF);
                     wDocument.Close(Word.WdSaveOptions.wdDoNotSaveChanges, Word.WdOriginalFormat.wdOriginalDocumentFormat, false);
 
                 }
@@ -1356,8 +1446,8 @@ namespace ExcelAPP
 
 
                     //нумерация страниц
-                    int pagesInTitle = wDocument.ComputeStatistics(WdStatistic.wdStatisticPages, false) - 1;
-                    int pageNumber = (int)StartNumberNumeric.Value + pagesInTitle;
+                    pagesInTitle = wDocument.ComputeStatistics(WdStatistic.wdStatisticPages, false); 
+                    int pageNumber = (int)StartNumberNumeric.Value + pagesInTitle - 1;
                     row = 2;
                     if (TwoSidedPrintCheckBox.Checked)
                     {
@@ -1443,7 +1533,7 @@ namespace ExcelAPP
                     }
 
                     wDocument.SaveAs2($"{pdfFolder}\\Содержание.docx");
-                    wDocument.ExportAsFixedFormat($"{pdfFolder}\\Содержание.pdf", Word.WdExportFormat.wdExportFormatPDF);
+                    //wDocument.ExportAsFixedFormat($"{pdfFolder}\\Содержание.pdf", Word.WdExportFormat.wdExportFormatPDF);
                     wDocument.Close(Word.WdSaveOptions.wdDoNotSaveChanges, Word.WdOriginalFormat.wdOriginalDocumentFormat, false);
                 }
                 return true;
@@ -1478,6 +1568,7 @@ namespace ExcelAPP
             if (!TitleGeneration()) return;
             if (!CreateDesktopFolder()) return;
             if (!PdfMerge()) return;
+            if (!TitleNumOfPart()) return; 
             if (!MoveFiles()) return;
 
             DeleteTempFiles();
@@ -1622,6 +1713,7 @@ namespace ExcelAPP
             objectiveFiles = null;
             localData = new List<SmetaFile>();
             objectiveData = new List<SmetaFile>();
+            partsSmeta = new List<SmetaFile>();
             GC.Collect();
         }
 
@@ -1642,6 +1734,11 @@ namespace ExcelAPP
             }
 
 
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            TitleNumOfPart();
         }
     }
 }
