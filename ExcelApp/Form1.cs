@@ -99,11 +99,13 @@ namespace ExcelAPP
                         return;
                     }
                     SelectFolderFunc();
-                } else if (dirFolders.Length > 2)
+                }
+                else if (dirFolders.Length > 2)
                 {
                     MessageBox.Show("В корневом разделе находятся лишние папки");
                     return;
-                } else
+                }
+                else
                 {
                     MessageBox.Show("В сметах должна быть только одна папка, которая должна содержать объектные сметы");
                     labelNameFolder.Text = "Добавьте папку с объектными сметами\"ОС\"";
@@ -218,7 +220,7 @@ namespace ExcelAPP
 
             try
             {
-                if(childFolder != null)
+                if (childFolder != null)
                 {
                     for (int i = 0; i < objectiveFiles.Length; i++) //Шаблон для объектных смет
                     {
@@ -450,19 +452,20 @@ namespace ExcelAPP
                                 lastUsedDocument = smetaFile;
                                 inputPdfDocument.Close();
 
-                                
+
                             }
                             else
                             {
                                 break;
-                            
-                        }
-                        partsSmeta.Add(lastUsedDocument); //TODO 1
-                        outputSmetaPdfDocument.Save($@"{DesktopFolder}\Сметы{bookNumber}.pdf");
-                        outputSmetaPdfDocument.Close();
 
-                        AddPageNumberSmetaITextSharp($@"{finalSmetaFolder.FullName}\Сметы{bookNumber}.pdf");
-                        bookNumber++;
+                            }
+                            partsSmeta.Add(lastUsedDocument); //TODO 1
+                            outputSmetaPdfDocument.Save($@"{finalSmetaFolder.FullName}\Сметы{bookNumber}.pdf");
+                            outputSmetaPdfDocument.Close();
+
+                            AddPageNumberSmetaITextSharp($@"{finalSmetaFolder.FullName}\Сметы{bookNumber}.pdf");
+                            bookNumber++;
+                        }
                     }
                 }
                 else
@@ -595,7 +598,7 @@ namespace ExcelAPP
                 using (MemoryStream stream = new MemoryStream())
                 {
                     iTextSharp.text.pdf.PdfReader reader = new iTextSharp.text.pdf.PdfReader(bytes);
-                    int titlePages = pagesInTitle; 
+                    int titlePages = pagesInTitle;
                     int pagesBook = reader.NumberOfPages;
 
                     using (iTextSharp.text.pdf.PdfStamper stamper = new iTextSharp.text.pdf.PdfStamper(reader, stream))
@@ -639,16 +642,18 @@ namespace ExcelAPP
                             for (int i = 1; i <= pagesBook; i++)
                             {
                                 iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + startPageNumber + pagesPzCount + titlePages).ToString(), blackFont), 810f, 15f, 0);
+                            }
                         }
+                        //titleDocument.Close();
+                        bytes = stream.ToArray();
+                        reader.Close();
                     }
-                    //titleDocument.Close();
-                    bytes = stream.ToArray();
-                    reader.Close();
+                    File.WriteAllBytes(filePath, bytes);
                 }
-                File.WriteAllBytes(filePath, bytes);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                MessageBox.Show(ex.Message.ToString());
                 MessageBox.Show("Ошибка нумерации смет");
                 DeleteTempFiles();
                 DeleteTempVar();
@@ -763,7 +768,7 @@ namespace ExcelAPP
                         }
                     }
 
-                    
+
 
                     row++;
                 }
@@ -783,7 +788,7 @@ namespace ExcelAPP
                         }
                     }
 
-                    
+
                     row++;
                 }
 
@@ -795,7 +800,7 @@ namespace ExcelAPP
                     {
                         if (lData.ShortCode == oData.Key)
                         {
-                            
+
                         }
                     }
                 }
@@ -1221,7 +1226,7 @@ namespace ExcelAPP
                     }
 
                     wDocument.SaveAs2($"{pdfFolder}\\Содержание.docx");
-                    //wDocument.ExportAsFixedFormat($"{pdfFolder}\\Содержание.pdf", Word.WdExportFormat.wdExportFormatPDF);
+                    wDocument.ExportAsFixedFormat($"{pdfFolder}\\Содержание.pdf", Word.WdExportFormat.wdExportFormatPDF);
                     wDocument.Close(Word.WdSaveOptions.wdDoNotSaveChanges, Word.WdOriginalFormat.wdOriginalDocumentFormat, false);
 
                 }
@@ -1477,7 +1482,7 @@ namespace ExcelAPP
 
 
                     //нумерация страниц
-                    pagesInTitle = wDocument.ComputeStatistics(WdStatistic.wdStatisticPages, false); 
+                    pagesInTitle = wDocument.ComputeStatistics(WdStatistic.wdStatisticPages, false);
                     int pageNumber = (int)StartNumberNumeric.Value + pagesInTitle - 1;
                     row = 2;
                     if (TwoSidedPrintCheckBox.Checked)
@@ -1563,7 +1568,7 @@ namespace ExcelAPP
                     }
 
                     wDocument.SaveAs2($"{pdfFolder}\\Содержание.docx");
-                    //wDocument.ExportAsFixedFormat($"{pdfFolder}\\Содержание.pdf", Word.WdExportFormat.wdExportFormatPDF);
+                    wDocument.ExportAsFixedFormat($"{pdfFolder}\\Содержание.pdf", Word.WdExportFormat.wdExportFormatPDF);
                     wDocument.Close(Word.WdSaveOptions.wdDoNotSaveChanges, Word.WdOriginalFormat.wdOriginalDocumentFormat, false);
                 }
                 return true;
@@ -1596,7 +1601,7 @@ namespace ExcelAPP
             if (!CreateFinalSmetaFolder()) return;
             if (!TitleGeneration()) return;
             if (!PdfMerge()) return;
-            if (!TitleNumOfPart()) return; 
+            if (!TitleNumOfPart()) return;
             if (!MoveFiles()) return;
 
             DeleteTempFiles();
@@ -1764,11 +1769,12 @@ namespace ExcelAPP
         {
             labelNameFolder.Text = _path;
 
-            if(Directory.Exists($"{_path}\\ОС"))
+            if (Directory.Exists($"{_path}\\ОС"))
             {
                 childFolder = new DirectoryInfo($@"{_path}\ОС");
                 objectiveFiles = childFolder.GetFiles(".", SearchOption.TopDirectoryOnly);
-            } else
+            }
+            else
             {
                 childFolder = null;
                 objectiveFiles = null;
