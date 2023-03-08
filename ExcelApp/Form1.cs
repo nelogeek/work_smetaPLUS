@@ -592,13 +592,13 @@ namespace ExcelAPP
             try
             {
                 byte[] bytes = File.ReadAllBytes(filePath);
-                //PdfDocument titleDocument = PdfReader.Open($"{_path}\\TEMPdf\\Содержание.pdf");
+                PdfDocument titleDocument = PdfReader.Open($"{_path}\\TEMPdf\\Содержание.pdf");
 
                 iTextSharp.text.Font blackFont = FontFactory.GetFont("Arial", 8, iTextSharp.text.Font.NORMAL, BaseColor.BLACK);
                 using (MemoryStream stream = new MemoryStream())
                 {
                     iTextSharp.text.pdf.PdfReader reader = new iTextSharp.text.pdf.PdfReader(bytes);
-                    int titlePages = pagesInTitle;
+                    int titlePages = titleDocument.PageCount;
                     int pagesBook = reader.NumberOfPages;
 
                     using (iTextSharp.text.pdf.PdfStamper stamper = new iTextSharp.text.pdf.PdfStamper(reader, stream))
@@ -644,9 +644,10 @@ namespace ExcelAPP
                                 iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + startPageNumber + pagesPzCount + titlePages).ToString(), blackFont), 810f, 15f, 0);
                             }
                         }
-                        //titleDocument.Close();
+                        titleDocument.Close();
                         bytes = stream.ToArray();
-                        reader.Close();
+                        //reader.Close();
+                        //reader.Dispose();
                     }
                     File.WriteAllBytes(filePath, bytes);
                 }
@@ -1794,7 +1795,7 @@ namespace ExcelAPP
 
                 infoTextBox.AppendText(Environment.NewLine + $"Объектные файлы:" + Environment.NewLine);
 
-                Directory.GetFiles(dirFolders[0], ".", SearchOption.TopDirectoryOnly).ToList()
+                Directory.GetFiles($"{_path}\\ОС", ".", SearchOption.TopDirectoryOnly).ToList()
                 .ForEach(f => infoTextBox.AppendText($"\n- {Path.GetFileName(f)}" + Environment.NewLine));
             }
             else
