@@ -441,7 +441,8 @@ namespace ExcelAPP
                             inputPdfDocument = PdfReader.Open($"{pdfFolder}\\{smetaFile.FolderInfo}.pdf", PdfDocumentOpenMode.Import);
                             int pageCountInputDocument = inputPdfDocument.PageCount;
 
-                            if (outputSmetaPdfDocument.PageCount + pageCountInputDocument < (int)pagesInPartBookNumeric.Value + 50)
+                            double precentagePartDividerPass = (double)pagesInPartBookNumeric.Value * 12.5 / 100;
+                            if (outputSmetaPdfDocument.PageCount + pageCountInputDocument < (double)pagesInPartBookNumeric.Value + precentagePartDividerPass)
                             {
                                 for (int j = 0; j < pageCountInputDocument; j++)
                                 {
