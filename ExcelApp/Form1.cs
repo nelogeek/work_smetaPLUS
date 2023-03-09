@@ -427,7 +427,6 @@ namespace ExcelAPP
 
                 SmetaFile lastUsedDocument = null;
 
-                //Объединение PDF
                 PdfDocument inputPdfDocument;
                 if (partsBookCheckBox.Checked)
                 {
@@ -451,21 +450,19 @@ namespace ExcelAPP
                                 }
                                 lastUsedDocument = smetaFile;
                                 inputPdfDocument.Close();
-
-
                             }
                             else
                             {
+                                inputPdfDocument.Close();
                                 break;
-
                             }
-                            partsSmeta.Add(lastUsedDocument); //TODO 1
-                            outputSmetaPdfDocument.Save($@"{finalSmetaFolder.FullName}\Сметы{bookNumber}.pdf");
-                            outputSmetaPdfDocument.Close();
-
-                            AddPageNumberSmetaITextSharp($@"{finalSmetaFolder.FullName}\Сметы{bookNumber}.pdf");
-                            bookNumber++;
                         }
+                        partsSmeta.Add(lastUsedDocument); //TODO 1
+                        outputSmetaPdfDocument.Save($@"{finalSmetaFolder.FullName}\Сметы{bookNumber}.pdf");
+                        outputSmetaPdfDocument.Close();
+
+                        AddPageNumberSmetaITextSharp($@"{finalSmetaFolder.FullName}\Сметы{bookNumber}.pdf");
+                        bookNumber++;
                     }
                 }
                 else
@@ -592,13 +589,12 @@ namespace ExcelAPP
             try
             {
                 byte[] bytes = File.ReadAllBytes(filePath);
-                PdfDocument titleDocument = PdfReader.Open($"{_path}\\TEMPdf\\Содержание.pdf");
 
                 iTextSharp.text.Font blackFont = FontFactory.GetFont("Arial", 8, iTextSharp.text.Font.NORMAL, BaseColor.BLACK);
                 using (MemoryStream stream = new MemoryStream())
                 {
                     iTextSharp.text.pdf.PdfReader reader = new iTextSharp.text.pdf.PdfReader(bytes);
-                    int titlePages = titleDocument.PageCount;
+                    int titlePages = pagesInTitle;
                     int pagesBook = reader.NumberOfPages;
 
                     using (iTextSharp.text.pdf.PdfStamper stamper = new iTextSharp.text.pdf.PdfStamper(reader, stream))
@@ -644,10 +640,9 @@ namespace ExcelAPP
                                 iTextSharp.text.pdf.ColumnText.ShowTextAligned(stamper.GetUnderContent(i), Element.ALIGN_RIGHT, new Phrase((i + startPageNumber + pagesPzCount + titlePages).ToString(), blackFont), 810f, 15f, 0);
                             }
                         }
-                        titleDocument.Close();
+                        stamper.Close();
+                        reader.Close();
                         bytes = stream.ToArray();
-                        //reader.Close();
-                        //reader.Dispose();
                     }
                     File.WriteAllBytes(filePath, bytes);
                 }
@@ -668,13 +663,11 @@ namespace ExcelAPP
             try
             {
                 byte[] bytes = File.ReadAllBytes(filePath);
-                //byte[] bytesTitle = File.ReadAllBytes($"{_path}\\TEMPdf\\Содержание.pdf");
 
                 iTextSharp.text.Font blackFont = FontFactory.GetFont("Arial", 8, iTextSharp.text.Font.NORMAL, BaseColor.BLACK);
                 using (MemoryStream stream = new MemoryStream())
                 {
                     iTextSharp.text.pdf.PdfReader reader = new iTextSharp.text.pdf.PdfReader(bytes);
-                    //iTextSharp.text.pdf.PdfReader readerOnlyTitle = new iTextSharp.text.pdf.PdfReader(bytesTitle);
                     int titlePages = pagesInTitle;
                     int pagesBook = reader.NumberOfPages;
 
