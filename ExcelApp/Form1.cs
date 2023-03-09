@@ -191,6 +191,7 @@ namespace ExcelAPP
             this.settingsToolStripMenuItem.Enabled = false;
             this.pagesInPartBookNumeric.Enabled = false;
             this.partsBookCheckBox.Enabled = false;
+            this.dividerPassPagesCount.Enabled = false;
         }
         protected void EnabledButton()
         {
@@ -204,6 +205,7 @@ namespace ExcelAPP
             this.settingsToolStripMenuItem.Enabled = true;
             this.pagesInPartBookNumeric.Enabled = true;
             this.partsBookCheckBox.Enabled = true;
+            this.dividerPassPagesCount.Enabled = true;
         }
 
         private bool ExcelParser() // Парсинг Excel файла
@@ -440,9 +442,17 @@ namespace ExcelAPP
                             var smetaFile = tempFilesList[i];
                             inputPdfDocument = PdfReader.Open($"{pdfFolder}\\{smetaFile.FolderInfo}.pdf", PdfDocumentOpenMode.Import);
                             int pageCountInputDocument = inputPdfDocument.PageCount;
+                            double dividerPass;
 
-                            double precentagePartDividerPass = (double)pagesInPartBookNumeric.Value * 12.5 / 100;
-                            if (outputSmetaPdfDocument.PageCount + pageCountInputDocument < (double)pagesInPartBookNumeric.Value + precentagePartDividerPass)
+                            if (AutoBooksPartPassCheckBox.Checked)
+                            {
+                                dividerPass = (double)pagesInPartBookNumeric.Value * 12.5 / 100;
+                            }
+                            else
+                            {
+                                dividerPass = (double)dividerPassPagesCount.Value;
+                            }
+                            if (outputSmetaPdfDocument.PageCount + pageCountInputDocument < (double)pagesInPartBookNumeric.Value + dividerPass)
                             {
                                 for (int j = 0; j < pageCountInputDocument; j++)
                                 {
@@ -1809,7 +1819,19 @@ namespace ExcelAPP
         {
             TitleNumOfPart();
         }
+
+        private void AutoBooksPartPassCheckBox_Click(object sender, EventArgs e)
+        {
+            if (AutoBooksPartPassCheckBox.Checked)
+            {
+                dividerPagesCountLabel.Enabled = false;
+                dividerPassPagesCount.Enabled = false;
+            }
+            else
+            {
+                dividerPagesCountLabel.Enabled = true;
+                dividerPassPagesCount.Enabled = true;
+            }
+        }
     }
-
-
 }
