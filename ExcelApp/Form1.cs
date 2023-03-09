@@ -36,6 +36,7 @@ namespace ExcelAPP
         List<SmetaFile> localData = new List<SmetaFile>();
         List<SmetaFile> objectiveData = new List<SmetaFile>();
         readonly Stopwatch stopWatch = new Stopwatch();
+        int fullBookPageCount;
 
         List<SmetaFile> partsSmeta = new List<SmetaFile>();
         int pagesInTitle = 0;
@@ -118,6 +119,14 @@ namespace ExcelAPP
 
         private void BtnBuild_Click(object sender, EventArgs e)
         {
+            if(fullBookPageCount > 400 && !partsBookCheckBox.Checked)
+            {
+                DialogResult dialogResult = MessageBox.Show("Вы точно хотите собрать одну книгу объемом более 400 страниц", "Подтверждение создания книги", MessageBoxButtons.YesNo);
+                if (dialogResult == DialogResult.No)
+                {
+                    return;
+                }
+            }
             if (backgroundWorker.IsBusy != true)
             {
                 DisableButton();
@@ -1787,7 +1796,8 @@ namespace ExcelAPP
 
             infoTextBox.Clear();
 
-            infoTextBox.Text = $"Общее количество страниц: {FullBookPageCounter}" + Environment.NewLine;
+            fullBookPageCount = FullBookPageCounter;
+            infoTextBox.Text = $"Общее количество страниц: {fullBookPageCount}" + Environment.NewLine;
 
             if (childFolder != null)
             {
