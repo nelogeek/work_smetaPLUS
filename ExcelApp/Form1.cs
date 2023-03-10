@@ -781,25 +781,54 @@ namespace ExcelAPP
                 int startPageNumber = Convert.ToInt32(StartNumberNumeric.Value) - 1; //TODO -1
                 int pagesPzCount = Convert.ToInt32(CountPagePZNumeric.Value);
                 int titlePages = pagesInTitle;
-                if ((startPageNumber + titlePages) % 2 == 1)
+
+                //-------------
+                //pagesInTitle = wDocument.ComputeStatistics(WdStatistic.wdStatisticPages, false); // кол-во страниц в содержании
+                int page = (int)StartNumberNumeric.Value + pagesInTitle - 1; // номер страницы
+
+                //TODO добавление страниц после содержания 
+
+                // нумерация ПЗ
+                if ((page % 2) == 0)
                 {
-                    titlePages++;
+                    page += 1;
                 }
-                if (pagesPzCount % 2 == 1)
+                else
                 {
-                    pagesPzCount++;
+                    page += 2;
                 }
-                var page = startPageNumber + pagesPzCount + titlePages;
+                //table.Cell(2, 5).Range.Text = page.ToString();
+                table.Cell(2, 6).Range.Text = "1";
+                page += (int)CountPagePZNumeric.Value - 1; //TODO -1
+
+                // нумерация сметы
+                if ((page % 2) == 0)
+                {
+                    page += 1;
+                }
+                else
+                {
+                    page += 2;
+                }
+                int tempPage = page;
+                //---------
+                //if ((startPageNumber + titlePages) % 2 == 1)
+                //{
+                //    titlePages++;
+                //}
+                //if (pagesPzCount % 2 == 1)
+                //{
+                //    pagesPzCount++;
+                //}
+                //var page = startPageNumber + pagesPzCount + titlePages;
 
                 int temp = 0;
 
-                table.Cell(2, 6).Range.Text = "1";
                 int rowInTable = table.Rows.Count;
                 for (var row = 1; row <= rowInTable; row++)
                 {
                     for (var ind = 0; ind < tempFilesList.Count; ind++)
                     {
-
                         var c = table.Cell(row, 3).Range.Text.Replace("\a", "").Replace("\r", "") == tempFilesList[ind].NameDate.ToString().Replace("\n", "");
                         var d = table.Cell(row, 4).Range.Text.Replace("\a", "").Replace("\r", "") == tempFilesList[ind].Price.ToString();
                         if (c)
@@ -809,7 +838,7 @@ namespace ExcelAPP
                                 table.Cell(row, 6).Range.Text = tempFilesList[ind].Part.ToString();
                                 if (temp != tempFilesList[ind].Part)
                                 {
-                                    page = startPageNumber + pagesPzCount + titlePages;
+                                    page = tempPage;
                                     temp = tempFilesList[ind].Part;
                                 }
 
@@ -1833,10 +1862,7 @@ namespace ExcelAPP
             Directory.GetFiles(_path, ".", SearchOption.TopDirectoryOnly).ToList()
                 .ForEach(f => infoTextBox.AppendText($"\n- {Path.GetFileName(f)}" + Environment.NewLine));
         }
-        private void button1_Click(object sender, EventArgs e)
-        {
-            TitleNumOfPart();
-        }
+        
 
         private void AutoBooksPartPassCheckBox_Click(object sender, EventArgs e)
         {
