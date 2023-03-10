@@ -1,6 +1,7 @@
 using iTextSharp.text;
 using Microsoft.Office.Interop.Excel;
 using Microsoft.Office.Interop.Word;
+using Org.BouncyCastle.Asn1.Tsp;
 using PdfSharp.Pdf;
 using PdfSharp.Pdf.IO;
 using System;
@@ -434,9 +435,15 @@ namespace ExcelAPP
                 string fileNameConcatPdf = $"{finalSmetaFolder.FullName}\\TEMPdf\\smetaBook.pdf";
                 string fileNameSmetaPdf = $"{finalSmetaFolder.FullName}\\Сметы.pdf";
                 string fileNameTitlePdf = $"{_path}\\TEMPdf\\Содержание.pdf";
+                
+                //TODO 1
+                // тест сортировки смет по коду
+                var sortedObjData = objectiveData.OrderBy(ob => ob.Code).ThenBy(ob => ob.Name).ToList();
+                var sortedLocData = localData.OrderBy(ob => ob.Code).ThenBy(ob => ob.Name).ToList();
+                //----------------------
 
-                tempFilesList = objectiveData;
-                tempFilesList.AddRange(localData);
+                tempFilesList = sortedObjData;
+                tempFilesList.AddRange(sortedLocData);
 
                 SmetaFile lastUsedDocument = null;
 
@@ -479,7 +486,7 @@ namespace ExcelAPP
                                 inputPdfDocument.Close();
                                 break;
                             }
-                            tempFilesList[i].Part = bookNumber; //TODO 1
+                            tempFilesList[i].Part = bookNumber; 
                         }
 
                         outputSmetaPdfDocument.Save($@"{finalSmetaFolder.FullName}\Сметы{bookNumber}.pdf");
@@ -858,6 +865,11 @@ namespace ExcelAPP
                 return true;
             }
             catch (Exception) { }
+            finally
+            {
+                wordApp.Quit();
+                GC.Collect();
+            }
 
 
             return false;
@@ -1862,7 +1874,7 @@ namespace ExcelAPP
             Directory.GetFiles(_path, ".", SearchOption.TopDirectoryOnly).ToList()
                 .ForEach(f => infoTextBox.AppendText($"\n- {Path.GetFileName(f)}" + Environment.NewLine));
         }
-        
+
 
         private void AutoBooksPartPassCheckBox_Click(object sender, EventArgs e)
         {
