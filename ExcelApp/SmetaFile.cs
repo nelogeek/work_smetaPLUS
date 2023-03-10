@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using Org.BouncyCastle.Bcpg.OpenPgp;
 
 namespace ExcelAPP
 {
@@ -16,6 +17,8 @@ namespace ExcelAPP
         public int PageCount { get; set; }
         public FileInfo FolderInfo { get; set; }
         public string ShortCode { get; set; }
+        public int Part { get; set; }
+        public int NumOfPage { get; set; }
 
         public SmetaFile(string Code, string Name, string NameDate, string Price, int PageCount, FileInfo FolderInfo, string ShortCode)
         {
@@ -26,6 +29,9 @@ namespace ExcelAPP
             this.PageCount = PageCount;
             this.FolderInfo = FolderInfo;
             this.ShortCode = ShortCode;
+            this.Part = -1;
+            this.NumOfPage = -1;
+
 
         }
 
