@@ -882,24 +882,8 @@ namespace ExcelAPP
                     }
                 }
 
-                // 2 вариант (бред)
-                //if (partsBookCheckBox.Checked)
-                //{
-                //    int rowInTable = table.Rows.Count;
-                //    for (var row = 1; row <= rowInTable; row++)
-                //    {
-                //        if (table.Cell(row, 2).Range.Text.Length > 3)
-                //        {
-                //            for (int i = 0; i < tempFilesList.Count; i++)
-                //            {
-
-                //            }
-                //        }
-                //    }
-                //}
 
                 wDocument.Save();
-                //wDocument.SaveAs2($"{pdfFolder}\\Содержание.docx");
                 if (Directory.Exists($"{pdfFolder}\\Содержание.pdf"))
                     Directory.Delete($"{pdfFolder}\\Содержание.pdf");
                 wDocument.ExportAsFixedFormat($"{pdfFolder}\\Содержание.pdf", Word.WdExportFormat.wdExportFormatPDF);
