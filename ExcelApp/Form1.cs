@@ -86,7 +86,7 @@ namespace ExcelAPP
                 }
                 else if (dirFolders.Length == 1)
                 {
-                    if (!(dirFolders[0] == $"{_path}\\ОС" || dirFolders[0] == $"{_path}\\Книга смет"))
+                    if (!(dirFolders[0] == $"{_path}\\ОС" || dirFolders[0] == $"{_path}\\OC" || dirFolders[0] == $"{_path}\\Книга смет"))
                     {
                         MessageBox.Show("В корневом разделе неправльная папка, исправьте название ОС или уберите Книгу смет");
                         return;
@@ -95,7 +95,7 @@ namespace ExcelAPP
                 }
                 else if (dirFolders.Length == 2)
                 {
-                    if (!(dirFolders[0] == $"{_path}\\ОС" || dirFolders[0] == $"{_path}\\Книга смет" && dirFolders[1] == $"{_path}\\ОС" || dirFolders[1] == $"{_path}\\Книга смет"))
+                    if (!(dirFolders[0] == $"{_path}\\ОС" || dirFolders[0] == $"{_path}\\OC" || dirFolders[0] == $"{_path}\\Книга смет" && dirFolders[1] == $"{_path}\\ОС" || dirFolders[0] == $"{_path}\\OC" || dirFolders[1] == $"{_path}\\Книга смет"))
                     {
                         MessageBox.Show("Названия папок должны быть на русском (ОС или Книга смет)");
                         return;
