@@ -1725,6 +1725,8 @@ namespace ExcelAPP
         {
             try
             {
+                eWorksheet.Range[$"G7"].Value = "";
+                eWorksheet.Rows[7].RowHeight = 11.3;
                 int lastUsedRow = eWorksheet.Cells.Find("*", System.Reflection.Missing.Value,
                        System.Reflection.Missing.Value, System.Reflection.Missing.Value,
                        Excel.XlSearchOrder.xlByRows, Excel.XlSearchDirection.xlPrevious,
@@ -1943,39 +1945,63 @@ namespace ExcelAPP
 
         private void button1_Click(object sender, EventArgs e) // TODO 4
         {
-            Word.Application wordApp = new Word.Application
-            {
-                //Visible = true,
-                //ScreenUpdating = true
-                Visible = false,
-                ScreenUpdating = false
-            };
-            //var wDocument = wordApp.Documents.Open($@"{pdfFolder}\Содержание.docx");
-            var wDocument = wordApp.Documents.Open($@"C:\Users\lokot\Desktop\test.docx");
-            var table = wDocument.Tables[1];
+            //Excel.Application app = new Excel.Application
+            //{
+            //    DisplayAlerts = true,
+            //    Visible = true,
+            //    ScreenUpdating = true
+            //};
 
-            int i = 0;
+            //Excel.Workbook eWorkbook;
+            //Excel.Worksheet eWorksheet;
 
-            if (partsBookCheckBox.Checked)
-            {
-                int rowInTable = table.Rows.Count;
-                for (var row = 1; row <= rowInTable; row++)
-                {
-                    if (table.Cell(row, 2).Range.Text.Length > 3) 
-                    {
-                        if (i != tempFilesList.Count - 1)
-                        {
-                            table.Cell(row, 6).Range.Text = tempFilesList[i].Part.ToString();
-                            i++;
-                        }
-                    }
-                }
-            }
+            //eWorkbook = app.Workbooks.Open($@"\DyshaPC\Desktop\Work Gazp\Smeta++\Test\04-01-02р (36900273) (ВЭЛ-ЭВ) (2000г) - ЛСР по Методике 2020 (БИМ)1.xlsx");
+            //eWorksheet = (Excel.Worksheet)eWorkbook.Sheets[1];
+            //eWorksheet.PageSetup.Orientation = XlPageOrientation.xlLandscape;
+
+            //eWorksheet.Range[$"G7"].Value = "";
+            //eWorksheet.Rows[7].RowHeight = 11.3;
 
 
+            //eWorksheet = null;
+            //eWorkbook.Save();
+            //eWorkbook.Close(true);
+            //eWorkbook = null;
+            //app.Quit();
 
-            wDocument.Close(Word.WdSaveOptions.wdDoNotSaveChanges, Word.WdOriginalFormat.wdOriginalDocumentFormat, false);
-            wordApp.Quit();
+            //Word.Application wordApp = new Word.Application
+            //{
+            //    //Visible = true,
+            //    //ScreenUpdating = true
+            //    Visible = false,
+            //    ScreenUpdating = false
+            //};
+            ////var wDocument = wordApp.Documents.Open($@"{pdfFolder}\Содержание.docx");
+            //var wDocument = wordApp.Documents.Open($@"C:\Users\lokot\Desktop\test.docx");
+            //var table = wDocument.Tables[1];
+
+            //int i = 0;
+
+            //if (partsBookCheckBox.Checked)
+            //{
+            //    int rowInTable = table.Rows.Count;
+            //    for (var row = 1; row <= rowInTable; row++)
+            //    {
+            //        if (table.Cell(row, 2).Range.Text.Length > 3) 
+            //        {
+            //            if (i != tempFilesList.Count - 1)
+            //            {
+            //                table.Cell(row, 6).Range.Text = tempFilesList[i].Part.ToString();
+            //                i++;
+            //            }
+            //        }
+            //    }
+            //}
+
+
+
+            //wDocument.Close(Word.WdSaveOptions.wdDoNotSaveChanges, Word.WdOriginalFormat.wdOriginalDocumentFormat, false);
+            //wordApp.Quit();
         }
     }
 }
