@@ -38,6 +38,8 @@ namespace ExcelAPP
         List<SmetaFile> objectiveData = new List<SmetaFile>();
         readonly Stopwatch stopWatch = new Stopwatch();
         int fullBookPageCount;
+        //protected int[][] firstPageNumbersArray;
+        List<List<int>> firstPageNumbersList = new List<List<int>>();
 
         int pagesInTitle = 0;
         IEnumerable<Pair> setDict;
@@ -452,6 +454,10 @@ namespace ExcelAPP
                 {
                     int bookNumber = 1;
                     int i = 0;
+                    bool changeBookCheck = true;
+                    
+
+                    int tempFirstPageNubmer = 1;
 
                     while (lastUsedDocument != tempFilesList[tempFilesList.Count - 1])
                     {
@@ -481,15 +487,28 @@ namespace ExcelAPP
                                 }
                                 lastUsedDocument = smetaFile;
                                 inputPdfDocument.Close();
+
                                 tempFilesList[i].Part = bookNumber; // тест
+
+                                //Передача номера первой страницы каждого документа в сожержание
+                                if (changeBookCheck)
+                                {
+                                    tempFirstPageNubmer = 1;
+                                    changeBookCheck = false;
+                                    firstPageNumbersList.Add(new List<int>());
+                                } else
+                                {
+                                    tempFirstPageNubmer += tempFilesList[i - 1].PageCount;
+                                }
+                                firstPageNumbersList[bookNumber - 1].Add(tempFirstPageNubmer);
                             }
                             else
                             {
                                 inputPdfDocument.Close();
+                                tempFirstPageNubmer = 1;
                                 //tempFilesList[i].Part = bookNumber; // тест
                                 break;
                             }
-
                         }
 
                         outputSmetaPdfDocument.Save($@"{finalSmetaFolder.FullName}\Сметы{bookNumber}.pdf");
@@ -497,6 +516,7 @@ namespace ExcelAPP
 
                         AddPageNumberSmetaITextSharp($@"{finalSmetaFolder.FullName}\Сметы{bookNumber}.pdf");
                         bookNumber++;
+                        changeBookCheck = true;
                     }
                 }
                 else
@@ -821,37 +841,6 @@ namespace ExcelAPP
                     page += 2;
                 }
                 int tempPage = page;
-
-                //int temp = 0;
-
-                //int rowInTable = table.Rows.Count;
-                //for (var row = 1; row <= rowInTable; row++)
-                //{
-                //    for (var ind = 0; ind < tempFilesList.Count; ind++)
-                //    {
-                //        var c = table.Cell(row, 3).Range.Text.Replace("\a", "").Replace("\r", "") == tempFilesList[ind].NameDate.ToString().Replace("\n", "");
-                //        var d = table.Cell(row, 4).Range.Text.Replace("\a", "").Replace("\r", "") == tempFilesList[ind].Price.ToString();
-                //        if (c)
-                //        {
-                //            if (d)
-                //            {
-                //                table.Cell(row, 6).Range.Text = tempFilesList[ind].Part.ToString();
-                //                if (temp != tempFilesList[ind].Part)
-                //                {
-                //                    page = tempPage;
-                //                    temp = tempFilesList[ind].Part;
-                //                }
-
-                //                table.Cell(row, 5).Range.Text = page.ToString();
-                //                page += tempFilesList[ind].PageCount;
-                //                break;
-                //            }
-                //        }
-                //    }
-                //}
-
-                // TODO 2
-
 
                 // 1 вариант
                 int i = 0;
@@ -1839,6 +1828,7 @@ namespace ExcelAPP
             localData = new List<SmetaFile>();
             objectiveData = new List<SmetaFile>();
             tempFilesList = new List<SmetaFile>();
+            firstPageNumbersList = new List<List<int>>();
             GC.Collect();
         }
 
