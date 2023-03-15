@@ -794,7 +794,7 @@ namespace ExcelAPP
 
                 //-------------
                 //pagesInTitle = wDocument.ComputeStatistics(WdStatistic.wdStatisticPages, false); // кол-во страниц в содержании
-                int page = (int)StartNumberNumeric.Value + pagesInTitle - 1; // номер страницы
+                int page = (int)StartNumberNumeric.Value + pagesInTitle; // номер страницы
 
                 //TODO добавление страниц после содержания 
 
