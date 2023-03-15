@@ -521,19 +521,35 @@ namespace ExcelAPP
                 }
                 else
                 {
+                    int tempFirstPageNubmer = 1;
+                    firstPageNumbersList.Add(new List<int>());
+                    bool firstDocument = true;
+
                     if (SplitBookContentCheckBox.Checked)
                     {
                         PdfDocument outputSmetaPdfDocument = new PdfDocument();
-                        foreach (var file in tempFilesList)
+                        for (int i = 0; i < tempFilesList.Count; i++)
                         {
-                            inputPdfDocument = PdfReader.Open($"{pdfFolder}\\{file.FolderInfo}.pdf", PdfDocumentOpenMode.Import);
-                            for (int i = 0; i < inputPdfDocument.PageCount; i++)
+                            var smetaFile = tempFilesList[i];
+                            inputPdfDocument = PdfReader.Open($"{pdfFolder}\\{smetaFile.FolderInfo}.pdf", PdfDocumentOpenMode.Import);
+                            for (int j = 0; j < inputPdfDocument.PageCount; j++)
                             {
-                                PdfPage page = inputPdfDocument.Pages[i];
+                                PdfPage page = inputPdfDocument.Pages[j];
                                 outputSmetaPdfDocument.AddPage(page);
                             }
                             inputPdfDocument.Close();
+                            //Передача номера первой страницы каждого документа в сожержание
+                            if (firstDocument)
+                            {
+                                firstDocument = false;
+                            }
+                            else
+                            {
+                                tempFirstPageNubmer += tempFilesList[i - 1].PageCount;
+                            }
+                            firstPageNumbersList[1].Add(tempFirstPageNubmer);
                         }
+
                         outputSmetaPdfDocument.Save(fileNameSmetaPdf);
                         outputSmetaPdfDocument.Close();
                     }
@@ -548,14 +564,25 @@ namespace ExcelAPP
                             outputPdfDocument.AddPage(page);
                         }
                         //Добавляем сметы
-                        foreach (var file in tempFilesList)
+                        for (int i = 0; i < tempFilesList.Count; i++)
                         {
-                            inputPdfDocument = PdfReader.Open($"{pdfFolder}\\{file.FolderInfo}.pdf", PdfDocumentOpenMode.Import);
-                            for (int i = 0; i < inputPdfDocument.PageCount; i++)
+                            var smetaFile = tempFilesList[i];
+                            inputPdfDocument = PdfReader.Open($"{pdfFolder}\\{smetaFile.FolderInfo}.pdf", PdfDocumentOpenMode.Import);
+                            for (int j = 0; j < inputPdfDocument.PageCount; j++)
                             {
-                                PdfPage page = inputPdfDocument.Pages[i];
+                                PdfPage page = inputPdfDocument.Pages[j];
                                 outputPdfDocument.AddPage(page);
                             }
+                            //Передача номера первой страницы каждого документа в сожержание
+                            if (firstDocument)
+                            {
+                                firstDocument = false;
+                            }
+                            else
+                            {
+                                tempFirstPageNubmer += tempFilesList[i - 1].PageCount;
+                            }
+                            firstPageNumbersList[1].Add(tempFirstPageNubmer);
                         }
                         outputPdfDocument.Save(fileNameConcatPdf);
                         inputPdfDocument.Close();
