@@ -1710,7 +1710,7 @@ namespace ExcelAPP
             try
             {
                 eWorksheet.Range[$"G7"].Value = "";
-                eWorksheet.Rows[7].RowHeight = 11.3;
+                eWorksheet.Rows[7].RowHeight = 11.25;
                 int lastUsedRow = eWorksheet.Cells.Find("*", System.Reflection.Missing.Value,
                        System.Reflection.Missing.Value, System.Reflection.Missing.Value,
                        Excel.XlSearchOrder.xlByRows, Excel.XlSearchDirection.xlPrevious,
