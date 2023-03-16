@@ -46,6 +46,7 @@
             this.dividerPassPagesCount = new System.Windows.Forms.NumericUpDown();
             this.dividerPagesCountLabel = new System.Windows.Forms.Label();
             this.RdPdToggle = new ExcelApp.Controls.ToggleButton();
+            this.button1 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.StartNumberNumeric)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.CountPagePZNumeric)).BeginInit();
             this.menuStrip1.SuspendLayout();
@@ -67,7 +68,7 @@
             // btnSelectFolder
             // 
             this.btnSelectFolder.Location = new System.Drawing.Point(540, 360);
-            this.btnSelectFolder.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btnSelectFolder.Margin = new System.Windows.Forms.Padding(4);
             this.btnSelectFolder.Name = "btnSelectFolder";
             this.btnSelectFolder.Size = new System.Drawing.Size(180, 28);
             this.btnSelectFolder.TabIndex = 3;
@@ -89,7 +90,7 @@
             // btnBuild
             // 
             this.btnBuild.Location = new System.Drawing.Point(743, 360);
-            this.btnBuild.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btnBuild.Margin = new System.Windows.Forms.Padding(4);
             this.btnBuild.Name = "btnBuild";
             this.btnBuild.Size = new System.Drawing.Size(129, 28);
             this.btnBuild.TabIndex = 5;
@@ -169,7 +170,7 @@
             this.TwoSidedPrintCheckBox.Checked = true;
             this.TwoSidedPrintCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
             this.TwoSidedPrintCheckBox.Location = new System.Drawing.Point(20, 212);
-            this.TwoSidedPrintCheckBox.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.TwoSidedPrintCheckBox.Margin = new System.Windows.Forms.Padding(4);
             this.TwoSidedPrintCheckBox.Name = "TwoSidedPrintCheckBox";
             this.TwoSidedPrintCheckBox.Size = new System.Drawing.Size(163, 20);
             this.TwoSidedPrintCheckBox.TabIndex = 19;
@@ -352,7 +353,7 @@
             // 
             this.RdPdToggle.AutoSize = true;
             this.RdPdToggle.Location = new System.Drawing.Point(103, 158);
-            this.RdPdToggle.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.RdPdToggle.Margin = new System.Windows.Forms.Padding(4);
             this.RdPdToggle.MinimumSize = new System.Drawing.Size(60, 27);
             this.RdPdToggle.Name = "RdPdToggle";
             this.RdPdToggle.OffBackColor = System.Drawing.Color.Gray;
@@ -363,6 +364,16 @@
             this.RdPdToggle.TabIndex = 23;
             this.RdPdToggle.UseVisualStyleBackColor = true;
             // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(350, 335);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(75, 23);
+            this.button1.TabIndex = 36;
+            this.button1.Text = "button1";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -370,6 +381,7 @@
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
             this.ClientSize = new System.Drawing.Size(909, 434);
+            this.Controls.Add(this.button1);
             this.Controls.Add(this.dividerPagesCountLabel);
             this.Controls.Add(this.dividerPassPagesCount);
             this.Controls.Add(this.pagesInPartBookNumeric);
@@ -392,7 +404,7 @@
             this.Controls.Add(this.menuStrip1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStrip1;
-            this.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.Margin = new System.Windows.Forms.Padding(5);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "Form1";
@@ -436,5 +448,6 @@
         private System.Windows.Forms.ToolStripMenuItem AutoBooksPartPassCheckBox;
         private System.Windows.Forms.NumericUpDown dividerPassPagesCount;
         private System.Windows.Forms.Label dividerPagesCountLabel;
+        private System.Windows.Forms.Button button1;
     }
 }

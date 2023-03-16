@@ -1,6 +1,7 @@
 using iTextSharp.text;
 using Microsoft.Office.Interop.Excel;
 using Microsoft.Office.Interop.Word;
+using Org.BouncyCastle.Asn1.Tsp;
 using PdfSharp.Pdf;
 using PdfSharp.Pdf.IO;
 using System;
@@ -37,6 +38,8 @@ namespace ExcelAPP
         List<SmetaFile> objectiveData = new List<SmetaFile>();
         readonly Stopwatch stopWatch = new Stopwatch();
         int fullBookPageCount;
+        //protected int[][] firstPageNumbersArray;
+        List<List<int>> firstPageNumbersList = new List<List<int>>();
 
         int pagesInTitle = 0;
         IEnumerable<Pair> setDict;
@@ -85,7 +88,7 @@ namespace ExcelAPP
                 }
                 else if (dirFolders.Length == 1)
                 {
-                    if (!(dirFolders[0] == $"{_path}\\ОС" || dirFolders[0] == $"{_path}\\Книга смет"))
+                    if (!(dirFolders[0] == $"{_path}\\ОС" || dirFolders[0] == $"{_path}\\OC" || dirFolders[0] == $"{_path}\\Книга смет"))
                     {
                         MessageBox.Show("В корневом разделе неправльная папка, исправьте название ОС или уберите Книгу смет");
                         return;
@@ -94,7 +97,7 @@ namespace ExcelAPP
                 }
                 else if (dirFolders.Length == 2)
                 {
-                    if (!(dirFolders[0] == $"{_path}\\ОС" || dirFolders[0] == $"{_path}\\Книга смет" && dirFolders[1] == $"{_path}\\ОС" || dirFolders[1] == $"{_path}\\Книга смет"))
+                    if (!(dirFolders[0] == $"{_path}\\ОС" || dirFolders[0] == $"{_path}\\OC" || dirFolders[0] == $"{_path}\\Книга смет" && dirFolders[1] == $"{_path}\\ОС" || dirFolders[0] == $"{_path}\\OC" || dirFolders[1] == $"{_path}\\Книга смет"))
                     {
                         MessageBox.Show("Названия папок должны быть на русском (ОС или Книга смет)");
                         return;
@@ -330,8 +333,8 @@ namespace ExcelAPP
                     eWorkbook.Close(true);
                 }
 
-                localData = localData.OrderBy(x => x.Code).ThenBy(x => x.Name).ToList(); // Сортировка по коду и названию
-                objectiveData = objectiveData.OrderBy(x => x.Code).ThenBy(x => x.Name).ToList(); // Сортировка по коду и названию
+                localData = localData.OrderBy(x => x.Code).ThenBy(x => x.NameDate).ToList(); // Сортировка по коду и названию
+                objectiveData = objectiveData.OrderBy(x => x.Code).ThenBy(x => x.NameDate).ToList(); // Сортировка по коду и названию
 
 
                 eWorkbook = null;
@@ -435,8 +438,14 @@ namespace ExcelAPP
                 string fileNameSmetaPdf = $"{finalSmetaFolder.FullName}\\Сметы.pdf";
                 string fileNameTitlePdf = $"{_path}\\TEMPdf\\Содержание.pdf";
 
-                tempFilesList = objectiveData;
-                tempFilesList.AddRange(localData);
+                //TODO 1
+                // тест сортировки смет по коду и имени
+                var sortedObjData = objectiveData.OrderBy(ob => ob.Code).ThenBy(ob => ob.Name).ToList();
+                var sortedLocData = localData.OrderBy(ob => ob.Code).ThenBy(ob => ob.Name).ToList();
+                //----------------------
+
+                tempFilesList = sortedObjData;
+                tempFilesList.AddRange(sortedLocData);
 
                 SmetaFile lastUsedDocument = null;
 
@@ -445,11 +454,15 @@ namespace ExcelAPP
                 {
                     int bookNumber = 1;
                     int i = 0;
+                    bool changeBookCheck = true;
+                    
+
+                    int tempFirstPageNubmer = 1;
 
                     while (lastUsedDocument != tempFilesList[tempFilesList.Count - 1])
                     {
                         PdfDocument outputSmetaPdfDocument = new PdfDocument();
-                        for (; i < tempFilesList.Count; i++)
+                        for (; i < tempFilesList.Count; i++) // TODO 3
                         {
                             var smetaFile = tempFilesList[i];
                             inputPdfDocument = PdfReader.Open($"{pdfFolder}\\{smetaFile.FolderInfo}.pdf", PdfDocumentOpenMode.Import);
@@ -464,6 +477,7 @@ namespace ExcelAPP
                             {
                                 dividerPass = (double)dividerPassPagesCount.Value;
                             }
+
                             if (outputSmetaPdfDocument.PageCount + pageCountInputDocument < (double)pagesInPartBookNumeric.Value + dividerPass)
                             {
                                 for (int j = 0; j < pageCountInputDocument; j++)
@@ -473,13 +487,28 @@ namespace ExcelAPP
                                 }
                                 lastUsedDocument = smetaFile;
                                 inputPdfDocument.Close();
+
+                                tempFilesList[i].Part = bookNumber; // тест
+
+                                //Передача номера первой страницы каждого документа в сожержание
+                                if (changeBookCheck)
+                                {
+                                    tempFirstPageNubmer = 1;
+                                    changeBookCheck = false;
+                                    firstPageNumbersList.Add(new List<int>());
+                                } else
+                                {
+                                    tempFirstPageNubmer += tempFilesList[i - 1].PageCount;
+                                }
+                                firstPageNumbersList[bookNumber - 1].Add(tempFirstPageNubmer);
                             }
                             else
                             {
                                 inputPdfDocument.Close();
+                                tempFirstPageNubmer = 1;
+                                //tempFilesList[i].Part = bookNumber; // тест
                                 break;
                             }
-                            tempFilesList[i].Part = bookNumber; //TODO 1
                         }
 
                         outputSmetaPdfDocument.Save($@"{finalSmetaFolder.FullName}\Сметы{bookNumber}.pdf");
@@ -487,23 +516,40 @@ namespace ExcelAPP
 
                         AddPageNumberSmetaITextSharp($@"{finalSmetaFolder.FullName}\Сметы{bookNumber}.pdf");
                         bookNumber++;
+                        changeBookCheck = true;
                     }
                 }
                 else
                 {
+                    int tempFirstPageNubmer = 1;
+                    firstPageNumbersList.Add(new List<int>());
+                    bool firstDocument = true;
+
                     if (SplitBookContentCheckBox.Checked)
                     {
                         PdfDocument outputSmetaPdfDocument = new PdfDocument();
-                        foreach (var file in tempFilesList)
+                        for (int i = 0; i < tempFilesList.Count; i++)
                         {
-                            inputPdfDocument = PdfReader.Open($"{pdfFolder}\\{file.FolderInfo}.pdf", PdfDocumentOpenMode.Import);
-                            for (int i = 0; i < inputPdfDocument.PageCount; i++)
+                            var smetaFile = tempFilesList[i];
+                            inputPdfDocument = PdfReader.Open($"{pdfFolder}\\{smetaFile.FolderInfo}.pdf", PdfDocumentOpenMode.Import);
+                            for (int j = 0; j < inputPdfDocument.PageCount; j++)
                             {
-                                PdfPage page = inputPdfDocument.Pages[i];
+                                PdfPage page = inputPdfDocument.Pages[j];
                                 outputSmetaPdfDocument.AddPage(page);
                             }
                             inputPdfDocument.Close();
+                            //Передача номера первой страницы каждого документа в сожержание
+                            if (firstDocument)
+                            {
+                                firstDocument = false;
+                            }
+                            else
+                            {
+                                tempFirstPageNubmer += tempFilesList[i - 1].PageCount;
+                            }
+                            firstPageNumbersList[1].Add(tempFirstPageNubmer);
                         }
+
                         outputSmetaPdfDocument.Save(fileNameSmetaPdf);
                         outputSmetaPdfDocument.Close();
                     }
@@ -518,14 +564,25 @@ namespace ExcelAPP
                             outputPdfDocument.AddPage(page);
                         }
                         //Добавляем сметы
-                        foreach (var file in tempFilesList)
+                        for (int i = 0; i < tempFilesList.Count; i++)
                         {
-                            inputPdfDocument = PdfReader.Open($"{pdfFolder}\\{file.FolderInfo}.pdf", PdfDocumentOpenMode.Import);
-                            for (int i = 0; i < inputPdfDocument.PageCount; i++)
+                            var smetaFile = tempFilesList[i];
+                            inputPdfDocument = PdfReader.Open($"{pdfFolder}\\{smetaFile.FolderInfo}.pdf", PdfDocumentOpenMode.Import);
+                            for (int j = 0; j < inputPdfDocument.PageCount; j++)
                             {
-                                PdfPage page = inputPdfDocument.Pages[i];
+                                PdfPage page = inputPdfDocument.Pages[j];
                                 outputPdfDocument.AddPage(page);
                             }
+                            //Передача номера первой страницы каждого документа в сожержание
+                            if (firstDocument)
+                            {
+                                firstDocument = false;
+                            }
+                            else
+                            {
+                                tempFirstPageNubmer += tempFilesList[i - 1].PageCount;
+                            }
+                            firstPageNumbersList[1].Add(tempFirstPageNubmer);
                         }
                         outputPdfDocument.Save(fileNameConcatPdf);
                         inputPdfDocument.Close();
@@ -759,7 +816,7 @@ namespace ExcelAPP
             }
         }
 
-        protected bool TitleNumOfPart() // TODO 2
+        protected bool TitleNumOfPart()
         {
             Word.Application wordApp = new Word.Application
             {
@@ -784,7 +841,7 @@ namespace ExcelAPP
 
                 //-------------
                 //pagesInTitle = wDocument.ComputeStatistics(WdStatistic.wdStatisticPages, false); // кол-во страниц в содержании
-                int page = (int)StartNumberNumeric.Value + pagesInTitle - 1; // номер страницы
+                int page = (int)StartNumberNumeric.Value + pagesInTitle; // номер страницы
 
                 //TODO добавление страниц после содержания 
 
@@ -811,53 +868,51 @@ namespace ExcelAPP
                     page += 2;
                 }
                 int tempPage = page;
-                //---------
-                //if ((startPageNumber + titlePages) % 2 == 1)
-                //{
-                //    titlePages++;
-                //}
-                //if (pagesPzCount % 2 == 1)
-                //{
-                //    pagesPzCount++;
-                //}
-                //var page = startPageNumber + pagesPzCount + titlePages;
 
+                // 1 вариант
+                int i = 0;
                 int temp = 0;
-
-                int rowInTable = table.Rows.Count;
-                for (var row = 1; row <= rowInTable; row++)
+                if (partsBookCheckBox.Checked)
                 {
-                    for (var ind = 0; ind < tempFilesList.Count; ind++)
+                    int rowInTable = table.Rows.Count;
+                    for (var row = 1; row <= rowInTable; row++)
                     {
-                        var c = table.Cell(row, 3).Range.Text.Replace("\a", "").Replace("\r", "") == tempFilesList[ind].NameDate.ToString().Replace("\n", "");
-                        var d = table.Cell(row, 4).Range.Text.Replace("\a", "").Replace("\r", "") == tempFilesList[ind].Price.ToString();
-                        if (c)
+                        if (table.Cell(row, 2).Range.Text.Length > 3)
                         {
-                            if (d)
+                            if (i != tempFilesList.Count)
                             {
-                                table.Cell(row, 6).Range.Text = tempFilesList[ind].Part.ToString();
-                                if (temp != tempFilesList[ind].Part)
+                                table.Cell(row, 6).Range.Text = tempFilesList[i].Part.ToString();
+                                //---------
+                                if (temp != tempFilesList[i].Part)
                                 {
                                     page = tempPage;
-                                    temp = tempFilesList[ind].Part;
+                                    temp = tempFilesList[i].Part;
                                 }
 
                                 table.Cell(row, 5).Range.Text = page.ToString();
-                                page += tempFilesList[ind].PageCount;
+                                page += tempFilesList[i].PageCount;
+                                //---------
+                                i++;
                             }
                         }
                     }
                 }
 
 
-
-                wDocument.SaveAs2($"{pdfFolder}\\Содержание.docx");
+                wDocument.Save();
+                if (Directory.Exists($"{pdfFolder}\\Содержание.pdf"))
+                    Directory.Delete($"{pdfFolder}\\Содержание.pdf");
                 wDocument.ExportAsFixedFormat($"{pdfFolder}\\Содержание.pdf", Word.WdExportFormat.wdExportFormatPDF);
-                wDocument.Close(Word.WdSaveOptions.wdDoNotSaveChanges, Word.WdOriginalFormat.wdOriginalDocumentFormat, false);
+                wDocument.Close(true);
 
                 return true;
             }
             catch (Exception) { }
+            finally
+            {
+                wordApp.Quit();
+                GC.Collect();
+            }
 
 
             return false;
@@ -1663,6 +1718,7 @@ namespace ExcelAPP
             string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}", ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
             string Time = $"Время сборки: {elapsedTime}";
             backgroundWorker.ReportProgress(1, Time);
+            stopWatch.Reset();
         }
 
 
@@ -1670,6 +1726,8 @@ namespace ExcelAPP
         {
             try
             {
+                eWorksheet.Range[$"G7"].Value = "";
+                eWorksheet.Rows[7].RowHeight = 11.25;
                 int lastUsedRow = eWorksheet.Cells.Find("*", System.Reflection.Missing.Value,
                        System.Reflection.Missing.Value, System.Reflection.Missing.Value,
                        Excel.XlSearchOrder.xlByRows, Excel.XlSearchDirection.xlPrevious,
@@ -1797,23 +1855,32 @@ namespace ExcelAPP
             localData = new List<SmetaFile>();
             objectiveData = new List<SmetaFile>();
             tempFilesList = new List<SmetaFile>();
+            firstPageNumbersList = new List<List<int>>();
             GC.Collect();
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e) // Закрытие программы
         {
-            DialogResult dialogResult = MessageBox.Show("Вы точно хотите закрыть программу?", "Подтверждение закрытия программы", MessageBoxButtons.YesNo);
-            if (dialogResult == DialogResult.Yes)
+            try
             {
+                DialogResult dialogResult = MessageBox.Show("Вы точно хотите закрыть программу?", "Подтверждение закрытия программы", MessageBoxButtons.YesNo);
+                if (dialogResult == DialogResult.Yes)
+                {
 
-                DeleteTempVar();
-                e.Cancel = false;
-                Environment.Exit(0);
+                    DeleteTempVar();
+                    e.Cancel = false;
+                    //Environment.Exit(0);
+                }
+                else
+                {
+                    e.Cancel = true;
+                }
             }
-            else
+            catch (Exception)
             {
-                e.Cancel = true;
+                MessageBox.Show("Ошибка завершения программы");
             }
+
         }
 
         private void SelectFolderFunc() //Функция обработки выбора папки
@@ -1862,7 +1929,7 @@ namespace ExcelAPP
             Directory.GetFiles(_path, ".", SearchOption.TopDirectoryOnly).ToList()
                 .ForEach(f => infoTextBox.AppendText($"\n- {Path.GetFileName(f)}" + Environment.NewLine));
         }
-        
+
 
         private void AutoBooksPartPassCheckBox_Click(object sender, EventArgs e)
         {
@@ -1876,6 +1943,67 @@ namespace ExcelAPP
                 dividerPagesCountLabel.Enabled = true;
                 dividerPassPagesCount.Enabled = true;
             }
+        }
+
+        private void button1_Click(object sender, EventArgs e) // TODO 4
+        {
+            //Excel.Application app = new Excel.Application
+            //{
+            //    DisplayAlerts = true,
+            //    Visible = true,
+            //    ScreenUpdating = true
+            //};
+
+            //Excel.Workbook eWorkbook;
+            //Excel.Worksheet eWorksheet;
+
+            //eWorkbook = app.Workbooks.Open($@"\DyshaPC\Desktop\Work Gazp\Smeta++\Test\04-01-02р (36900273) (ВЭЛ-ЭВ) (2000г) - ЛСР по Методике 2020 (БИМ)1.xlsx");
+            //eWorksheet = (Excel.Worksheet)eWorkbook.Sheets[1];
+            //eWorksheet.PageSetup.Orientation = XlPageOrientation.xlLandscape;
+
+            //eWorksheet.Range[$"G7"].Value = "";
+            //eWorksheet.Rows[7].RowHeight = 11.3;
+
+
+            //eWorksheet = null;
+            //eWorkbook.Save();
+            //eWorkbook.Close(true);
+            //eWorkbook = null;
+            //app.Quit();
+
+            //Word.Application wordApp = new Word.Application
+            //{
+            //    //Visible = true,
+            //    //ScreenUpdating = true
+            //    Visible = false,
+            //    ScreenUpdating = false
+            //};
+            ////var wDocument = wordApp.Documents.Open($@"{pdfFolder}\Содержание.docx");
+            //var wDocument = wordApp.Documents.Open($@"C:\Users\lokot\Desktop\test.docx");
+            //var table = wDocument.Tables[1];
+
+            //int i = 0;
+
+            //if (partsBookCheckBox.Checked)
+            //{
+            //    int rowInTable = table.Rows.Count;
+            //    for (var row = 1; row <= rowInTable; row++)
+            //    {
+            //        if (table.Cell(row, 2).Range.Text.Length > 3) 
+            //        {
+            //            if (i != tempFilesList.Count - 1)
+            //            {
+            //                table.Cell(row, 6).Range.Text = tempFilesList[i].Part.ToString();
+            //                i++;
+            //            }
+            //        }
+            //    }
+            //}
+
+
+
+            //wDocument.Close(Word.WdSaveOptions.wdDoNotSaveChanges, Word.WdOriginalFormat.wdOriginalDocumentFormat, false);
+            //wordApp.Quit();
         }
     }
 }
