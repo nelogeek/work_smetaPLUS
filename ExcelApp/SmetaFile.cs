@@ -31,8 +31,6 @@ namespace ExcelAPP
             this.ShortCode = ShortCode;
             this.Part = -1;
             this.NumOfPage = -1;
-
-
         }
 
         //public ~SmetaFile() //TODO make a destructor (garbage collection)
