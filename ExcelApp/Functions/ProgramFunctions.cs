@@ -12,12 +12,6 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using Excel = Microsoft.Office.Interop.Excel;
-using Label = System.Windows.Forms.Label;
-using TextBox = System.Windows.Forms.TextBox;
-using Button = System.Windows.Forms.Button;
-using CheckBox = System.Windows.Forms.CheckBox;
-using ToggleButton = ExcelApp.Controls.ToggleButton;
-using ToolStripMenuItem = System.Windows.Forms.ToolStripMenuItem;
 using Word = Microsoft.Office.Interop.Word;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -26,24 +20,12 @@ namespace ExcelApp.Functions
 {
     partial class ProgramFunctions
     {
-        //Ссылки на элементы формы
-        public Label labelNameFolder;
-        public TextBox infoTextBox;
-        public NumericUpDown StartNumberNumeric;
-        public NumericUpDown CountPagePZNumeric;
-        public Button btnBuild;
-        public Button btnSelectFolder;
-        public CheckBox TwoSidedPrintCheckBox;
-        public CheckBox SplitBookContentCheckBox;
-        public ToggleButton RdPdToggle;
-        public ToolStripMenuItem settingsToolStripMenuItem;
-        public NumericUpDown pagesInPartBookNumeric;
-        public CheckBox partsBookCheckBox;
-        public NumericUpDown dividerPassPagesCount;
-        public ToolStripMenuItem AutoPageBreakerToolStripMenuItem;
-        public ToolStripMenuItem AutoBooksPartPassCheckBox;
+        public ProgramFunctions()
+        {
+            mf = MainForm.instance;
+        }
 
-        public BackgroundWorker bgWorker;
+        readonly MainForm mf;
 
         public string path;
         public string[] dirFolders;
@@ -66,13 +48,12 @@ namespace ExcelApp.Functions
         public int pagesInTitle = 0;
         public IEnumerable<Pair> setDict;
         public List<SmetaFile> allDataFilesList;
-
-        public void SelectFolderFunc() //Функция обработки выбора папки
+        
+        public void SelectFolder() //Функция обработки выбора папки
         {
-
             try
             {
-                labelNameFolder.Text = path;
+                mf.labelNameFolder.Text = path;
 
                 if (Directory.Exists($"{path}\\ОС"))
                 {
@@ -97,29 +78,29 @@ namespace ExcelApp.Functions
                     objectiveFiles = null;
                 }
 
-                infoTextBox.Clear();
+                mf.infoTextBox.Clear();
 
                 fullBookPageCount = FullBookPageCounter();
-                infoTextBox.Text = $"Общее количество страниц: {fullBookPageCount}";
-                infoTextBox.AppendText(
+                mf.infoTextBox.Text = $"Общее количество страниц: {fullBookPageCount}";
+                mf.infoTextBox.AppendText(
                     Environment.NewLine + $"Количество всех файлов: {localFiles.Length + objectiveFiles.Length}\n" +
                     Environment.NewLine + $"Количество папок: {dirFolders.Length}" + Environment.NewLine);
 
                 if (childFolder != null)
                 {
-                    infoTextBox.AppendText(Environment.NewLine +
+                    mf.infoTextBox.AppendText(Environment.NewLine +
                     $"Количество объектных файлов: {objectiveFiles.Length}\n" + Environment.NewLine);
-                    infoTextBox.AppendText(Environment.NewLine + $"Объектные файлы:" + Environment.NewLine);
+                    mf.infoTextBox.AppendText(Environment.NewLine + $"Объектные файлы:" + Environment.NewLine);
 
                     Directory.GetFiles($"{path}\\ОС", ".", SearchOption.TopDirectoryOnly).ToList()
-                    .ForEach(f => infoTextBox.AppendText($"\n- {Path.GetFileName(f)}" + Environment.NewLine));
+                    .ForEach(f => mf.infoTextBox.AppendText($"\n- {Path.GetFileName(f)}" + Environment.NewLine));
                 }
 
-                infoTextBox.AppendText(Environment.NewLine + $"Количество локальных файлов: {localFiles.Length}\n" + Environment.NewLine);
-                infoTextBox.AppendText(Environment.NewLine + $"Локальные файлы:" + Environment.NewLine);
+                mf.infoTextBox.AppendText(Environment.NewLine + $"Количество локальных файлов: {localFiles.Length}\n" + Environment.NewLine);
+                mf.infoTextBox.AppendText(Environment.NewLine + $"Локальные файлы:" + Environment.NewLine);
 
                 Directory.GetFiles(path, ".", SearchOption.TopDirectoryOnly).ToList()
-                    .ForEach(f => infoTextBox.AppendText($"\n- {Path.GetFileName(f)}" + Environment.NewLine));
+                    .ForEach(f => mf.infoTextBox.AppendText($"\n- {Path.GetFileName(f)}" + Environment.NewLine));
             }
             catch (Exception ex)
             {
@@ -139,7 +120,7 @@ namespace ExcelApp.Functions
             Workbook eWorkbook;
             try
             {
-                infoTextBox.Text = "Подсчёт страниц";
+                mf.infoTextBox.Text = "Подсчёт страниц";
                 if (childFolder != null)
                 {
                     for (int i = 0; i < objectiveFiles.Length; i++)
@@ -161,7 +142,7 @@ namespace ExcelApp.Functions
             {
                 MessageBox.Show("Ошибка подсчета страниц");
                 Console.WriteLine(ex.Message.ToString());
-                bgWorker.CancelAsync();
+                mf.backgroundWorker.CancelAsync();
                 app.Quit();
                 eWorkbook = null;
                 DeleteTempFiles();
@@ -173,32 +154,32 @@ namespace ExcelApp.Functions
 
         public void DisableButtons()
         {
-            StartNumberNumeric.Enabled = false;
-            CountPagePZNumeric.Enabled = false;
-            btnBuild.Enabled = false;
-            btnSelectFolder.Enabled = false;
-            TwoSidedPrintCheckBox.Enabled = false;
-            SplitBookContentCheckBox.Enabled = false;
-            RdPdToggle.Enabled = false;
-            settingsToolStripMenuItem.Enabled = false;
-            pagesInPartBookNumeric.Enabled = false;
-            partsBookCheckBox.Enabled = false;
-            dividerPassPagesCount.Enabled = false;
+            mf.StartNumberNumeric.Enabled = false;
+            mf.CountPagePZNumeric.Enabled = false;
+            mf.btnBuild.Enabled = false;
+            mf.btnSelectFolder.Enabled = false;
+            mf.TwoSidedPrintCheckBox.Enabled = false;
+            mf.SplitBookContentCheckBox.Enabled = false;
+            mf.RdPdToggle.Enabled = false;
+            mf.settingsToolStripMenuItem.Enabled = false;
+            mf.pagesInPartBookNumeric.Enabled = false;
+            mf.partsBookCheckBox.Enabled = false;
+            mf.dividerPassPagesCount.Enabled = false;
         }
 
         public void EnableButtons()
         {
-            StartNumberNumeric.Enabled = true;
-            CountPagePZNumeric.Enabled = true;
-            btnBuild.Enabled = true;
-            btnSelectFolder.Enabled = true;
-            TwoSidedPrintCheckBox.Enabled = true;
-            SplitBookContentCheckBox.Enabled = true;
-            RdPdToggle.Enabled = true;
-            settingsToolStripMenuItem.Enabled = true;
-            pagesInPartBookNumeric.Enabled = true;
-            partsBookCheckBox.Enabled = true;
-            dividerPassPagesCount.Enabled = true;
+            mf.StartNumberNumeric.Enabled = true;
+            mf.CountPagePZNumeric.Enabled = true;
+            mf.btnBuild.Enabled = true;
+            mf.btnSelectFolder.Enabled = true;
+            mf.TwoSidedPrintCheckBox.Enabled = true;
+            mf.SplitBookContentCheckBox.Enabled = true;
+            mf.RdPdToggle.Enabled = true;
+            mf.settingsToolStripMenuItem.Enabled = true;
+            mf.pagesInPartBookNumeric.Enabled = true;
+            mf.partsBookCheckBox.Enabled = true;
+            mf.dividerPassPagesCount.Enabled = true;
         }
 
         public bool ExcelParser() // Парсинг Excel файла
@@ -225,7 +206,7 @@ namespace ExcelApp.Functions
                         string date = eWorksheet.Range["C18"].Value.ToString().Split(new string[] { " цен " }, StringSplitOptions.None)[1];
                         nameDate += $"\n(в ценах на {date})";
 
-                        if (RdPdToggle.Checked)
+                        if (mf.RdPdToggle.Checked)
                         {
                             eWorksheet.Range["E8"].Replace("ОБЪЕКТНЫЙ СМЕТНЫЙ РАСЧЕТ (СМЕТА)", "ОБЪЕКТНАЯ СМЕТА");
                         }
@@ -241,7 +222,7 @@ namespace ExcelApp.Functions
                             objectiveFiles[i],
                             ShortCode));
 
-                        if (AutoPageBreakerToolStripMenuItem.Checked)
+                        if (mf.AutoPageBreakerToolStripMenuItem.Checked)
                         {
                             PageBreaker(eWorksheet);
                         }
@@ -275,14 +256,14 @@ namespace ExcelApp.Functions
                     string date = eWorksheet.Range["D26"].Value.ToString();
                     nameDate += $"\n(в ценах на {date})";
 
-                    if (RdPdToggle.Checked)
+                    if (mf.RdPdToggle.Checked)
                     {
                         eWorksheet.Range["A18"].Replace("ЛОКАЛЬНЫЙ СМЕТНЫЙ РАСЧЕТ (СМЕТА)", "ЛОКАЛЬНАЯ СМЕТА");
                     }
 
                     int pages = eWorksheet.PageSetup.Pages.Count; // кол-во страниц на листе
 
-                    if (AutoPageBreakerToolStripMenuItem.Checked)
+                    if (mf.AutoPageBreakerToolStripMenuItem.Checked)
                     {
                         PageBreaker(eWorksheet);
                     }
@@ -318,7 +299,7 @@ namespace ExcelApp.Functions
             {
                 MessageBox.Show("Ошибка при парсинге смет");
                 Console.WriteLine(ex.Message.ToString());
-                bgWorker.CancelAsync();
+                mf.backgroundWorker.CancelAsync();
                 DeleteTempFiles();
                 DeleteTempVar();
 
@@ -327,7 +308,7 @@ namespace ExcelApp.Functions
                 app.Quit();
                 GC.Collect();
 
-                bgWorker.ReportProgress(1, "Сборка остановлена");
+                mf.backgroundWorker.ReportProgress(1, "Сборка остановлена");
 
                 return false;
             }
@@ -365,7 +346,7 @@ namespace ExcelApp.Functions
                 Console.WriteLine(ex.StackTrace);
                 Console.WriteLine(ex.Message.ToString());
 
-                bgWorker.CancelAsync();
+                mf.backgroundWorker.CancelAsync();
                 DeleteTempFiles();
                 DeleteTempVar();
 
@@ -415,7 +396,7 @@ namespace ExcelApp.Functions
             {
                 MessageBox.Show("Ошибка конвертации в PDF");
                 MessageBox.Show(ex.Message.ToString());
-                bgWorker.CancelAsync();
+                mf.backgroundWorker.CancelAsync();
                 DeleteTempFiles();
                 DeleteTempVar();
 
@@ -423,7 +404,7 @@ namespace ExcelApp.Functions
                 eWorkbook = null;
                 GC.Collect();
 
-                bgWorker.ReportProgress(10, "Сборка остановлена");
+                mf.backgroundWorker.ReportProgress(10, "Сборка остановлена");
 
                 return false;
             }
@@ -444,13 +425,13 @@ namespace ExcelApp.Functions
             {
                 MessageBox.Show("Ошибка создания финальной папки");
                 MessageBox.Show(ex.Message.ToString());
-                bgWorker.CancelAsync();
+                mf.backgroundWorker.CancelAsync();
                 DeleteTempFiles();
                 DeleteTempVar();
 
                 GC.Collect();
 
-                bgWorker.ReportProgress(40, "Сборка остановлена");
+                mf.backgroundWorker.ReportProgress(40, "Сборка остановлена");
 
                 return false;
             }
@@ -490,7 +471,7 @@ namespace ExcelApp.Functions
                     wDocument.PageSetup.RightMargin = wordApp.InchesToPoints(0.4f);
                     wDocument.PageSetup.HeaderDistance = 20f;
 
-                    if (TwoSidedPrintCheckBox.Checked)
+                    if (mf.TwoSidedPrintCheckBox.Checked)
                     {
                         wDocument.Sections[1].PageSetup.OddAndEvenPagesHeaderFooter = -1; // -1 = true  -  настройка: четные-нечетные страницы
 
@@ -498,7 +479,7 @@ namespace ExcelApp.Functions
 
                         wDocument.Sections[1].Headers[Word.WdHeaderFooterIndex.wdHeaderFooterPrimary].LinkToPrevious = false;
                         wDocument.Sections[1].Headers[Word.WdHeaderFooterIndex.wdHeaderFooterPrimary].PageNumbers.RestartNumberingAtSection = true;
-                        wDocument.Sections[1].Headers[Word.WdHeaderFooterIndex.wdHeaderFooterPrimary].PageNumbers.StartingNumber = (int)StartNumberNumeric.Value; // номер первой страницы
+                        wDocument.Sections[1].Headers[Word.WdHeaderFooterIndex.wdHeaderFooterPrimary].PageNumbers.StartingNumber = (int)mf.StartNumberNumeric.Value; // номер первой страницы
 
                         // колонтитул нечетной страницы
                         wDocument.Tables.Add(headerRange, 1, 6, ref defaultTableBehavior, ref autoFitBehavior);
@@ -608,7 +589,7 @@ namespace ExcelApp.Functions
 
                         header.LinkToPrevious = false;
                         header.PageNumbers.RestartNumberingAtSection = true;
-                        header.PageNumbers.StartingNumber = (int)StartNumberNumeric.Value; // номер первой страницы
+                        header.PageNumbers.StartingNumber = (int)mf.StartNumberNumeric.Value; // номер первой страницы
 
                         // колонтитул страницы
                         wDocument.Tables.Add(headerRange, 1, 6, ref defaultTableBehavior, ref autoFitBehavior);
@@ -708,7 +689,7 @@ namespace ExcelApp.Functions
                         NumberDocument++;
                         Table.Rows.Add();
                         Table.Cell(row, 1).Range.Text = NumberDocument.ToString();
-                        if (RdPdToggle.Checked)
+                        if (mf.RdPdToggle.Checked)
                         {
                             Table.Cell(row, 2).Range.Text = $"{data.ShortCode}p"; //TODO иправить вывод кода объектных смет (буква 'p')
                         }
@@ -778,11 +759,11 @@ namespace ExcelApp.Functions
 
                     //нумерация страниц
                     pagesInTitle = wDocument.ComputeStatistics(WdStatistic.wdStatisticPages, false); // кол-во страниц в содержании
-                    int pageNumber = (int)StartNumberNumeric.Value + pagesInTitle - 1; // номер страницы
+                    int pageNumber = (int)mf.StartNumberNumeric.Value + pagesInTitle - 1; // номер страницы
 
                     row = 2;
 
-                    if (TwoSidedPrintCheckBox.Checked)
+                    if (mf.TwoSidedPrintCheckBox.Checked)
                     {
                         //TODO добавление страниц после содержания 
 
@@ -796,7 +777,7 @@ namespace ExcelApp.Functions
                             pageNumber += 2;
                         }
                         Table.Cell(row, 5).Range.Text = pageNumber.ToString();
-                        pageNumber += (int)CountPagePZNumeric.Value - 1;
+                        pageNumber += (int)mf.CountPagePZNumeric.Value - 1;
                         row += 2;
 
                         // нумерация сметы
@@ -841,7 +822,7 @@ namespace ExcelApp.Functions
                         // нумерация ПЗ
                         pageNumber++;
                         Table.Cell(row, 5).Range.Text = pageNumber.ToString();
-                        pageNumber += (int)CountPagePZNumeric.Value - 1;
+                        pageNumber += (int)mf.CountPagePZNumeric.Value - 1;
                         row += 2;
 
                         // нумерация сметы
@@ -890,7 +871,7 @@ namespace ExcelApp.Functions
                     wDocument.PageSetup.RightMargin = wordApp.InchesToPoints(0.4f);
                     wDocument.PageSetup.HeaderDistance = 20f;
 
-                    if (TwoSidedPrintCheckBox.Checked)
+                    if (mf.TwoSidedPrintCheckBox.Checked)
                     {
                         wDocument.Sections[1].PageSetup.OddAndEvenPagesHeaderFooter = -1; // -1 = true  - настройка: четные-нечетные страницы
 
@@ -898,7 +879,7 @@ namespace ExcelApp.Functions
 
                         wDocument.Sections[1].Headers[Word.WdHeaderFooterIndex.wdHeaderFooterPrimary].LinkToPrevious = false;
                         wDocument.Sections[1].Headers[Word.WdHeaderFooterIndex.wdHeaderFooterPrimary].PageNumbers.RestartNumberingAtSection = true;
-                        wDocument.Sections[1].Headers[Word.WdHeaderFooterIndex.wdHeaderFooterPrimary].PageNumbers.StartingNumber = (int)StartNumberNumeric.Value; // номер первой страницы
+                        wDocument.Sections[1].Headers[Word.WdHeaderFooterIndex.wdHeaderFooterPrimary].PageNumbers.StartingNumber = (int)mf.StartNumberNumeric.Value; // номер первой страницы
 
                         // колонтитул нечетной страницы
                         wDocument.Tables.Add(headerRange, 1, 6, ref defaultTableBehavior, ref autoFitBehavior);
@@ -1008,7 +989,7 @@ namespace ExcelApp.Functions
 
                         header.LinkToPrevious = false;
                         header.PageNumbers.RestartNumberingAtSection = true;
-                        header.PageNumbers.StartingNumber = (int)StartNumberNumeric.Value; // номер первой страницы
+                        header.PageNumbers.StartingNumber = (int)mf.StartNumberNumeric.Value; // номер первой страницы
 
                         // колонтитул страницы
                         wDocument.Tables.Add(headerRange, 1, 6, ref defaultTableBehavior, ref autoFitBehavior);
@@ -1127,9 +1108,9 @@ namespace ExcelApp.Functions
 
                     //нумерация страниц
                     pagesInTitle = wDocument.ComputeStatistics(WdStatistic.wdStatisticPages, false);
-                    int pageNumber = (int)StartNumberNumeric.Value + pagesInTitle - 1;
+                    int pageNumber = (int)mf.StartNumberNumeric.Value + pagesInTitle - 1;
                     row = 2;
-                    if (TwoSidedPrintCheckBox.Checked)
+                    if (mf.TwoSidedPrintCheckBox.Checked)
                     {
                         // добавление страниц после содержания TODO
 
@@ -1143,7 +1124,7 @@ namespace ExcelApp.Functions
                             pageNumber += 2;
                         }
                         Table.Cell(row, 5).Range.Text = pageNumber.ToString();
-                        pageNumber += (int)CountPagePZNumeric.Value - 1;
+                        pageNumber += (int)mf.CountPagePZNumeric.Value - 1;
                         row++;
 
                         // нумерация сметы
@@ -1187,7 +1168,7 @@ namespace ExcelApp.Functions
                         // нумерация ПЗ
                         pageNumber++;
                         Table.Cell(row, 5).Range.Text = pageNumber.ToString();
-                        pageNumber += (int)CountPagePZNumeric.Value - 1;
+                        pageNumber += (int)mf.CountPagePZNumeric.Value - 1;
                         row++;
 
                         // нумерация сметы
@@ -1223,8 +1204,8 @@ namespace ExcelApp.Functions
                 DeleteTempVar();
                 MessageBox.Show("Ошибка генерации содержания");
                 MessageBox.Show(ex.Message.ToString());
-                bgWorker.CancelAsync();
-                bgWorker.ReportProgress(45, "Сборка остановлена");
+                mf.backgroundWorker.CancelAsync();
+                mf.backgroundWorker.ReportProgress(45, "Сборка остановлена");
 
                 return false;
             }
@@ -1255,7 +1236,7 @@ namespace ExcelApp.Functions
                 SmetaFile lastUsedDocument = null;
 
                 PdfDocument inputPdfDocument;
-                if (partsBookCheckBox.Checked)
+                if (mf.partsBookCheckBox.Checked)
                 {
                     int bookNumber = 1;
                     int i = 0;
@@ -1274,16 +1255,16 @@ namespace ExcelApp.Functions
                             int pageCountInputDocument = inputPdfDocument.PageCount;
                             double dividerPass;
 
-                            if (AutoBooksPartPassCheckBox.Checked)
+                            if (mf.AutoBooksPartPassCheckBox.Checked)
                             {
-                                dividerPass = (double)pagesInPartBookNumeric.Value * 12.5 / 100;
+                                dividerPass = (double)mf.pagesInPartBookNumeric.Value * 12.5 / 100;
                             }
                             else
                             {
-                                dividerPass = (double)dividerPassPagesCount.Value;
+                                dividerPass = (double)mf.dividerPassPagesCount.Value;
                             }
 
-                            if (outputSmetaPdfDocument.PageCount + pageCountInputDocument < (double)pagesInPartBookNumeric.Value + dividerPass)
+                            if (outputSmetaPdfDocument.PageCount + pageCountInputDocument < (double)mf.pagesInPartBookNumeric.Value + dividerPass)
                             {
                                 for (int j = 0; j < pageCountInputDocument; j++)
                                 {
@@ -1331,7 +1312,7 @@ namespace ExcelApp.Functions
                     firstPageNumbersList.Add(new List<int>());
                     bool firstDocument = true;
 
-                    if (SplitBookContentCheckBox.Checked)
+                    if (mf.SplitBookContentCheckBox.Checked)
                     {
                         PdfDocument outputSmetaPdfDocument = new PdfDocument();
                         for (int i = 0; i < allDataFilesList.Count; i++)
@@ -1395,7 +1376,7 @@ namespace ExcelApp.Functions
                         inputPdfDocument.Close();
                         outputPdfDocument.Close();
                     }
-                    if (SplitBookContentCheckBox.Checked) //Нумерация страниц
+                    if (mf.SplitBookContentCheckBox.Checked) //Нумерация страниц
                     {
                         AddPageNumberTitleITextSharp(fileNameTitlePdf);
                         AddPageNumberSmetaITextSharp(fileNameSmetaPdf);
@@ -1411,10 +1392,10 @@ namespace ExcelApp.Functions
             catch (Exception)
             {
                 MessageBox.Show("Ошибка сборки книги");
-                bgWorker.CancelAsync();
+                mf.backgroundWorker.CancelAsync();
                 DeleteTempFiles();
                 DeleteTempVar();
-                bgWorker.ReportProgress(65, "Сборка остановлена");
+                mf.backgroundWorker.ReportProgress(65, "Сборка остановлена");
                 return false;
             }
         }
@@ -1433,9 +1414,9 @@ namespace ExcelApp.Functions
 
                     using (iTextSharp.text.pdf.PdfStamper stamper = new iTextSharp.text.pdf.PdfStamper(readerTitle, stream))
                     {
-                        int startPageNumber = Convert.ToInt32(StartNumberNumeric.Value) - 1;
+                        int startPageNumber = Convert.ToInt32(mf.StartNumberNumeric.Value) - 1;
 
-                        if (TwoSidedPrintCheckBox.Checked)
+                        if (mf.TwoSidedPrintCheckBox.Checked)
                         {
                             for (int i = 1; i <= pagesTitle; i++)
                             {
@@ -1467,8 +1448,8 @@ namespace ExcelApp.Functions
                 MessageBox.Show("Ошибка нумерации содержания");
                 DeleteTempFiles();
                 DeleteTempVar();
-                bgWorker.ReportProgress(65, "Сборка остановлена");
-                bgWorker.CancelAsync();
+                mf.backgroundWorker.ReportProgress(65, "Сборка остановлена");
+                mf.backgroundWorker.CancelAsync();
             }
         }
 
@@ -1487,10 +1468,10 @@ namespace ExcelApp.Functions
 
                     using (iTextSharp.text.pdf.PdfStamper stamper = new iTextSharp.text.pdf.PdfStamper(reader, stream))
                     {
-                        int startPageNumber = Convert.ToInt32(StartNumberNumeric.Value) - 1;
-                        int pagesPzCount = Convert.ToInt32(CountPagePZNumeric.Value);
+                        int startPageNumber = Convert.ToInt32(mf.StartNumberNumeric.Value) - 1;
+                        int pagesPzCount = Convert.ToInt32(mf.CountPagePZNumeric.Value);
 
-                        if (TwoSidedPrintCheckBox.Checked)
+                        if (mf.TwoSidedPrintCheckBox.Checked)
                         {
                             if ((startPageNumber + titlePages) % 2 == 1)
                             {
@@ -1544,8 +1525,8 @@ namespace ExcelApp.Functions
                 MessageBox.Show("Ошибка нумерации смет");
                 DeleteTempFiles();
                 DeleteTempVar();
-                bgWorker.ReportProgress(65, "Сборка остановлена");
-                bgWorker.CancelAsync();
+                mf.backgroundWorker.ReportProgress(65, "Сборка остановлена");
+                mf.backgroundWorker.CancelAsync();
             }
         }
 
@@ -1564,10 +1545,10 @@ namespace ExcelApp.Functions
 
                     using (iTextSharp.text.pdf.PdfStamper stamper = new iTextSharp.text.pdf.PdfStamper(reader, stream))
                     {
-                        int startPageNumber = Convert.ToInt32(StartNumberNumeric.Value) - 1;
-                        int pagesPzCount = Convert.ToInt32(CountPagePZNumeric.Value);
+                        int startPageNumber = Convert.ToInt32(mf.StartNumberNumeric.Value) - 1;
+                        int pagesPzCount = Convert.ToInt32(mf.CountPagePZNumeric.Value);
 
-                        if (TwoSidedPrintCheckBox.Checked)
+                        if (mf.TwoSidedPrintCheckBox.Checked)
                         {
                             if ((startPageNumber + titlePages) % 2 == 1)
                             {
@@ -1616,8 +1597,8 @@ namespace ExcelApp.Functions
                 DeleteTempFiles();
                 DeleteTempVar();
                 MessageBox.Show("Ошибка нумерации книги");
-                bgWorker.ReportProgress(65, "Сборка остановлена");
-                bgWorker.CancelAsync();
+                mf.backgroundWorker.ReportProgress(65, "Сборка остановлена");
+                mf.backgroundWorker.CancelAsync();
             }
         }
 
@@ -1640,13 +1621,13 @@ namespace ExcelApp.Functions
 
 
 
-                int startPageNumber = Convert.ToInt32(StartNumberNumeric.Value) - 1; //TODO -1
-                int pagesPzCount = Convert.ToInt32(CountPagePZNumeric.Value);
+                int startPageNumber = Convert.ToInt32(mf.StartNumberNumeric.Value) - 1; //TODO -1
+                int pagesPzCount = Convert.ToInt32(mf.CountPagePZNumeric.Value);
                 int titlePages = pagesInTitle;
 
                 //-------------
                 //pagesInTitle = wDocument.ComputeStatistics(WdStatistic.wdStatisticPages, false); // кол-во страниц в содержании
-                int page = (int)StartNumberNumeric.Value + pagesInTitle; // номер страницы
+                int page = (int)mf.StartNumberNumeric.Value + pagesInTitle; // номер страницы
 
                 //TODO добавление страниц после содержания 
 
@@ -1661,7 +1642,7 @@ namespace ExcelApp.Functions
                 }
                 //table.Cell(2, 5).Range.Text = page.ToString();
                 table.Cell(2, 6).Range.Text = "1";
-                page += (int)CountPagePZNumeric.Value - 1; //TODO -1
+                page += (int)mf.CountPagePZNumeric.Value - 1; //TODO -1
 
                 // нумерация сметы
                 if ((page % 2) == 0)
@@ -1677,7 +1658,7 @@ namespace ExcelApp.Functions
                 // 1 вариант
                 int i = 0;
                 int temp = 0;
-                if (partsBookCheckBox.Checked)
+                if (mf.partsBookCheckBox.Checked)
                 {
                     int rowInTable = table.Rows.Count;
                     for (var row = 1; row <= rowInTable; row++)
@@ -1718,8 +1699,8 @@ namespace ExcelApp.Functions
                 MessageBox.Show("Ошибка нумерации частей содержания");
                 DeleteTempFiles();
                 DeleteTempVar();
-                bgWorker.ReportProgress(80, "Сборка остановлена");
-                bgWorker.CancelAsync();
+                mf.backgroundWorker.ReportProgress(80, "Сборка остановлена");
+                mf.backgroundWorker.CancelAsync();
             }
             finally
             {
@@ -1734,7 +1715,7 @@ namespace ExcelApp.Functions
         {
             try
             {
-                if (SplitBookContentCheckBox.Checked)
+                if (mf.SplitBookContentCheckBox.Checked)
                 {
                     File.Move($@"{path}\TEMPdf\Содержание.pdf", $@"{finalSmetaFolder.FullName}\Содержание.pdf");
                     File.Move($@"{path}\TEMPdf\Содержание.docx", $@"{finalSmetaFolder.FullName}\Содержание.docx");
@@ -1744,7 +1725,7 @@ namespace ExcelApp.Functions
                     File.Move($@"{path}\TEMPdf\smetaBook.pdf", $@"{finalSmetaFolder.FullName}\smetaBook.pdf");
                 }
 
-                bgWorker.ReportProgress(77, "Сборка начата...");
+                mf.backgroundWorker.ReportProgress(77, "Сборка начата...");
                 return true;
             }
             catch (Exception)
@@ -1752,8 +1733,8 @@ namespace ExcelApp.Functions
                 DeleteTempFiles();
                 DeleteTempVar();
                 MessageBox.Show("Ошибка перемещения файлов в финальную папку");
-                bgWorker.CancelAsync();
-                bgWorker.ReportProgress(85, "Сборка остановлена");
+                mf.backgroundWorker.CancelAsync();
+                mf.backgroundWorker.ReportProgress(85, "Сборка остановлена");
                 return false;
             }
         }

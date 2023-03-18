@@ -5,34 +5,22 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
-
 namespace ExcelAPP
 {
     public partial class MainForm : Form
     {
         private readonly ProgramFunctions PF = new ProgramFunctions();
+        
+        public static MainForm instance; //Singleton
 
         public MainForm()
         {
+            if(instance == null)
+                instance = this;
             InitializeComponent();
+
             backgroundWorker.WorkerReportsProgress = true;
             backgroundWorker.WorkerSupportsCancellation = true;
-            PF.labelNameFolder = labelNameFolder;
-            PF.infoTextBox = infoTextBox;
-            PF.StartNumberNumeric = StartNumberNumeric;
-            PF.CountPagePZNumeric = CountPagePZNumeric;
-            PF.btnBuild = btnBuild;
-            PF.btnSelectFolder = btnSelectFolder;
-            PF.TwoSidedPrintCheckBox = TwoSidedPrintCheckBox;
-            PF.SplitBookContentCheckBox = SplitBookContentCheckBox;
-            PF.RdPdToggle = RdPdToggle;
-            PF.settingsToolStripMenuItem = settingsToolStripMenuItem;
-            PF.pagesInPartBookNumeric = pagesInPartBookNumeric;
-            PF.partsBookCheckBox = partsBookCheckBox;
-            PF.dividerPassPagesCount = dividerPassPagesCount;
-            PF.AutoPageBreakerToolStripMenuItem = AutoPageBreakerToolStripMenuItem;
-            PF.AutoBooksPartPassCheckBox = AutoBooksPartPassCheckBox;
-            PF.bgWorker = backgroundWorker;
         }
 
         private void BtnSelectFolder_Click(object sender, EventArgs e)
@@ -67,18 +55,18 @@ namespace ExcelAPP
                 if (PF.dirFolders.Length == 0)
                 {
                     MessageBox.Show("В корневой директории отсутствуют папки, книга будет сгенерирована без ОС");
-                    PF.SelectFolderFunc();
+                    PF.SelectFolder();
                 }
                 else if (PF.dirFolders.Length == 1)
                 {
                     if (PF.dirFolders[0] == $"{PF.path}\\ОС" || PF.dirFolders[0] == $"{PF.path}\\OC")
                     {
-                        PF.SelectFolderFunc();
+                        PF.SelectFolder();
                     }
                     else if (PF.dirFolders[0] == $"{PF.path}\\Книга смет")
                     {
                         MessageBox.Show("Книга будет сгенерирована без ОС");
-                        PF.SelectFolderFunc();
+                        PF.SelectFolder();
                     }
                     else
                     {
@@ -96,7 +84,7 @@ namespace ExcelAPP
                             return;
                         }
                     }
-                    PF.SelectFolderFunc();
+                    PF.SelectFolder();
                 }
                 else if (PF.dirFolders.Length == 3) //Переделать для TEMP PDF
                 {
