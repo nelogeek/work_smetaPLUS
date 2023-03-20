@@ -136,6 +136,8 @@ namespace ExcelApp.Functions
                     numberPagesInBooks += eWorkbook.Sheets[1].PageSetup.Pages.Count;
                     eWorkbook.Close();
                 }
+                eWorkbook = null;
+                app.Quit();
                 return numberPagesInBooks;
             }
             catch (Exception ex)
@@ -143,8 +145,8 @@ namespace ExcelApp.Functions
                 MessageBox.Show("Ошибка подсчета страниц");
                 Console.WriteLine(ex.Message.ToString());
                 mf.backgroundWorker.CancelAsync();
-                app.Quit();
                 eWorkbook = null;
+                app.Quit();
                 DeleteTempFiles();
                 DeleteTempVar();
                 GC.Collect();
