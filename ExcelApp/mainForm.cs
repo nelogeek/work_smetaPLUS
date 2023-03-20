@@ -9,15 +9,17 @@ namespace ExcelAPP
 {
     public partial class MainForm : Form
     {
-        private readonly ProgramFunctions PF = new ProgramFunctions();
-        
         public static MainForm instance; //Singleton
+
+        private readonly ProgramFunctions pf;
 
         public MainForm()
         {
             if(instance == null)
                 instance = this;
             InitializeComponent();
+
+            pf = new ProgramFunctions();
 
             backgroundWorker.WorkerReportsProgress = true;
             backgroundWorker.WorkerSupportsCancellation = true;
@@ -29,16 +31,16 @@ namespace ExcelAPP
 
             if (selectedPatch.ShowDialog() == DialogResult.OK)
             {
-                PF.path = selectedPatch.SelectedPath; //Указание пути к корневой папке
-                PF.rootFolder = new DirectoryInfo(PF.path);
-                PF.localFiles = PF.rootFolder.GetFiles(".", SearchOption.TopDirectoryOnly); //Сбор локальных файлов
+                pf.path = selectedPatch.SelectedPath; //Указание пути к корневой папке
+                pf.rootFolder = new DirectoryInfo(pf.path);
+                pf.localFiles = pf.rootFolder.GetFiles(".", SearchOption.TopDirectoryOnly); //Сбор локальных файлов
 
-                PF.pdfFolder = new DirectoryInfo($"{PF.path}\\TEMPdf"); //Указание пути к папке с временными файлами
-                PF.finalSmetaFolder = new DirectoryInfo($"{PF.path}\\Книга смет"); //Указание пути к итоговой папке
+                pf.pdfFolder = new DirectoryInfo($"{pf.path}\\TEMPdf"); //Указание пути к папке с временными файлами
+                pf.finalSmetaFolder = new DirectoryInfo($"{pf.path}\\Книга смет"); //Указание пути к итоговой папке
 
-                PF.DeleteTempFiles();
+                pf.DeleteTempFiles();
 
-                foreach (var file in PF.localFiles) //Проверка расширения файлов
+                foreach (var file in pf.localFiles) //Проверка расширения файлов
                 {
                     Regex regex = new Regex(@".*", RegexOptions.RightToLeft);
                     MatchCollection match = regex.Matches(file.Name);
@@ -51,22 +53,22 @@ namespace ExcelAPP
                     }
                 }
 
-                PF.dirFolders = Directory.GetDirectories(PF.path); //Сбор информации и обработка папок
-                if (PF.dirFolders.Length == 0)
+                pf.dirFolders = Directory.GetDirectories(pf.path); //Сбор информации и обработка папок
+                if (pf.dirFolders.Length == 0)
                 {
                     MessageBox.Show("В корневой директории отсутствуют папки, книга будет сгенерирована без ОС");
-                    PF.SelectFolder();
+                    pf.SelectFolder();
                 }
-                else if (PF.dirFolders.Length == 1)
+                else if (pf.dirFolders.Length == 1)
                 {
-                    if (PF.dirFolders[0] == $"{PF.path}\\ОС" || PF.dirFolders[0] == $"{PF.path}\\OC")
+                    if (pf.dirFolders[0] == $"{pf.path}\\ОС" || pf.dirFolders[0] == $"{pf.path}\\OC")
                     {
-                        PF.SelectFolder();
+                        pf.SelectFolder();
                     }
-                    else if (PF.dirFolders[0] == $"{PF.path}\\Книга смет")
+                    else if (pf.dirFolders[0] == $"{pf.path}\\Книга смет")
                     {
                         MessageBox.Show("Книга будет сгенерирована без ОС");
-                        PF.SelectFolder();
+                        pf.SelectFolder();
                     }
                     else
                     {
@@ -74,19 +76,19 @@ namespace ExcelAPP
                         return;
                     }
                 }
-                else if (PF.dirFolders.Length == 2)
+                else if (pf.dirFolders.Length == 2)
                 {
                     for(int i = 0; i < 2; i++)
                     {
-                        if (!(PF.dirFolders[i] == $"{PF.path}\\ОС" || PF.dirFolders[i] == $"{PF.path}\\OC" || PF.dirFolders[i] == $"{PF.path}\\Книга смет"))
+                        if (!(pf.dirFolders[i] == $"{pf.path}\\ОС" || pf.dirFolders[i] == $"{pf.path}\\OC" || pf.dirFolders[i] == $"{pf.path}\\Книга смет"))
                         {
                             MessageBox.Show("В корневом разделе неправильная папка");
                             return;
                         }
                     }
-                    PF.SelectFolder();
+                    pf.SelectFolder();
                 }
-                else if (PF.dirFolders.Length == 3) //Переделать для TEMP PDF
+                else if (pf.dirFolders.Length == 3) //Переделать для TEMP PDF
                 {
                     MessageBox.Show("В корневом разделе находятся лишние папки");
                     return;
@@ -101,7 +103,7 @@ namespace ExcelAPP
 
         private void BtnBuild_Click(object sender, EventArgs e)
         {
-            if (PF.fullBookPageCount > 400 && !partsBookCheckBox.Checked) //Проверка на слишком большое количество страниц
+            if (pf.fullBookPageCount > 400 && !partsBookCheckBox.Checked) //Проверка на слишком большое количество страниц
             {
                 DialogResult dialogResult = MessageBox.Show("Вы точно хотите собрать одну книгу объемом более 400 страниц", "Подтверждение создания книги", MessageBoxButtons.YesNo);
                 if (dialogResult == DialogResult.No)
@@ -111,7 +113,7 @@ namespace ExcelAPP
             }
             if (backgroundWorker.IsBusy != true)
             {
-                PF.DisableButtons();
+                pf.DisableButtons();
                 backgroundWorker.RunWorkerAsync();
                 buildProgressBar.Visible = true;
             }
@@ -120,50 +122,50 @@ namespace ExcelAPP
 
         protected void RunBackgroundWorker_DoWork() //Запуск сборки
         {
-            PF.stopWatch.Start();
+            pf.stopWatch.Start();
 
             backgroundWorker.ReportProgress(1, "Парсинг");
             backgroundWorker.ProgressChanged += BackgroundWorker_ProgressChanged;
-            if (!PF.ExcelParser()) return;
+            if (!pf.ExcelParser()) return;
 
             backgroundWorker.ReportProgress(10, "Конвертация");
             backgroundWorker.ProgressChanged += BackgroundWorker_ProgressChanged;
-            if (!PF.ExcelConverter()) return;
+            if (!pf.ExcelConverter()) return;
 
             backgroundWorker.ReportProgress(40, "Создание финальный папки");
             backgroundWorker.ProgressChanged += BackgroundWorker_ProgressChanged;
-            if (!PF.CreateFinalSmetaFolder()) return;
+            if (!pf.CreateFinalSmetaFolder()) return;
 
             backgroundWorker.ReportProgress(45, "Генерация содержания");
             backgroundWorker.ProgressChanged += BackgroundWorker_ProgressChanged;
-            if (!PF.TitleGeneration()) return;
+            if (!pf.TitleGeneration()) return;
 
             backgroundWorker.ReportProgress(65, "Сборка книги");
             backgroundWorker.ProgressChanged += BackgroundWorker_ProgressChanged;
-            if (!PF.PdfMerge()) return;
+            if (!pf.PdfMerge()) return;
 
             backgroundWorker.ReportProgress(80, "Нумерация частей содержания");
             backgroundWorker.ProgressChanged += BackgroundWorker_ProgressChanged;
-            if (!PF.TitleNumOfPart()) return;
+            if (!pf.TitleNumOfPart()) return;
 
             backgroundWorker.ReportProgress(85, "Перемещение файлов");
             backgroundWorker.ProgressChanged += BackgroundWorker_ProgressChanged;
-            if (!PF.MoveFiles()) return;
+            if (!pf.MoveFiles()) return;
 
             backgroundWorker.ReportProgress(90, "Удаление временных файлов");
             backgroundWorker.ProgressChanged += BackgroundWorker_ProgressChanged;
-            PF.DeleteTempFiles();
+            pf.DeleteTempFiles();
 
             backgroundWorker.ReportProgress(95, "Удаление временных переменных");
             backgroundWorker.ProgressChanged += BackgroundWorker_ProgressChanged;
-            PF.DeleteTempVar();
+            pf.DeleteTempVar();
 
             backgroundWorker.ReportProgress(100, "Сборка завершена");
             backgroundWorker.ProgressChanged += BackgroundWorker_ProgressChanged;
 
-            PF.stopWatch.Stop();
-            TimeSpan ts = PF.stopWatch.Elapsed;
-            PF.stopWatch.Reset();
+            pf.stopWatch.Stop();
+            TimeSpan ts = pf.stopWatch.Elapsed;
+            pf.stopWatch.Reset();
             string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}", ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
             backgroundWorker.ReportProgress(100, $"Время сборки: {elapsedTime}");
         }
@@ -173,16 +175,16 @@ namespace ExcelAPP
             if (e.Cancelled == true)
             {
                 labelProgressStage.Text = "Отмена!";
-                PF.EnableButtons();
+                pf.EnableButtons();
             }
             else if (e.Error != null)
             {
                 labelProgressStage.Text = "Ошибка: " + e.Error.Message;
-                PF.EnableButtons();
+                pf.EnableButtons();
             }
             else
             {
-                PF.EnableButtons();
+                pf.EnableButtons();
                 infoTextBox.Clear();
             }
         }
@@ -195,14 +197,14 @@ namespace ExcelAPP
 
         public void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            if (PF.path != null)
+            if (pf.path != null)
             {
-                if (Directory.Exists($"{PF.finalSmetaFolder.FullName}"))
+                if (Directory.Exists($"{pf.finalSmetaFolder.FullName}"))
                 {
                     DialogResult dialogResult = MessageBox.Show("Вы хотите заменить папку 'Книга смет'?", "Подтверждение замены папки", MessageBoxButtons.YesNo);
                     if (dialogResult == DialogResult.Yes)
                     {
-                        Directory.Delete(PF.finalSmetaFolder.FullName, true);
+                        Directory.Delete(pf.finalSmetaFolder.FullName, true);
                         RunBackgroundWorker_DoWork();
                     }
                     else
@@ -232,7 +234,7 @@ namespace ExcelAPP
                 DialogResult dialogResult = MessageBox.Show("Вы точно хотите закрыть программу?", "Подтверждение закрытия программы", MessageBoxButtons.YesNo);
                 if (dialogResult == DialogResult.Yes)
                 {
-                    PF.DeleteTempVar();
+                    pf.DeleteTempVar();
                     e.Cancel = false;
                 }
                 else
