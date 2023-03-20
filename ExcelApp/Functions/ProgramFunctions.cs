@@ -136,6 +136,8 @@ namespace ExcelApp.Functions
                     numberPagesInBooks += eWorkbook.Sheets[1].PageSetup.Pages.Count;
                     eWorkbook.Close();
                 }
+                eWorkbook = null;
+                app.Quit();
                 return numberPagesInBooks;
             }
             catch (Exception ex)
@@ -143,8 +145,8 @@ namespace ExcelApp.Functions
                 MessageBox.Show("Ошибка подсчета страниц");
                 Console.WriteLine(ex.Message.ToString());
                 mf.backgroundWorker.CancelAsync();
-                app.Quit();
                 eWorkbook = null;
+                app.Quit();
                 DeleteTempFiles();
                 DeleteTempVar();
                 GC.Collect();
@@ -1293,7 +1295,6 @@ namespace ExcelApp.Functions
                             {
                                 inputPdfDocument.Close();
                                 tempFirstPageNubmer = 1;
-                                //tempFilesList[i].Part = bookNumber; // тест
                                 break;
                             }
                         }
@@ -1301,7 +1302,7 @@ namespace ExcelApp.Functions
                         outputSmetaPdfDocument.Save($@"{finalSmetaFolder.FullName}\Сметы{bookNumber}.pdf");
                         outputSmetaPdfDocument.Close();
 
-                        AddPageNumberSmetaITextSharp($@"{finalSmetaFolder.FullName}\Сметы{bookNumber}.pdf");
+                        AddPageNumberSmetaITextSharp($@"{finalSmetaFolder.FullName}\Сметы{bookNumber}.pdf", bookNumber);
                         bookNumber++;
                         changeBookCheck = true;
                     }
@@ -1379,7 +1380,7 @@ namespace ExcelApp.Functions
                     if (mf.SplitBookContentCheckBox.Checked) //Нумерация страниц
                     {
                         AddPageNumberTitleITextSharp(fileNameTitlePdf);
-                        AddPageNumberSmetaITextSharp(fileNameSmetaPdf);
+                        AddPageNumberSmetaITextSharp(fileNameSmetaPdf, 1);
                     }
                     else
                     {
@@ -1453,8 +1454,9 @@ namespace ExcelApp.Functions
             }
         }
 
-        public void AddPageNumberSmetaITextSharp(string filePath) // Нумерация страниц книги смет
+        public void AddPageNumberSmetaITextSharp(string filePath, int bookNumber) // Нумерация страниц книги смет
         {
+            
             try
             {
                 byte[] bytes = File.ReadAllBytes(filePath);
@@ -1480,6 +1482,10 @@ namespace ExcelApp.Functions
                             if (pagesPzCount % 2 == 1)
                             {
                                 pagesPzCount++;
+                            }
+                            if (bookNumber != 1)
+                            {
+                                pagesPzCount = 0;
                             }
 
                             for (int i = 1; i <= pagesBook; i++)
