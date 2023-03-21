@@ -57,9 +57,9 @@
             // labelNameFolder
             // 
             this.labelNameFolder.AutoSize = true;
-            this.labelNameFolder.Location = new System.Drawing.Point(17, 41);
+            this.labelNameFolder.Location = new System.Drawing.Point(17, 38);
             this.labelNameFolder.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
-            this.labelNameFolder.MaximumSize = new System.Drawing.Size(821, 20);
+            this.labelNameFolder.MaximumSize = new System.Drawing.Size(885, 20);
             this.labelNameFolder.MinimumSize = new System.Drawing.Size(21, 20);
             this.labelNameFolder.Name = "labelNameFolder";
             this.labelNameFolder.Size = new System.Drawing.Size(21, 20);
@@ -67,7 +67,7 @@
             // 
             // btnSelectFolder
             // 
-            this.btnSelectFolder.Location = new System.Drawing.Point(564, 351);
+            this.btnSelectFolder.Location = new System.Drawing.Point(562, 362);
             this.btnSelectFolder.Margin = new System.Windows.Forms.Padding(4);
             this.btnSelectFolder.Name = "btnSelectFolder";
             this.btnSelectFolder.Size = new System.Drawing.Size(180, 28);
@@ -89,7 +89,7 @@
             // 
             // btnBuild
             // 
-            this.btnBuild.Location = new System.Drawing.Point(768, 351);
+            this.btnBuild.Location = new System.Drawing.Point(766, 362);
             this.btnBuild.Margin = new System.Windows.Forms.Padding(4);
             this.btnBuild.Name = "btnBuild";
             this.btnBuild.Size = new System.Drawing.Size(129, 28);
@@ -200,13 +200,13 @@
             // infoTextBox
             // 
             this.infoTextBox.BackColor = System.Drawing.SystemColors.Menu;
-            this.infoTextBox.Location = new System.Drawing.Point(335, 38);
+            this.infoTextBox.Location = new System.Drawing.Point(335, 66);
             this.infoTextBox.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.infoTextBox.Multiline = true;
             this.infoTextBox.Name = "infoTextBox";
             this.infoTextBox.ReadOnly = true;
             this.infoTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.infoTextBox.Size = new System.Drawing.Size(562, 297);
+            this.infoTextBox.Size = new System.Drawing.Size(562, 285);
             this.infoTextBox.TabIndex = 21;
             // 
             // label2
@@ -238,7 +238,7 @@
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Padding = new System.Windows.Forms.Padding(5, 2, 0, 2);
-            this.menuStrip1.Size = new System.Drawing.Size(909, 28);
+            this.menuStrip1.Size = new System.Drawing.Size(909, 30);
             this.menuStrip1.TabIndex = 28;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -248,7 +248,7 @@
             this.AutoPageBreakerToolStripMenuItem,
             this.AutoBooksPartPassCheckBox});
             this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
-            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(98, 24);
+            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(98, 26);
             this.settingsToolStripMenuItem.Text = "Настройки";
             // 
             // AutoPageBreakerToolStripMenuItem

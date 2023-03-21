@@ -48,7 +48,7 @@ namespace ExcelApp.Functions
         public int pagesInTitle = 0;
         public IEnumerable<Pair> setDict;
         public List<SmetaFile> allDataFilesList;
-        
+
         public void SelectFolder() //Функция обработки выбора папки
         {
             try
@@ -286,7 +286,7 @@ namespace ExcelApp.Functions
                     nameDate = null;
                     date = null;
                     eWorkbook.Save();
-                    eWorkbook.Close(true);
+                    eWorkbook.Close(false);
                 }
 
                 localData = localData.OrderBy(x => x.Code).ThenBy(x => x.NameDate).ToList(); // Сортировка по коду и названию
@@ -342,7 +342,7 @@ namespace ExcelApp.Functions
                     a[a.Count].Delete();
                     a.Add(eWorksheet.Range[$"A{lastUsedRow - 13}"]);
                 }
-                eWorksheet = null;
+                //eWorksheet = null;
             }
             catch (Exception ex)
             {
@@ -998,7 +998,6 @@ namespace ExcelApp.Functions
                         // колонтитул страницы
                         wDocument.Tables.Add(headerRange, 1, 6, ref defaultTableBehavior, ref autoFitBehavior);
                         Word.Table headerTable = headerRange.Tables[1];
-
                         headerTable.Borders.Enable = 0;
                         Word.Range rangePageNum = headerTable.Range.Cells[headerTable.Range.Cells.Count].Range;
                         rangePageNum.Collapse(Word.WdCollapseDirection.wdCollapseStart);
@@ -1304,7 +1303,7 @@ namespace ExcelApp.Functions
                         outputSmetaPdfDocument.Save($@"{finalSmetaFolder.FullName}\Сметы{bookNumber}.pdf");
                         outputSmetaPdfDocument.Close();
 
-                        AddPageNumberSmetaITextSharp($@"{finalSmetaFolder.FullName}\Сметы{bookNumber}.pdf" , bookNumber);
+                        AddPageNumberSmetaITextSharp($@"{finalSmetaFolder.FullName}\Сметы{bookNumber}.pdf", bookNumber);
                         bookNumber++;
                         changeBookCheck = true;
                     }
@@ -1484,7 +1483,7 @@ namespace ExcelApp.Functions
                             {
                                 pagesPzCount++;
                             }
-                            if(bookNumber != 1)
+                            if (bookNumber != 1)
                             {
                                 pagesPzCount = 0;
                             }
@@ -1613,6 +1612,8 @@ namespace ExcelApp.Functions
         {
             Word.Application wordApp = new Word.Application
             {
+                //Visible = true,
+                //ScreenUpdating = true
                 Visible = false,
                 ScreenUpdating = false
             };
@@ -1620,8 +1621,13 @@ namespace ExcelApp.Functions
 
             try
             {
+
+
+
                 var table = wDocument.Tables[1];
+
                 table.Cell(2, 6).Range.Text = "1";
+
                 int titlePages = pagesInTitle;
                 int startPageNumber = Convert.ToInt32(mf.StartNumberNumeric.Value) - 1;
                 int pagesPzCount = Convert.ToInt32(mf.CountPagePZNumeric.Value);
@@ -1635,6 +1641,7 @@ namespace ExcelApp.Functions
                     pagesPzCount++;
                 }
                 int page = startPageNumber + pagesPzCount + titlePages;
+
                 int i = 0;
                 int j = 0;
                 int part = 0;
@@ -1648,23 +1655,33 @@ namespace ExcelApp.Functions
                             if (i != allDataFilesList.Count)
                             {
                                 table.Cell(row, 6).Range.Text = allDataFilesList[i].Part.ToString();
+                                //---------
+
                                 if (part != allDataFilesList[i].Part)
                                 {
                                     part = allDataFilesList[i].Part;
                                     j = 0;
                                 }
+
                                 table.Cell(row, 5).Range.Text = (page + firstPageNumbersList[part - 1][j]).ToString();
                                 i++;
                                 j++;
+
+
+
+                                //---------
+
                             }
                         }
                     }
                 }
 
+
                 wDocument.Save();
                 if (Directory.Exists($"{pdfFolder}\\Содержание.pdf"))
                     Directory.Delete($"{pdfFolder}\\Содержание.pdf");
                 wDocument.ExportAsFixedFormat($"{pdfFolder}\\Содержание.pdf", Word.WdExportFormat.wdExportFormatPDF);
+
 
                 return true;
             }
@@ -1683,9 +1700,10 @@ namespace ExcelApp.Functions
                 wordApp.Quit();
                 GC.Collect();
             }
+
+
             return false;
         }
-
         public bool MoveFiles() //Перемещение файлов в финальную папку
         {
             try
