@@ -455,7 +455,7 @@ namespace ExcelAPP
                     int bookNumber = 1;
                     int i = 0;
                     bool changeBookCheck = true;
-                    
+
 
                     int tempFirstPageNubmer = 1;
 
@@ -496,7 +496,8 @@ namespace ExcelAPP
                                     tempFirstPageNubmer = 1;
                                     changeBookCheck = false;
                                     firstPageNumbersList.Add(new List<int>());
-                                } else
+                                }
+                                else
                                 {
                                     tempFirstPageNubmer += tempFilesList[i - 1].PageCount;
                                 }
@@ -689,7 +690,7 @@ namespace ExcelAPP
                             {
                                 titlePages++;
                             }
-                            if (pagesPzCount % 2 == 1)
+                            if (pagesPzCount % 2 == 1) // TODO 1
                             {
                                 pagesPzCount++;
                             }
@@ -825,53 +826,34 @@ namespace ExcelAPP
                 Visible = false,
                 ScreenUpdating = false
             };
+            var wDocument = wordApp.Documents.Open($@"{pdfFolder}\Содержание.docx");
 
             try
             {
 
-                var wDocument = wordApp.Documents.Open($@"{pdfFolder}\Содержание.docx");
-                //var wDocument = wordApp.Documents.Open($@"C:\Users\lokot\Desktop\test2.docx");
+                
+
                 var table = wDocument.Tables[1];
 
-
-
-                int startPageNumber = Convert.ToInt32(StartNumberNumeric.Value) - 1; //TODO -1
-                int pagesPzCount = Convert.ToInt32(CountPagePZNumeric.Value);
-                int titlePages = pagesInTitle;
-
-                //-------------
-                //pagesInTitle = wDocument.ComputeStatistics(WdStatistic.wdStatisticPages, false); // кол-во страниц в содержании
-                int page = (int)StartNumberNumeric.Value + pagesInTitle; // номер страницы
-
-                //TODO добавление страниц после содержания 
-
-                // нумерация ПЗ
-                if ((page % 2) == 0)
-                {
-                    page += 1;
-                }
-                else
-                {
-                    page += 2;
-                }
-                //table.Cell(2, 5).Range.Text = page.ToString();
                 table.Cell(2, 6).Range.Text = "1";
-                page += (int)CountPagePZNumeric.Value - 1; //TODO -1
 
-                // нумерация сметы
-                if ((page % 2) == 0)
-                {
-                    page += 1;
-                }
-                else
-                {
-                    page += 2;
-                }
-                int tempPage = page;
+                int titlePages = pagesInTitle;
+                int startPageNumber = Convert.ToInt32(StartNumberNumeric.Value) - 1;
+                int pagesPzCount = Convert.ToInt32(CountPagePZNumeric.Value);
 
-                // 1 вариант
+                if ((startPageNumber + titlePages) % 2 == 1)
+                {
+                    titlePages++;
+                }
+                if (pagesPzCount % 2 == 1)
+                {
+                    pagesPzCount++;
+                }
+                int page = startPageNumber + pagesPzCount + titlePages;
+
                 int i = 0;
-                int temp = 0;
+                int j = 0;
+                int part = 0;
                 if (partsBookCheckBox.Checked)
                 {
                     int rowInTable = table.Rows.Count;
@@ -883,16 +865,21 @@ namespace ExcelAPP
                             {
                                 table.Cell(row, 6).Range.Text = tempFilesList[i].Part.ToString();
                                 //---------
-                                if (temp != tempFilesList[i].Part)
+                                
+                                if (part != tempFilesList[i].Part)
                                 {
-                                    page = tempPage;
-                                    temp = tempFilesList[i].Part;
+                                    part = tempFilesList[i].Part;
+                                    j = 0;
                                 }
-
-                                table.Cell(row, 5).Range.Text = page.ToString();
-                                page += tempFilesList[i].PageCount;
-                                //---------
+                                
+                                table.Cell(row, 5).Range.Text = (page + firstPageNumbersList[part-1][j]).ToString(); 
                                 i++;
+                                j++;
+
+
+                                
+                                //---------
+
                             }
                         }
                     }
@@ -903,13 +890,18 @@ namespace ExcelAPP
                 if (Directory.Exists($"{pdfFolder}\\Содержание.pdf"))
                     Directory.Delete($"{pdfFolder}\\Содержание.pdf");
                 wDocument.ExportAsFixedFormat($"{pdfFolder}\\Содержание.pdf", Word.WdExportFormat.wdExportFormatPDF);
-                wDocument.Close(true);
+                
 
                 return true;
             }
-            catch (Exception) { }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message.ToString());
+                MessageBox.Show(ex.ToString());
+            }
             finally
             {
+                wDocument.Close(false);
                 wordApp.Quit();
                 GC.Collect();
             }
