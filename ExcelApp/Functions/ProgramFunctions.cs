@@ -200,6 +200,7 @@ namespace ExcelApp.Functions
                         eWorkbook = app.Workbooks.Open($@"{filePath}");
                         eWorksheet = (Worksheet)eWorkbook.Sheets[1];
                         eWorksheet.PageSetup.Orientation = XlPageOrientation.xlLandscape;
+                        eWorksheet.PageSetup.PaperSize = XlPaperSize.xlPaperA4;
                         Regex regex = new Regex(@"(\w*)-(\w*)-(\w*)");
                         string code = regex.Matches(eWorksheet.Range["E8"].Value.ToString())[0].ToString();
                         string ShortCode = code.Replace("p", "").Replace("р", "").Replace("OC-", "").Replace("ОС-", "");
@@ -243,6 +244,7 @@ namespace ExcelApp.Functions
                     eWorkbook = app.Workbooks.Open($@"{filePath}");
                     eWorksheet = (Worksheet)eWorkbook.Sheets[1];
                     eWorksheet.PageSetup.Orientation = XlPageOrientation.xlLandscape;
+                    eWorksheet.PageSetup.PaperSize = XlPaperSize.xlPaperA4;
 
                     Regex regex = new Regex(@"(\w*)-(\w*)-(\w*)");
                     MatchCollection match = regex.Matches(eWorksheet.Range["A18"].Value.ToString());
