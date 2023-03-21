@@ -48,7 +48,7 @@ namespace ExcelApp.Functions
         public int pagesInTitle = 0;
         public IEnumerable<Pair> setDict;
         public List<SmetaFile> allDataFilesList;
-        
+
         public void SelectFolder() //Функция обработки выбора папки
         {
             try
@@ -80,11 +80,21 @@ namespace ExcelApp.Functions
 
                 mf.infoTextBox.Clear();
 
-                fullBookPageCount = FullBookPageCounter();
+                //fullBookPageCount = FullBookPageCounter();
+                fullBookPageCount = 1;
                 mf.infoTextBox.Text = $"Общее количество страниц: {fullBookPageCount}";
-                mf.infoTextBox.AppendText(
-                    Environment.NewLine + $"Количество всех файлов: {localFiles.Length + objectiveFiles.Length}\n" +
-                    Environment.NewLine + $"Количество папок: {dirFolders.Length}" + Environment.NewLine);
+                if (objectiveFiles == null)
+                {
+                    mf.infoTextBox.AppendText(
+                        Environment.NewLine + $"Количество всех файлов: {localFiles.Length}\n" +
+                        Environment.NewLine + $"Количество папок: {dirFolders.Length}" + Environment.NewLine);
+                }
+                else
+                {
+                    mf.infoTextBox.AppendText(
+                        Environment.NewLine + $"Количество всех файлов: {localFiles.Length + objectiveFiles.Length}\n" +
+                        Environment.NewLine + $"Количество папок: {dirFolders.Length}" + Environment.NewLine);
+                }
 
                 if (childFolder != null)
                 {
@@ -201,6 +211,7 @@ namespace ExcelApp.Functions
                         eWorksheet = (Worksheet)eWorkbook.Sheets[1];
                         eWorksheet.PageSetup.Orientation = XlPageOrientation.xlLandscape;
                         eWorksheet.PageSetup.PaperSize = XlPaperSize.xlPaperA4;
+
                         Regex regex = new Regex(@"(\w*)-(\w*)-(\w*)");
                         string code = regex.Matches(eWorksheet.Range["E8"].Value.ToString())[0].ToString();
                         string ShortCode = code.Replace("p", "").Replace("р", "").Replace("OC-", "").Replace("ОС-", "");
@@ -328,21 +339,20 @@ namespace ExcelApp.Functions
                        System.Reflection.Missing.Value, System.Reflection.Missing.Value,
                        XlSearchOrder.xlByRows, XlSearchDirection.xlPrevious,
                        false, System.Reflection.Missing.Value, System.Reflection.Missing.Value).Row;
-                var a = eWorksheet.HPageBreaks;
+                var hPageBreaks = eWorksheet.HPageBreaks;
                 eWorksheet.ResetAllPageBreaks();
 
-                for (int p = 1; p <= a.Count; p++)
+                for (int p = 1; p <= hPageBreaks.Count; p++)
                 {
-                    int i = a[p].Location.Row;
-                    a.Add(eWorksheet.Range[$"A{i}"]);
+                    int i = hPageBreaks[p].Location.Row;
+                    hPageBreaks.Add(eWorksheet.Range[$"A{i}"]);
                 }
-                int lastPageBreak = a[a.Count].Location.Row;
+                int lastPageBreak = hPageBreaks[hPageBreaks.Count].Location.Row;
                 if (lastUsedRow - lastPageBreak < 13)
                 {
-                    a[a.Count].Delete();
-                    a.Add(eWorksheet.Range[$"A{lastUsedRow - 13}"]);
+                    hPageBreaks[hPageBreaks.Count].Delete();
+                    hPageBreaks.Add(eWorksheet.Range[$"A{lastUsedRow - 13}"]);
                 }
-                eWorksheet = null;
             }
             catch (Exception ex)
             {
@@ -1304,7 +1314,7 @@ namespace ExcelApp.Functions
                         outputSmetaPdfDocument.Save($@"{finalSmetaFolder.FullName}\Сметы{bookNumber}.pdf");
                         outputSmetaPdfDocument.Close();
 
-                        AddPageNumberSmetaITextSharp($@"{finalSmetaFolder.FullName}\Сметы{bookNumber}.pdf" , bookNumber);
+                        AddPageNumberSmetaITextSharp($@"{finalSmetaFolder.FullName}\Сметы{bookNumber}.pdf", bookNumber);
                         bookNumber++;
                         changeBookCheck = true;
                     }
@@ -1484,7 +1494,7 @@ namespace ExcelApp.Functions
                             {
                                 pagesPzCount++;
                             }
-                            if(bookNumber != 1)
+                            if (bookNumber != 1)
                             {
                                 pagesPzCount = 0;
                             }
@@ -1700,7 +1710,7 @@ namespace ExcelApp.Functions
 
                 return true;
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 MessageBox.Show(ex.Message.ToString());
                 MessageBox.Show("Ошибка нумерации частей содержания");
