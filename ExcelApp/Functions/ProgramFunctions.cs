@@ -80,8 +80,7 @@ namespace ExcelApp.Functions
 
                 mf.infoTextBox.Clear();
 
-                //fullBookPageCount = FullBookPageCounter();
-                fullBookPageCount = 1;
+                fullBookPageCount = FullBookPageCounter();
                 mf.infoTextBox.Text = $"Общее количество страниц: {fullBookPageCount}";
                 if (objectiveFiles == null)
                 {
@@ -196,22 +195,26 @@ namespace ExcelApp.Functions
 
         public bool ExcelParser() // Парсинг Excel файла
         {
-            Excel.Application app = new Excel.Application { DisplayAlerts = false, Visible = false, ScreenUpdating = false };
+            Excel.Application app = new Excel.Application
+            {
+                DisplayAlerts = false,
+                Visible = false,
+                ScreenUpdating = false
+            };
 
-            Workbook eWorkbook;
-            Worksheet eWorksheet;
+            Excel.Workbook eWorkbook;
+            Excel.Worksheet eWorksheet;
+
             try
             {
-                if (childFolder != null) //Проверка наличия папки ОС
+                if (childFolder != null)
                 {
                     for (int i = 0; i < objectiveFiles.Length; i++) //Шаблон для объектных смет
                     {
                         string filePath = $"{childFolder}\\{objectiveFiles[i]}";
                         eWorkbook = app.Workbooks.Open($@"{filePath}");
-                        eWorksheet = (Worksheet)eWorkbook.Sheets[1];
+                        eWorksheet = (Excel.Worksheet)eWorkbook.Sheets[1];
                         eWorksheet.PageSetup.Orientation = XlPageOrientation.xlLandscape;
-                        eWorksheet.PageSetup.PaperSize = XlPaperSize.xlPaperA4;
-
                         Regex regex = new Regex(@"(\w*)-(\w*)-(\w*)");
                         string code = regex.Matches(eWorksheet.Range["E8"].Value.ToString())[0].ToString();
                         string ShortCode = code.Replace("p", "").Replace("р", "").Replace("OC-", "").Replace("ОС-", "");
@@ -241,32 +244,34 @@ namespace ExcelApp.Functions
                             PageBreaker(eWorksheet);
                         }
 
+
                         money = null;
                         pages = 0;
                         nameDate = null;
                         date = null;
                         eWorkbook.Save();
-                        eWorkbook.Close(true);
+                        eWorkbook.Close(false);
                     }
                 }
                 for (int j = 0; j < localFiles.Length; j++) //Шаблон для локальных смет
                 {
                     string filePath = $"{rootFolder}\\{localFiles[j]}";
                     eWorkbook = app.Workbooks.Open($@"{filePath}");
-                    eWorksheet = (Worksheet)eWorkbook.Sheets[1];
+                    eWorksheet = (Excel.Worksheet)eWorkbook.Sheets[1];
                     eWorksheet.PageSetup.Orientation = XlPageOrientation.xlLandscape;
-                    eWorksheet.PageSetup.PaperSize = XlPaperSize.xlPaperA4;
 
                     Regex regex = new Regex(@"(\w*)-(\w*)-(\w*)");
                     MatchCollection match = regex.Matches(eWorksheet.Range["A18"].Value.ToString());
 
                     regex = new Regex(@"(\w*)-(\w*)");
                     string shortCode = regex.Matches(match[0].Value.ToString())[0].ToString();
+
                     string money = eWorksheet.Range["C28"].Value.ToString().Replace("(", "").Replace(")", "");
                     if (money == "0")
                     {
                         money = eWorksheet.Range["D28"].Value.ToString().Replace("(", "").Replace(")", "");
                     }
+
                     string nameDate = eWorksheet.Range["A20"].Value.ToString();
                     string date = eWorksheet.Range["D26"].Value.ToString();
                     nameDate += $"\n(в ценах на {date})";
@@ -276,7 +281,8 @@ namespace ExcelApp.Functions
                         eWorksheet.Range["A18"].Replace("ЛОКАЛЬНЫЙ СМЕТНЫЙ РАСЧЕТ (СМЕТА)", "ЛОКАЛЬНАЯ СМЕТА");
                     }
 
-                    int pages = eWorksheet.PageSetup.Pages.Count; // кол-во страниц на листе
+
+                    int pages = eWorksheet.PageSetup.Pages.Count; /// кол-во страниц на листе
 
                     if (mf.AutoPageBreakerToolStripMenuItem.Checked)
                     {
@@ -297,15 +303,15 @@ namespace ExcelApp.Functions
                     nameDate = null;
                     date = null;
                     eWorkbook.Save();
-                    eWorkbook.Close(true);
+                    eWorkbook.Close(false);
                 }
 
-                localData = localData.OrderBy(x => x.Code).ThenBy(x => x.NameDate).ToList(); // Сортировка по коду и названию
-                objectiveData = objectiveData.OrderBy(x => x.Code).ThenBy(x => x.NameDate).ToList(); // Сортировка по коду и названию
+                localData = localData.OrderBy(x => x.Code).ThenBy(x => x.Name).ToList(); // Сортировка по коду и названию
+                objectiveData = objectiveData.OrderBy(x => x.Code).ThenBy(x => x.Name).ToList(); // Сортировка по коду и названию
 
+                app.Quit();
                 eWorkbook = null;
                 eWorksheet = null;
-                app.Quit();
                 GC.Collect();
 
                 return true;
@@ -313,14 +319,15 @@ namespace ExcelApp.Functions
             catch (Exception ex)
             {
                 MessageBox.Show("Ошибка при парсинге смет");
+                MessageBox.Show(ex.Message.ToString());
+                Console.WriteLine(ex.StackTrace);
                 Console.WriteLine(ex.Message.ToString());
                 mf.backgroundWorker.CancelAsync();
                 DeleteTempFiles();
                 DeleteTempVar();
-
+                app.Quit();
                 eWorkbook = null;
                 eWorksheet = null;
-                app.Quit();
                 GC.Collect();
 
                 mf.backgroundWorker.ReportProgress(1, "Сборка остановлена");
@@ -329,23 +336,23 @@ namespace ExcelApp.Functions
             }
         }
 
-        public void PageBreaker(Excel.Worksheet eWorksheet) // Регулировка разрывов страниц
+        protected void PageBreaker(Excel.Worksheet eWorksheet) // Регулировка разрывов страниц
         {
             try
             {
-                eWorksheet.Range[$"G7"].Value = "";
+                eWorksheet.Range[$"G7"].Value = ""; //Удаление строки приказов
                 eWorksheet.Rows[7].RowHeight = 11.25;
                 int lastUsedRow = eWorksheet.Cells.Find("*", System.Reflection.Missing.Value,
                        System.Reflection.Missing.Value, System.Reflection.Missing.Value,
-                       XlSearchOrder.xlByRows, XlSearchDirection.xlPrevious,
+                       Excel.XlSearchOrder.xlByRows, Excel.XlSearchDirection.xlPrevious,
                        false, System.Reflection.Missing.Value, System.Reflection.Missing.Value).Row;
                 var hPageBreaks = eWorksheet.HPageBreaks;
                 eWorksheet.ResetAllPageBreaks();
 
                 for (int p = 1; p <= hPageBreaks.Count; p++)
                 {
-                    int i = hPageBreaks[p].Location.Row;
-                    hPageBreaks.Add(eWorksheet.Range[$"A{i}"]);
+                    int rowPageBreak = hPageBreaks[p].Location.Row;
+                    hPageBreaks.Add(eWorksheet.Range[$"A{rowPageBreak}"]);
                 }
                 int lastPageBreak = hPageBreaks[hPageBreaks.Count].Location.Row;
                 if (lastUsedRow - lastPageBreak < 13)
@@ -356,15 +363,8 @@ namespace ExcelApp.Functions
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Ошибка при регулировке разрывов страниц");
                 Console.WriteLine(ex.StackTrace);
                 Console.WriteLine(ex.Message.ToString());
-
-                mf.backgroundWorker.CancelAsync();
-                DeleteTempFiles();
-                DeleteTempVar();
-
-                GC.Collect();
             }
         }
 
