@@ -1619,62 +1619,39 @@ namespace ExcelApp.Functions
             }
         }
 
-        public bool TitleNumOfPart() //Нумерация частей в содержании
+
+        public bool TitleNumOfPart() //Нумерация частей и страниц содержания
         {
             Word.Application wordApp = new Word.Application
             {
-                //Visible = true,
-                //ScreenUpdating = true
                 Visible = false,
                 ScreenUpdating = false
             };
+            var wDocument = wordApp.Documents.Open($@"{pdfFolder}\Содержание.docx");
 
             try
             {
-
-                var wDocument = wordApp.Documents.Open($@"{pdfFolder}\Содержание.docx");
-                //var wDocument = wordApp.Documents.Open($@"C:\Users\lokot\Desktop\test2.docx");
                 var table = wDocument.Tables[1];
 
-
-
-                int startPageNumber = Convert.ToInt32(mf.StartNumberNumeric.Value) - 1; //TODO -1
-                int pagesPzCount = Convert.ToInt32(mf.CountPagePZNumeric.Value);
-                int titlePages = pagesInTitle;
-
-                //-------------
-                //pagesInTitle = wDocument.ComputeStatistics(WdStatistic.wdStatisticPages, false); // кол-во страниц в содержании
-                int page = (int)mf.StartNumberNumeric.Value + pagesInTitle; // номер страницы
-
-                //TODO добавление страниц после содержания 
-
-                // нумерация ПЗ
-                if ((page % 2) == 0)
-                {
-                    page += 1;
-                }
-                else
-                {
-                    page += 2;
-                }
-                //table.Cell(2, 5).Range.Text = page.ToString();
                 table.Cell(2, 6).Range.Text = "1";
-                page += (int)mf.CountPagePZNumeric.Value - 1; //TODO -1
 
-                // нумерация сметы
-                if ((page % 2) == 0)
-                {
-                    page += 1;
-                }
-                else
-                {
-                    page += 2;
-                }
-                int tempPage = page;
+                int titlePages = pagesInTitle;
+                int startPageNumber = Convert.ToInt32(mf.StartNumberNumeric.Value) - 1;
+                int pagesPzCount = Convert.ToInt32(mf.CountPagePZNumeric.Value);
 
-                // 1 вариант
+                if ((startPageNumber + titlePages) % 2 == 1)
+                {
+                    titlePages++;
+                }
+                if (pagesPzCount % 2 == 1)
+                {
+                    pagesPzCount++;
+                }
+                int page = startPageNumber + pagesPzCount + titlePages;
+
                 int i = 0;
-                int temp = 0;
+                int j = 0;
+                int part = 0;
                 if (mf.partsBookCheckBox.Checked)
                 {
                     int rowInTable = table.Rows.Count;
@@ -1686,27 +1663,25 @@ namespace ExcelApp.Functions
                             {
                                 table.Cell(row, 6).Range.Text = allDataFilesList[i].Part.ToString();
                                 //---------
-                                if (temp != allDataFilesList[i].Part)
+
+                                if (part != allDataFilesList[i].Part)
                                 {
-                                    page = tempPage;
-                                    temp = allDataFilesList[i].Part;
+                                    part = allDataFilesList[i].Part;
+                                    j = 0;
                                 }
 
-                                table.Cell(row, 5).Range.Text = page.ToString();
-                                page += allDataFilesList[i].PageCount;
-                                //---------
+                                table.Cell(row, 5).Range.Text = (page + firstPageNumbersList[part - 1][j]).ToString();
                                 i++;
+                                j++;
                             }
                         }
                     }
                 }
 
-
                 wDocument.Save();
                 if (Directory.Exists($"{pdfFolder}\\Содержание.pdf"))
                     Directory.Delete($"{pdfFolder}\\Содержание.pdf");
                 wDocument.ExportAsFixedFormat($"{pdfFolder}\\Содержание.pdf", Word.WdExportFormat.wdExportFormatPDF);
-                wDocument.Close(true);
 
                 return true;
             }
@@ -1721,10 +1696,10 @@ namespace ExcelApp.Functions
             }
             finally
             {
+                wDocument.Close(false);
                 wordApp.Quit();
                 GC.Collect();
             }
-
             return false;
         }
 
