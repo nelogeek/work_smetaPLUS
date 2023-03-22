@@ -779,8 +779,6 @@ namespace ExcelApp.Functions
 
                     if (mf.TwoSidedPrintCheckBox.Checked)
                     {
-                        //TODO добавление страниц после содержания 
-
                         // нумерация ПЗ
                         if ((pageNumber % 2) == 0)
                         {
@@ -1238,11 +1236,8 @@ namespace ExcelApp.Functions
                 string fileNameSmetaPdf = $"{finalSmetaFolder.FullName}\\Сметы.pdf";
                 string fileNameTitlePdf = $"{path}\\TEMPdf\\Содержание.pdf";
 
-                //TODO 1
-                // тест сортировки смет по коду и имени
                 var sortedObjData = objectiveData.OrderBy(ob => ob.Code).ThenBy(ob => ob.Name).ToList();
                 var sortedLocData = localData.OrderBy(ob => ob.Code).ThenBy(ob => ob.Name).ToList();
-                //----------------------
 
                 allDataFilesList = sortedObjData;
                 allDataFilesList.AddRange(sortedLocData);
@@ -1262,7 +1257,7 @@ namespace ExcelApp.Functions
                     while (lastUsedDocument != allDataFilesList[allDataFilesList.Count - 1])
                     {
                         PdfDocument outputSmetaPdfDocument = new PdfDocument();
-                        for (; i < allDataFilesList.Count; i++) // TODO 3
+                        for (; i < allDataFilesList.Count; i++) 
                         {
                             var smetaFile = allDataFilesList[i];
                             inputPdfDocument = PdfReader.Open($"{pdfFolder}\\{smetaFile.FolderInfo}.pdf", PdfDocumentOpenMode.Import);
