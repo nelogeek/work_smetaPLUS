@@ -342,7 +342,7 @@ namespace ExcelApp.Functions
                     a[a.Count].Delete();
                     a.Add(eWorksheet.Range[$"A{lastUsedRow - 13}"]);
                 }
-                //eWorksheet = null;
+
             }
             catch (Exception ex)
             {
