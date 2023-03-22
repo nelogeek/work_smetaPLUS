@@ -1662,13 +1662,18 @@ namespace ExcelApp.Functions
                             if (i != allDataFilesList.Count)
                             {
                                 table.Cell(row, 6).Range.Text = allDataFilesList[i].Part.ToString();
-                                //---------
-
+                                
                                 if (part != allDataFilesList[i].Part)
                                 {
                                     part = allDataFilesList[i].Part;
                                     j = 0;
                                 }
+                                if (part != 1)
+                                {
+                                    pagesPzCount = 0;
+                                }
+                                page = startPageNumber + pagesPzCount + titlePages;
+
 
                                 table.Cell(row, 5).Range.Text = (page + firstPageNumbersList[part - 1][j]).ToString();
                                 i++;
