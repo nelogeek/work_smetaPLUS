@@ -670,6 +670,7 @@ namespace ExcelApp.Functions
                     Table.Rows.Add();
                     Table.Cell(row, 1).Range.Text = NumberDocument.ToString();
                     Table.Cell(row, 3).Range.Text = "Пояснительная записка" + "\n";
+                    Table.Cell(row, 6).Range.Text = "1";
                     row++;
                     // ОБЪЕКТНЫЕ СМЕТЫ
                     Table.Rows.Add();
@@ -1063,6 +1064,7 @@ namespace ExcelApp.Functions
                     Table.Rows.Add();
                     Table.Cell(row, 1).Range.Text = NumberDocument.ToString();
                     Table.Cell(row, 3).Range.Text = "Пояснительная записка" + "\n";
+                    Table.Cell(row, 6).Range.Text = "1";
                     row++;
                     // шапка локальных смет
                     Table.Rows.Add();
