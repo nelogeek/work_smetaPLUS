@@ -382,27 +382,19 @@ namespace ExcelApp.Functions
                     string filePath = $"{path}\\ОС\\{file.FolderInfo}";
                     eWorkbook = app.Workbooks.Open(filePath);
                     eWorksheet = (Worksheet)eWorkbook.Sheets[1];
-                    string tempPDFPath = $"{path}\\TEMPdf\\{file.FolderInfo}";
                     eWorksheet.PageSetup.RightFooter = ""; //Удаление нумерации станиц в Excel
-
-                    app.ActiveWorkbook.ExportAsFixedFormat(Excel.XlFixedFormatType.xlTypePDF, tempPDFPath);
+                    app.ActiveWorkbook.ExportAsFixedFormat(Excel.XlFixedFormatType.xlTypePDF, $"{pdfFolder.FullName}\\{file.FolderInfo}");
                     eWorkbook.Close(false);
                 }
                 foreach (var file in localData)
                 {
                     string filePath = $"{path}\\{file.FolderInfo}";
-                    string tempPDFPath = $"{path}\\TEMPdf\\{file.FolderInfo}";
                     eWorkbook = app.Workbooks.Open(filePath);
                     eWorksheet = (Worksheet)eWorkbook.Sheets[1];
-
                     eWorksheet.PageSetup.RightFooter = ""; //Удаление нумерации стpаниц в Excel
-                    app.ActiveWorkbook.ExportAsFixedFormat(Excel.XlFixedFormatType.xlTypePDF, tempPDFPath);
+                    app.ActiveWorkbook.ExportAsFixedFormat(Excel.XlFixedFormatType.xlTypePDF, $"{pdfFolder.FullName}\\{file.FolderInfo}");
                     eWorkbook.Close(false);
                 }
-                app.Quit();
-                eWorkbook = null;
-                eWorksheet = null;
-                GC.Collect();
 
                 return true;
             }
@@ -413,14 +405,16 @@ namespace ExcelApp.Functions
                 mf.backgroundWorker.CancelAsync();
                 DeleteTempFiles();
                 DeleteTempVar();
-
-                app.Quit();
-                eWorkbook = null;
-                GC.Collect();
-
                 mf.backgroundWorker.ReportProgress(10, "Сборка остановлена");
 
                 return false;
+            }
+            finally
+            {
+                eWorksheet = null;
+                eWorkbook = null;
+                app.Quit();
+                GC.Collect();
             }
         }
 
