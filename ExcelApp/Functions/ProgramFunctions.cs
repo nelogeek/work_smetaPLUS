@@ -462,7 +462,6 @@ namespace ExcelApp.Functions
                     Object defaultTableBehavior = Word.WdDefaultTableBehavior.wdWord9TableBehavior;
                     Object autoFitBehavior = Word.WdAutoFitBehavior.wdAutoFitWindow;
 
-
                     var wDocument = wordApp.Documents.Add();
 
                     // настройка полей документа
@@ -475,7 +474,6 @@ namespace ExcelApp.Functions
                     if (mf.TwoSidedPrintCheckBox.Checked)
                     {
                         wDocument.Sections[1].PageSetup.OddAndEvenPagesHeaderFooter = -1; // -1 = true  -  настройка: четные-нечетные страницы
-
                         Word.Range headerRange = wDocument.Sections[1].Headers[Word.WdHeaderFooterIndex.wdHeaderFooterPrimary].Range;
 
                         wDocument.Sections[1].Headers[Word.WdHeaderFooterIndex.wdHeaderFooterPrimary].LinkToPrevious = false;
@@ -583,9 +581,7 @@ namespace ExcelApp.Functions
                     }
                     else
                     {
-
                         Word.HeaderFooter header = wDocument.Sections[1].Headers[Word.WdHeaderFooterIndex.wdHeaderFooterPrimary];
-
                         Word.Range headerRange = header.Range;
 
                         header.LinkToPrevious = false;
@@ -653,7 +649,7 @@ namespace ExcelApp.Functions
                     Table.Columns[4].PreferredWidth = 9f;
                     Table.Columns[5].PreferredWidth = 4f;
                     Table.Columns[6].PreferredWidth = 4f;
-                    //---
+
                     Table.Range.Rows[row].Range.Font.Name = "Times New Roman";
                     Table.Rows[row].Range.Font.Size = 10;
                     Table.Cell(row, 1).Range.Font.Size = 9;
@@ -700,6 +696,7 @@ namespace ExcelApp.Functions
                         }
                         Table.Cell(row, 3).Range.Text = data.NameDate + "\n";
                         Table.Cell(row, 4).Range.Text = data.Price;
+                        Table.Cell(row, 6).Range.Text = "1";
                         // изменение параметров строки
                         Table.Cell(row, 3).Range.Font.Bold = 0;
                         Table.Cell(row, 3).Range.Font.Size = 10;
@@ -747,6 +744,7 @@ namespace ExcelApp.Functions
                                 Table.Cell(row, 2).Range.Text = lData.Code;
                                 Table.Cell(row, 3).Range.Text = lData.NameDate + "\n";
                                 Table.Cell(row, 4).Range.Text = lData.Price;
+                                Table.Cell(row, 6).Range.Text = "1";
                                 // изменение параметров строки
                                 Table.Cell(row, 3).Range.Font.Size = 10;
                                 Table.Cell(row, 3).Range.Font.Italic = 0;
@@ -766,8 +764,6 @@ namespace ExcelApp.Functions
 
                     if (mf.TwoSidedPrintCheckBox.Checked)
                     {
-                        //TODO добавление страниц после содержания 
-
                         // нумерация ПЗ
                         if ((pageNumber % 2) == 0)
                         {
@@ -797,8 +793,6 @@ namespace ExcelApp.Functions
                             pageNumber += data.PageCount;
                             row++;
                         }
-
-
                         row++;
 
                         foreach (var oData in setDict) // локальные сметы
@@ -818,8 +812,6 @@ namespace ExcelApp.Functions
                     }
                     else
                     {
-                        // добавление страниц после содержания TODO
-
                         // нумерация ПЗ
                         pageNumber++;
                         Table.Cell(row, 5).Range.Text = pageNumber.ToString();
@@ -858,7 +850,6 @@ namespace ExcelApp.Functions
                 }
                 else
                 {
-
                     object oMissing = Type.Missing;
                     Object defaultTableBehavior = Word.WdDefaultTableBehavior.wdWord9TableBehavior;
                     Object autoFitBehavior = Word.WdAutoFitBehavior.wdAutoFitWindow;
@@ -904,7 +895,6 @@ namespace ExcelApp.Functions
                         headerTable.Cell(2, 3).Range.Font.Italic = 1;
                         headerTable.Cell(2, 3).Range.Font.Bold = 1;
                         headerTable.Cell(2, 3).Range.Font.Color = Word.WdColor.wdColorBlack;
-
 
                         // заполнение таблицы
                         headerTable.Rows.Add();
@@ -985,7 +975,6 @@ namespace ExcelApp.Functions
                     {
 
                         Word.HeaderFooter header = wDocument.Sections[1].Headers[Word.WdHeaderFooterIndex.wdHeaderFooterPrimary];
-
                         Word.Range headerRange = header.Range;
 
                         header.LinkToPrevious = false;
@@ -1092,6 +1081,7 @@ namespace ExcelApp.Functions
                         Table.Cell(row, 2).Range.Text = lData.Code;
                         Table.Cell(row, 3).Range.Text = lData.NameDate + "\n";
                         Table.Cell(row, 4).Range.Text = lData.Price;
+                        Table.Cell(row, 6).Range.Text = "1";
                         // изменение параметров строки
                         Table.Cell(row, 3).Range.Font.Size = 10;
                         Table.Cell(row, 3).Range.Font.Italic = 0;
@@ -1104,17 +1094,12 @@ namespace ExcelApp.Functions
 
                     }
 
-
-
-
                     //нумерация страниц
                     pagesInTitle = wDocument.ComputeStatistics(WdStatistic.wdStatisticPages, false);
                     int pageNumber = (int)mf.StartNumberNumeric.Value + pagesInTitle - 1;
                     row = 2;
                     if (mf.TwoSidedPrintCheckBox.Checked)
                     {
-                        // добавление страниц после содержания TODO
-
                         // нумерация ПЗ
                         if ((pageNumber % 2) == 0)
                         {
@@ -1144,11 +1129,7 @@ namespace ExcelApp.Functions
                             pageNumber += data.PageCount;
                             row++;
                         }
-
-
                         row++;
-
-
 
                         foreach (var lData in localData)
                         {
@@ -1158,14 +1139,9 @@ namespace ExcelApp.Functions
                             row++;
 
                         }
-
-
-
                     }
                     else
                     {
-                        // добавление страниц после содержания TODO
-
                         // нумерация ПЗ
                         pageNumber++;
                         Table.Cell(row, 5).Range.Text = pageNumber.ToString();
@@ -1180,8 +1156,6 @@ namespace ExcelApp.Functions
                             row++;
                         }
                         row++;
-
-
 
                         foreach (var lData in localData)
                         {
@@ -1207,7 +1181,6 @@ namespace ExcelApp.Functions
                 MessageBox.Show(ex.Message.ToString());
                 mf.backgroundWorker.CancelAsync();
                 mf.backgroundWorker.ReportProgress(45, "Сборка остановлена");
-
                 return false;
             }
             finally
