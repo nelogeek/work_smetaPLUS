@@ -294,10 +294,10 @@ namespace ExcelApp.Functions
                         nameDate, // Наименование c датой
                         money, // Сумма денег
                         pages, // кол-во страниц на листе
-                        localFiles[j],
-                        ShortCode));
+                        localFiles[j], // путь файла
+                        ShortCode)); // короткий код для сравнения
 
-                    
+
                     eWorkbook.Save();
                     eWorkbook.Close(false);
                 }
