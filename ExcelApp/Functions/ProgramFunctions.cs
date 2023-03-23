@@ -215,6 +215,7 @@ namespace ExcelApp.Functions
                         eWorkbook = app.Workbooks.Open($@"{filePath}");
                         eWorksheet = (Excel.Worksheet)eWorkbook.Sheets[1];
                         eWorksheet.PageSetup.Orientation = XlPageOrientation.xlLandscape;
+
                         Regex regex = new Regex(@"(\w*)-(\w*)-(\w*)");
                         string code = regex.Matches(eWorksheet.Range["E8"].Value.ToString())[0].ToString();
                         string ShortCode = code.Replace("p", "").Replace("р", "").Replace("OC-", "").Replace("ОС-", "");
@@ -228,6 +229,11 @@ namespace ExcelApp.Functions
                             eWorksheet.Range["E8"].Replace("ОБЪЕКТНЫЙ СМЕТНЫЙ РАСЧЕТ (СМЕТА)", "ОБЪЕКТНАЯ СМЕТА");
                         }
 
+                        if (mf.AutoPageBreakerToolStripMenuItem.Checked)
+                        {
+                            PageBreaker(eWorksheet);
+                        }
+
                         int pages = eWorkbook.Sheets[1].PageSetup.Pages.Count; // кол-во страниц на листе
 
                         objectiveData.Add(new SmetaFile(
@@ -238,12 +244,6 @@ namespace ExcelApp.Functions
                             pages, // кол-во страниц на листе
                             objectiveFiles[i],
                             ShortCode));
-
-                        if (mf.AutoPageBreakerToolStripMenuItem.Checked)
-                        {
-                            PageBreaker(eWorksheet);
-                        }
-
 
                         money = null;
                         pages = 0;
@@ -262,16 +262,13 @@ namespace ExcelApp.Functions
 
                     Regex regex = new Regex(@"(\w*)-(\w*)-(\w*)");
                     MatchCollection match = regex.Matches(eWorksheet.Range["A18"].Value.ToString());
-
                     regex = new Regex(@"(\w*)-(\w*)");
                     string shortCode = regex.Matches(match[0].Value.ToString())[0].ToString();
-
                     string money = eWorksheet.Range["C28"].Value.ToString().Replace("(", "").Replace(")", "");
                     if (money == "0")
                     {
                         money = eWorksheet.Range["D28"].Value.ToString().Replace("(", "").Replace(")", "");
                     }
-
                     string nameDate = eWorksheet.Range["A20"].Value.ToString();
                     string date = eWorksheet.Range["D26"].Value.ToString();
                     nameDate += $"\n(в ценах на {date})";
@@ -281,13 +278,12 @@ namespace ExcelApp.Functions
                         eWorksheet.Range["A18"].Replace("ЛОКАЛЬНЫЙ СМЕТНЫЙ РАСЧЕТ (СМЕТА)", "ЛОКАЛЬНАЯ СМЕТА");
                     }
 
-
-                    int pages = eWorksheet.PageSetup.Pages.Count; /// кол-во страниц на листе
-
                     if (mf.AutoPageBreakerToolStripMenuItem.Checked)
                     {
                         PageBreaker(eWorksheet);
                     }
+
+                    int pages = eWorksheet.PageSetup.Pages.Count; // кол-во страниц на листе
 
                     localData.Add(new SmetaFile(
                         match[0].ToString(), // код сметы
@@ -309,11 +305,6 @@ namespace ExcelApp.Functions
                 localData = localData.OrderBy(x => x.Code).ThenBy(x => x.Name).ToList(); // Сортировка по коду и названию
                 objectiveData = objectiveData.OrderBy(x => x.Code).ThenBy(x => x.Name).ToList(); // Сортировка по коду и названию
 
-                app.Quit();
-                eWorkbook = null;
-                eWorksheet = null;
-                GC.Collect();
-
                 return true;
             }
             catch (Exception ex)
@@ -325,14 +316,16 @@ namespace ExcelApp.Functions
                 mf.backgroundWorker.CancelAsync();
                 DeleteTempFiles();
                 DeleteTempVar();
-                app.Quit();
-                eWorkbook = null;
-                eWorksheet = null;
-                GC.Collect();
-
                 mf.backgroundWorker.ReportProgress(1, "Сборка остановлена");
 
                 return false;
+            }
+            finally
+            {
+                eWorksheet = null;
+                eWorkbook = null;
+                app.Quit();
+                GC.Collect();
             }
         }
 
