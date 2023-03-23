@@ -670,6 +670,7 @@ namespace ExcelApp.Functions
                     Table.Rows.Add();
                     Table.Cell(row, 1).Range.Text = NumberDocument.ToString();
                     Table.Cell(row, 3).Range.Text = "Пояснительная записка" + "\n";
+                    Table.Cell(row, 6).Range.Text = "1";
                     row++;
                     // ОБЪЕКТНЫЕ СМЕТЫ
                     Table.Rows.Add();
@@ -1063,6 +1064,7 @@ namespace ExcelApp.Functions
                     Table.Rows.Add();
                     Table.Cell(row, 1).Range.Text = NumberDocument.ToString();
                     Table.Cell(row, 3).Range.Text = "Пояснительная записка" + "\n";
+                    Table.Cell(row, 6).Range.Text = "1";
                     row++;
                     // шапка локальных смет
                     Table.Rows.Add();
@@ -1593,8 +1595,6 @@ namespace ExcelApp.Functions
             {
                 var table = wDocument.Tables[1];
 
-                table.Cell(2, 6).Range.Text = "1";
-
                 int titlePages = pagesInTitle;
                 int startPageNumber = Convert.ToInt32(mf.StartNumberNumeric.Value) - 1;
                 int pagesPzCount = Convert.ToInt32(mf.CountPagePZNumeric.Value);
@@ -1609,9 +1609,9 @@ namespace ExcelApp.Functions
                 }
                 int page = startPageNumber + pagesPzCount + titlePages;
 
-                int i = 0;
-                int j = 0;
-                int part = 0;
+                int DataFilesCount = 0;
+                int FileIndex = 0;
+                int NumberOfPart = 0;
                 if (mf.partsBookCheckBox.Checked)
                 {
                     int rowInTable = table.Rows.Count;
@@ -1619,25 +1619,24 @@ namespace ExcelApp.Functions
                     {
                         if (table.Cell(row, 2).Range.Text.Length > 3)
                         {
-                            if (i != allDataFilesList.Count)
+                            if (DataFilesCount != allDataFilesList.Count)
                             {
-                                table.Cell(row, 6).Range.Text = allDataFilesList[i].Part.ToString();
+                                table.Cell(row, 6).Range.Text = allDataFilesList[DataFilesCount].Part.ToString();
                                 
-                                if (part != allDataFilesList[i].Part)
+                                if (NumberOfPart != allDataFilesList[DataFilesCount].Part)
                                 {
-                                    part = allDataFilesList[i].Part;
-                                    j = 0;
+                                    NumberOfPart = allDataFilesList[DataFilesCount].Part;
+                                    FileIndex = 0;
                                 }
-                                if (part != 1)
+                                if (NumberOfPart != 1)
                                 {
                                     pagesPzCount = 0;
                                 }
                                 page = startPageNumber + pagesPzCount + titlePages;
 
-
-                                table.Cell(row, 5).Range.Text = (page + firstPageNumbersList[part - 1][j]).ToString();
-                                i++;
-                                j++;
+                                table.Cell(row, 5).Range.Text = (page + firstPageNumbersList[NumberOfPart - 1][FileIndex]).ToString();
+                                DataFilesCount++;
+                                FileIndex++;
                             }
                         }
                     }
@@ -1647,7 +1646,6 @@ namespace ExcelApp.Functions
                 if (Directory.Exists($"{pdfFolder}\\Содержание.pdf"))
                     Directory.Delete($"{pdfFolder}\\Содержание.pdf");
                 wDocument.ExportAsFixedFormat($"{pdfFolder}\\Содержание.pdf", Word.WdExportFormat.wdExportFormatPDF);
-
                 return true;
             }
             catch (Exception ex)
