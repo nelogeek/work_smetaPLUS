@@ -205,6 +205,7 @@ namespace ExcelApp.Functions
             Excel.Workbook eWorkbook;
             Excel.Worksheet eWorksheet;
 
+            string fileName = " "; //Для вывода информации о файле с ошибкой
             try
             {
                 string code;
@@ -218,6 +219,7 @@ namespace ExcelApp.Functions
                     for (int i = 0; i < objectiveFiles.Length; i++) //Шаблон для объектных смет
                     {
                         string filePath = $"{childFolder}\\{objectiveFiles[i]}";
+                        fileName = objectiveFiles[i].FullName;
                         eWorkbook = app.Workbooks.Open($@"{filePath}");
                         eWorksheet = (Excel.Worksheet)eWorkbook.Sheets[1];
                         eWorksheet.PageSetup.Orientation = XlPageOrientation.xlLandscape;
@@ -260,6 +262,7 @@ namespace ExcelApp.Functions
                 for (int j = 0; j < localFiles.Length; j++) //Шаблон для локальных смет
                 {
                     string filePath = $"{rootFolder}\\{localFiles[j]}";
+                    fileName = localFiles[j].FullName;
                     eWorkbook = app.Workbooks.Open($@"{filePath}");
                     eWorksheet = (Excel.Worksheet)eWorkbook.Sheets[1];
                     eWorksheet.PageSetup.Orientation = XlPageOrientation.xlLandscape;
@@ -320,6 +323,7 @@ namespace ExcelApp.Functions
             {
                 MessageBox.Show("Ошибка при парсинге смет");
                 MessageBox.Show(ex.Message.ToString());
+                MessageBox.Show(fileName);
                 Console.WriteLine(ex.StackTrace);
                 Console.WriteLine(ex.Message.ToString());
                 mf.backgroundWorker.CancelAsync();
