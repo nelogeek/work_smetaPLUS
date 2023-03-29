@@ -380,11 +380,13 @@
             // 
             this.btnReBuild.Location = new System.Drawing.Point(20, 362);
             this.btnReBuild.Name = "btnReBuild";
+
             this.btnReBuild.Size = new System.Drawing.Size(163, 28);
             this.btnReBuild.TabIndex = 38;
             this.btnReBuild.Text = "Пересобрать книгу";
             this.btnReBuild.UseVisualStyleBackColor = true;
             this.btnReBuild.Click += new System.EventHandler(this.button1_Click);
+
             // 
             // MainForm
             // 

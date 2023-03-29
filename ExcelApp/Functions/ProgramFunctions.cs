@@ -205,22 +205,33 @@ namespace ExcelApp.Functions
             Excel.Workbook eWorkbook;
             Excel.Worksheet eWorksheet;
 
+            string fileName = " "; //Для вывода информации о файле с ошибкой
             try
             {
+                string code;
+                string ShortCode;
+                string money;
+                string nameDate;
+                string date;
+                int pages;
                 if (childFolder != null)
                 {
                     for (int i = 0; i < objectiveFiles.Length; i++) //Шаблон для объектных смет
                     {
                         string filePath = $"{childFolder}\\{objectiveFiles[i]}";
+                        fileName = objectiveFiles[i].FullName;
                         eWorkbook = app.Workbooks.Open($@"{filePath}");
                         eWorksheet = (Excel.Worksheet)eWorkbook.Sheets[1];
                         eWorksheet.PageSetup.Orientation = XlPageOrientation.xlLandscape;
-                        Regex regex = new Regex(@"(\w*)-(\w*)-(\w*)");
-                        string code = regex.Matches(eWorksheet.Range["E8"].Value.ToString())[0].ToString();
-                        string ShortCode = code.Replace("p", "").Replace("р", "").Replace("OC-", "").Replace("ОС-", "");
-                        string money = eWorksheet.Range["G12"].Value.ToString();
-                        string nameDate = eWorksheet.Range["C5"].Value.ToString();
-                        string date = eWorksheet.Range["C18"].Value.ToString().Split(new string[] { " цен " }, StringSplitOptions.None)[1];
+                        eWorksheet.PageSetup.PaperSize = XlPaperSize.xlPaperA4;
+
+                        //Regex regex = new Regex(@"(\w*)-(\w*)-(\w*)");
+                        Regex regex = new Regex(@"\b(\w*)-(\w*[.]?\w*)-(\w*[.]?\w*)\b");
+                        code = regex.Matches(eWorksheet.Range["E8"].Value.ToString())[0].ToString().Replace("OC-", "").Replace("ОС-", "").Trim();
+                        ShortCode = code.Replace("p", "").Replace("р", "").Replace("OC-", "").Replace("ОС-", "").Trim();
+                        money = eWorksheet.Range["G12"].Value.ToString();
+                        nameDate = eWorksheet.Range["C5"].Value.ToString();
+                        date = eWorksheet.Range["C18"].Value.ToString().Split(new string[] { " цен " }, StringSplitOptions.None)[1];
                         nameDate += $"\n(в ценах на {date})";
 
                         if (mf.RdPdToggle.Checked)
@@ -228,27 +239,23 @@ namespace ExcelApp.Functions
                             eWorksheet.Range["E8"].Replace("ОБЪЕКТНЫЙ СМЕТНЫЙ РАСЧЕТ (СМЕТА)", "ОБЪЕКТНАЯ СМЕТА");
                         }
 
-                        int pages = eWorkbook.Sheets[1].PageSetup.Pages.Count; // кол-во страниц на листе
-
-                        objectiveData.Add(new SmetaFile(
-                            code, // код сметы
-                            eWorksheet.Range["C5"].Value.ToString(), // наименование
-                            nameDate, // Наименование
-                            money, // Сумма денег
-                            pages, // кол-во страниц на листе
-                            objectiveFiles[i],
-                            ShortCode));
-
                         if (mf.AutoPageBreakerToolStripMenuItem.Checked)
                         {
                             PageBreaker(eWorksheet);
                         }
 
+                        pages = eWorkbook.Sheets[1].PageSetup.Pages.Count;
 
-                        money = null;
-                        pages = 0;
-                        nameDate = null;
-                        date = null;
+                        objectiveData.Add(new SmetaFile(
+                            code, // код сметы
+                            eWorksheet.Range["C5"].Value.ToString(), // наименование
+                            nameDate, // Наименование c датой
+                            money, // Сумма денег
+                            pages, // Кол-во страниц на листе
+                            objectiveFiles[i], // путь файла
+                            ShortCode)); // короткий код для сравнения
+
+
                         eWorkbook.Save();
                         eWorkbook.Close(false);
                     }
@@ -256,24 +263,24 @@ namespace ExcelApp.Functions
                 for (int j = 0; j < localFiles.Length; j++) //Шаблон для локальных смет
                 {
                     string filePath = $"{rootFolder}\\{localFiles[j]}";
+                    fileName = localFiles[j].FullName;
                     eWorkbook = app.Workbooks.Open($@"{filePath}");
                     eWorksheet = (Excel.Worksheet)eWorkbook.Sheets[1];
                     eWorksheet.PageSetup.Orientation = XlPageOrientation.xlLandscape;
+                    eWorksheet.PageSetup.PaperSize = XlPaperSize.xlPaperA4;
 
-                    Regex regex = new Regex(@"(\w*)-(\w*)-(\w*)");
+                    Regex regex = new Regex(@"\b(\w*)-(\w*[.]?\w*)-(\w*)\b");
                     MatchCollection match = regex.Matches(eWorksheet.Range["A18"].Value.ToString());
+                    regex = new Regex(@"(\w*)-(\w*[.]?\w*)");
+                    ShortCode = regex.Matches(match[0].Value.ToString())[0].ToString().Trim();
 
-                    regex = new Regex(@"(\w*)-(\w*)");
-                    string shortCode = regex.Matches(match[0].Value.ToString())[0].ToString();
-
-                    string money = eWorksheet.Range["C28"].Value.ToString().Replace("(", "").Replace(")", "");
+                    money = eWorksheet.Range["C28"].Value.ToString().Replace("(", "").Replace(")", "");
                     if (money == "0")
                     {
                         money = eWorksheet.Range["D28"].Value.ToString().Replace("(", "").Replace(")", "");
                     }
-
-                    string nameDate = eWorksheet.Range["A20"].Value.ToString();
-                    string date = eWorksheet.Range["D26"].Value.ToString();
+                    nameDate = eWorksheet.Range["A20"].Value.ToString();
+                    date = eWorksheet.Range["D26"].Value.ToString();
                     nameDate += $"\n(в ценах на {date})";
 
                     if (mf.RdPdToggle.Checked)
@@ -281,13 +288,12 @@ namespace ExcelApp.Functions
                         eWorksheet.Range["A18"].Replace("ЛОКАЛЬНЫЙ СМЕТНЫЙ РАСЧЕТ (СМЕТА)", "ЛОКАЛЬНАЯ СМЕТА");
                     }
 
-
-                    int pages = eWorksheet.PageSetup.Pages.Count; /// кол-во страниц на листе
-
                     if (mf.AutoPageBreakerToolStripMenuItem.Checked)
                     {
                         PageBreaker(eWorksheet);
                     }
+
+                    pages = eWorksheet.PageSetup.Pages.Count; // кол-во страниц на листе
 
                     localData.Add(new SmetaFile(
                         match[0].ToString(), // код сметы
@@ -295,13 +301,10 @@ namespace ExcelApp.Functions
                         nameDate, // Наименование c датой
                         money, // Сумма денег
                         pages, // кол-во страниц на листе
-                        localFiles[j],
-                        shortCode));
+                        localFiles[j], // путь файла
+                        ShortCode)); // короткий код для сравнения
 
-                    money = null;
-                    pages = 0;
-                    nameDate = null;
-                    date = null;
+
                     eWorkbook.Save();
                     eWorkbook.Close(false);
                 }
@@ -309,10 +312,12 @@ namespace ExcelApp.Functions
                 localData = localData.OrderBy(x => x.Code).ThenBy(x => x.Name).ToList(); // Сортировка по коду и названию
                 objectiveData = objectiveData.OrderBy(x => x.Code).ThenBy(x => x.Name).ToList(); // Сортировка по коду и названию
 
-                app.Quit();
-                eWorkbook = null;
-                eWorksheet = null;
-                GC.Collect();
+                code = null;
+                ShortCode = null;
+                money = null;
+                nameDate = null;
+                date = null;
+                pages = 0;
 
                 return true;
             }
@@ -320,19 +325,22 @@ namespace ExcelApp.Functions
             {
                 MessageBox.Show("Ошибка при парсинге смет");
                 MessageBox.Show(ex.Message.ToString());
+                MessageBox.Show(fileName);
                 Console.WriteLine(ex.StackTrace);
                 Console.WriteLine(ex.Message.ToString());
                 mf.backgroundWorker.CancelAsync();
                 DeleteTempFiles();
                 DeleteTempVar();
-                app.Quit();
-                eWorkbook = null;
-                eWorksheet = null;
-                GC.Collect();
-
                 mf.backgroundWorker.ReportProgress(1, "Сборка остановлена");
 
                 return false;
+            }
+            finally
+            {
+                eWorksheet = null;
+                eWorkbook = null;
+                app.Quit();
+                GC.Collect();
             }
         }
 
@@ -469,7 +477,6 @@ namespace ExcelApp.Functions
                     Object defaultTableBehavior = Word.WdDefaultTableBehavior.wdWord9TableBehavior;
                     Object autoFitBehavior = Word.WdAutoFitBehavior.wdAutoFitWindow;
 
-
                     var wDocument = wordApp.Documents.Add();
 
                     // настройка полей документа
@@ -482,7 +489,6 @@ namespace ExcelApp.Functions
                     if (mf.TwoSidedPrintCheckBox.Checked)
                     {
                         wDocument.Sections[1].PageSetup.OddAndEvenPagesHeaderFooter = -1; // -1 = true  -  настройка: четные-нечетные страницы
-
                         Word.Range headerRange = wDocument.Sections[1].Headers[Word.WdHeaderFooterIndex.wdHeaderFooterPrimary].Range;
 
                         wDocument.Sections[1].Headers[Word.WdHeaderFooterIndex.wdHeaderFooterPrimary].LinkToPrevious = false;
@@ -590,9 +596,7 @@ namespace ExcelApp.Functions
                     }
                     else
                     {
-
                         Word.HeaderFooter header = wDocument.Sections[1].Headers[Word.WdHeaderFooterIndex.wdHeaderFooterPrimary];
-
                         Word.Range headerRange = header.Range;
 
                         header.LinkToPrevious = false;
@@ -660,7 +664,7 @@ namespace ExcelApp.Functions
                     Table.Columns[4].PreferredWidth = 9f;
                     Table.Columns[5].PreferredWidth = 4f;
                     Table.Columns[6].PreferredWidth = 4f;
-                    //---
+
                     Table.Range.Rows[row].Range.Font.Name = "Times New Roman";
                     Table.Rows[row].Range.Font.Size = 10;
                     Table.Cell(row, 1).Range.Font.Size = 9;
@@ -681,6 +685,7 @@ namespace ExcelApp.Functions
                     Table.Rows.Add();
                     Table.Cell(row, 1).Range.Text = NumberDocument.ToString();
                     Table.Cell(row, 3).Range.Text = "Пояснительная записка" + "\n";
+                    Table.Cell(row, 6).Range.Text = "1";
                     row++;
                     // ОБЪЕКТНЫЕ СМЕТЫ
                     Table.Rows.Add();
@@ -697,16 +702,10 @@ namespace ExcelApp.Functions
                         NumberDocument++;
                         Table.Rows.Add();
                         Table.Cell(row, 1).Range.Text = NumberDocument.ToString();
-                        if (mf.RdPdToggle.Checked)
-                        {
-                            Table.Cell(row, 2).Range.Text = $"{data.ShortCode}p"; //TODO иправить вывод кода объектных смет (буква 'p')
-                        }
-                        else
-                        {
-                            Table.Cell(row, 2).Range.Text = data.ShortCode;
-                        }
+                        Table.Cell(row, 2).Range.Text = data.Code;
                         Table.Cell(row, 3).Range.Text = data.NameDate + "\n";
                         Table.Cell(row, 4).Range.Text = data.Price;
+                        Table.Cell(row, 6).Range.Text = "1";
                         // изменение параметров строки
                         Table.Cell(row, 3).Range.Font.Bold = 0;
                         Table.Cell(row, 3).Range.Font.Size = 10;
@@ -754,6 +753,7 @@ namespace ExcelApp.Functions
                                 Table.Cell(row, 2).Range.Text = lData.Code;
                                 Table.Cell(row, 3).Range.Text = lData.NameDate + "\n";
                                 Table.Cell(row, 4).Range.Text = lData.Price;
+                                Table.Cell(row, 6).Range.Text = "1";
                                 // изменение параметров строки
                                 Table.Cell(row, 3).Range.Font.Size = 10;
                                 Table.Cell(row, 3).Range.Font.Italic = 0;
@@ -773,8 +773,6 @@ namespace ExcelApp.Functions
 
                     if (mf.TwoSidedPrintCheckBox.Checked)
                     {
-                        //TODO добавление страниц после содержания 
-
                         // нумерация ПЗ
                         if ((pageNumber % 2) == 0)
                         {
@@ -804,8 +802,6 @@ namespace ExcelApp.Functions
                             pageNumber += data.PageCount;
                             row++;
                         }
-
-
                         row++;
 
                         foreach (var oData in setDict) // локальные сметы
@@ -825,8 +821,6 @@ namespace ExcelApp.Functions
                     }
                     else
                     {
-                        // добавление страниц после содержания TODO
-
                         // нумерация ПЗ
                         pageNumber++;
                         Table.Cell(row, 5).Range.Text = pageNumber.ToString();
@@ -865,7 +859,6 @@ namespace ExcelApp.Functions
                 }
                 else
                 {
-
                     object oMissing = Type.Missing;
                     Object defaultTableBehavior = Word.WdDefaultTableBehavior.wdWord9TableBehavior;
                     Object autoFitBehavior = Word.WdAutoFitBehavior.wdAutoFitWindow;
@@ -911,7 +904,6 @@ namespace ExcelApp.Functions
                         headerTable.Cell(2, 3).Range.Font.Italic = 1;
                         headerTable.Cell(2, 3).Range.Font.Bold = 1;
                         headerTable.Cell(2, 3).Range.Font.Color = Word.WdColor.wdColorBlack;
-
 
                         // заполнение таблицы
                         headerTable.Rows.Add();
@@ -992,7 +984,6 @@ namespace ExcelApp.Functions
                     {
 
                         Word.HeaderFooter header = wDocument.Sections[1].Headers[Word.WdHeaderFooterIndex.wdHeaderFooterPrimary];
-
                         Word.Range headerRange = header.Range;
 
                         header.LinkToPrevious = false;
@@ -1081,6 +1072,7 @@ namespace ExcelApp.Functions
                     Table.Rows.Add();
                     Table.Cell(row, 1).Range.Text = NumberDocument.ToString();
                     Table.Cell(row, 3).Range.Text = "Пояснительная записка" + "\n";
+                    Table.Cell(row, 6).Range.Text = "1";
                     row++;
                     // шапка локальных смет
                     Table.Rows.Add();
@@ -1099,6 +1091,7 @@ namespace ExcelApp.Functions
                         Table.Cell(row, 2).Range.Text = lData.Code;
                         Table.Cell(row, 3).Range.Text = lData.NameDate + "\n";
                         Table.Cell(row, 4).Range.Text = lData.Price;
+                        Table.Cell(row, 6).Range.Text = "1";
                         // изменение параметров строки
                         Table.Cell(row, 3).Range.Font.Size = 10;
                         Table.Cell(row, 3).Range.Font.Italic = 0;
@@ -1111,17 +1104,12 @@ namespace ExcelApp.Functions
 
                     }
 
-
-
-
                     //нумерация страниц
                     pagesInTitle = wDocument.ComputeStatistics(WdStatistic.wdStatisticPages, false);
                     int pageNumber = (int)mf.StartNumberNumeric.Value + pagesInTitle - 1;
                     row = 2;
                     if (mf.TwoSidedPrintCheckBox.Checked)
                     {
-                        // добавление страниц после содержания TODO
-
                         // нумерация ПЗ
                         if ((pageNumber % 2) == 0)
                         {
@@ -1151,11 +1139,7 @@ namespace ExcelApp.Functions
                             pageNumber += data.PageCount;
                             row++;
                         }
-
-
                         row++;
-
-
 
                         foreach (var lData in localData)
                         {
@@ -1165,14 +1149,9 @@ namespace ExcelApp.Functions
                             row++;
 
                         }
-
-
-
                     }
                     else
                     {
-                        // добавление страниц после содержания TODO
-
                         // нумерация ПЗ
                         pageNumber++;
                         Table.Cell(row, 5).Range.Text = pageNumber.ToString();
@@ -1187,8 +1166,6 @@ namespace ExcelApp.Functions
                             row++;
                         }
                         row++;
-
-
 
                         foreach (var lData in localData)
                         {
@@ -1214,7 +1191,6 @@ namespace ExcelApp.Functions
                 MessageBox.Show(ex.Message.ToString());
                 mf.backgroundWorker.CancelAsync();
                 mf.backgroundWorker.ReportProgress(45, "Сборка остановлена");
-
                 return false;
             }
             finally
@@ -1232,11 +1208,8 @@ namespace ExcelApp.Functions
                 string fileNameSmetaPdf = $"{finalSmetaFolder.FullName}\\Сметы.pdf";
                 string fileNameTitlePdf = $"{path}\\TEMPdf\\Содержание.pdf";
 
-                //TODO 1
-                // тест сортировки смет по коду и имени
-                var sortedObjData = objectiveData.OrderBy(ob => ob.Code).ThenBy(ob => ob.Name).ToList();
-                var sortedLocData = localData.OrderBy(ob => ob.Code).ThenBy(ob => ob.Name).ToList();
-                //----------------------
+                List<SmetaFile> sortedObjData = objectiveData.OrderBy(ob => ob.Code).ThenBy(ob => ob.Name).ToList();
+                List<SmetaFile> sortedLocData = localData.OrderBy(ob => ob.Code).ThenBy(ob => ob.Name).ToList();
 
                 allDataFilesList = sortedObjData;
                 allDataFilesList.AddRange(sortedLocData);
@@ -1247,18 +1220,16 @@ namespace ExcelApp.Functions
                 if (mf.partsBookCheckBox.Checked)
                 {
                     int bookNumber = 1;
-                    int i = 0;
+                    int index = 0;
                     bool changeBookCheck = true;
-
-
                     int tempFirstPageNubmer = 1;
 
                     while (lastUsedDocument != allDataFilesList[allDataFilesList.Count - 1])
                     {
                         PdfDocument outputSmetaPdfDocument = new PdfDocument();
-                        for (; i < allDataFilesList.Count; i++) // TODO 3
+                        for (; index < allDataFilesList.Count; index++)
                         {
-                            var smetaFile = allDataFilesList[i];
+                            var smetaFile = allDataFilesList[index];
                             inputPdfDocument = PdfReader.Open($"{pdfFolder}\\{smetaFile.FolderInfo}.pdf", PdfDocumentOpenMode.Import);
                             int pageCountInputDocument = inputPdfDocument.PageCount;
                             double dividerPass;
@@ -1282,7 +1253,7 @@ namespace ExcelApp.Functions
                                 lastUsedDocument = smetaFile;
                                 inputPdfDocument.Close();
 
-                                allDataFilesList[i].Part = bookNumber; // тест
+                                allDataFilesList[index].Part = bookNumber;
 
                                 //Передача номера первой страницы каждого документа в сожержание
                                 if (changeBookCheck)
@@ -1293,7 +1264,7 @@ namespace ExcelApp.Functions
                                 }
                                 else
                                 {
-                                    tempFirstPageNubmer += allDataFilesList[i - 1].PageCount;
+                                    tempFirstPageNubmer += allDataFilesList[index - 1].PageCount;
                                 }
                                 firstPageNumbersList[bookNumber - 1].Add(tempFirstPageNubmer);
                             }
@@ -1627,8 +1598,6 @@ namespace ExcelApp.Functions
             {
                 var table = wDocument.Tables[1];
 
-                table.Cell(2, 6).Range.Text = "1";
-
                 int titlePages = pagesInTitle;
                 int startPageNumber = Convert.ToInt32(mf.StartNumberNumeric.Value) - 1;
                 int pagesPzCount = Convert.ToInt32(mf.CountPagePZNumeric.Value);
@@ -1643,9 +1612,9 @@ namespace ExcelApp.Functions
                 }
                 int page = startPageNumber + pagesPzCount + titlePages;
 
-                int i = 0;
-                int j = 0;
-                int part = 0;
+                int DataFilesCount = 0;
+                int FileIndex = 0;
+                int NumberOfPart = 0;
                 if (mf.partsBookCheckBox.Checked)
                 {
                     int rowInTable = table.Rows.Count;
@@ -1653,25 +1622,24 @@ namespace ExcelApp.Functions
                     {
                         if (table.Cell(row, 2).Range.Text.Length > 3)
                         {
-                            if (i != allDataFilesList.Count)
+                            if (DataFilesCount != allDataFilesList.Count)
                             {
-                                table.Cell(row, 6).Range.Text = allDataFilesList[i].Part.ToString();
-                                
-                                if (part != allDataFilesList[i].Part)
+                                table.Cell(row, 6).Range.Text = allDataFilesList[DataFilesCount].Part.ToString();
+
+                                if (NumberOfPart != allDataFilesList[DataFilesCount].Part)
                                 {
-                                    part = allDataFilesList[i].Part;
-                                    j = 0;
+                                    NumberOfPart = allDataFilesList[DataFilesCount].Part;
+                                    FileIndex = 0;
                                 }
-                                if (part != 1)
+                                if (NumberOfPart != 1)
                                 {
                                     pagesPzCount = 0;
                                 }
                                 page = startPageNumber + pagesPzCount + titlePages;
 
-
-                                table.Cell(row, 5).Range.Text = (page + firstPageNumbersList[part - 1][j]).ToString();
-                                i++;
-                                j++;
+                                table.Cell(row, 5).Range.Text = (page + firstPageNumbersList[NumberOfPart - 1][FileIndex]).ToString();
+                                DataFilesCount++;
+                                FileIndex++;
                             }
                         }
                     }
@@ -1681,7 +1649,6 @@ namespace ExcelApp.Functions
                 if (Directory.Exists($"{pdfFolder}\\Содержание.pdf"))
                     Directory.Delete($"{pdfFolder}\\Содержание.pdf");
                 wDocument.ExportAsFixedFormat($"{pdfFolder}\\Содержание.pdf", Word.WdExportFormat.wdExportFormatPDF);
-
                 return true;
             }
             catch (Exception ex)
@@ -1753,5 +1720,7 @@ namespace ExcelApp.Functions
             firstPageNumbersList = new List<List<int>>();
             GC.Collect();
         }
+
+
     }
 }
