@@ -47,6 +47,7 @@
             this.dividerPagesCountLabel = new System.Windows.Forms.Label();
             this.buildProgressBar = new System.Windows.Forms.ProgressBar();
             this.RdPdToggle = new ExcelApp.Controls.ToggleButton();
+            this.button1 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.StartNumberNumeric)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.CountPagePZNumeric)).BeginInit();
             this.menuStrip1.SuspendLayout();
@@ -238,7 +239,7 @@
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Padding = new System.Windows.Forms.Padding(5, 2, 0, 2);
-            this.menuStrip1.Size = new System.Drawing.Size(909, 30);
+            this.menuStrip1.Size = new System.Drawing.Size(909, 28);
             this.menuStrip1.TabIndex = 28;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -248,7 +249,7 @@
             this.AutoPageBreakerToolStripMenuItem,
             this.AutoBooksPartPassCheckBox});
             this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
-            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(98, 26);
+            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(98, 24);
             this.settingsToolStripMenuItem.Text = "Настройки";
             // 
             // AutoPageBreakerToolStripMenuItem
@@ -372,6 +373,16 @@
             this.RdPdToggle.TabIndex = 23;
             this.RdPdToggle.UseVisualStyleBackColor = true;
             // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(20, 362);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(170, 28);
+            this.button1.TabIndex = 38;
+            this.button1.Text = "Пересобрать книгу";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -379,6 +390,7 @@
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
             this.ClientSize = new System.Drawing.Size(909, 434);
+            this.Controls.Add(this.button1);
             this.Controls.Add(this.buildProgressBar);
             this.Controls.Add(this.dividerPagesCountLabel);
             this.Controls.Add(this.dividerPassPagesCount);
@@ -447,5 +459,6 @@
         public System.Windows.Forms.ToolStripMenuItem AutoBooksPartPassCheckBox;
         public System.Windows.Forms.NumericUpDown dividerPassPagesCount;
         private System.Windows.Forms.ProgressBar buildProgressBar;
+        private System.Windows.Forms.Button button1;
     }
 }
