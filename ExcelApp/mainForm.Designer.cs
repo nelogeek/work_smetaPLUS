@@ -47,7 +47,7 @@
             this.dividerPagesCountLabel = new System.Windows.Forms.Label();
             this.buildProgressBar = new System.Windows.Forms.ProgressBar();
             this.RdPdToggle = new ExcelApp.Controls.ToggleButton();
-            this.button1 = new System.Windows.Forms.Button();
+            this.btnReBuild = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.StartNumberNumeric)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.CountPagePZNumeric)).BeginInit();
             this.menuStrip1.SuspendLayout();
@@ -376,15 +376,15 @@
             this.RdPdToggle.TabIndex = 23;
             this.RdPdToggle.UseVisualStyleBackColor = true;
             // 
-            // button1
+            // btnReBuild
             // 
-            this.button1.Location = new System.Drawing.Point(20, 362);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(170, 28);
-            this.button1.TabIndex = 38;
-            this.button1.Text = "Пересобрать книгу";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.btnReBuild.Location = new System.Drawing.Point(20, 362);
+            this.btnReBuild.Name = "btnReBuild";
+            this.btnReBuild.Size = new System.Drawing.Size(170, 28);
+            this.btnReBuild.TabIndex = 38;
+            this.btnReBuild.Text = "Пересобрать книгу";
+            this.btnReBuild.UseVisualStyleBackColor = true;
+            this.btnReBuild.Click += new System.EventHandler(this.btnReBuild_Click);
             // 
             // MainForm
             // 
@@ -393,7 +393,7 @@
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
             this.ClientSize = new System.Drawing.Size(909, 434);
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.btnReBuild);
             this.Controls.Add(this.buildProgressBar);
             this.Controls.Add(this.dividerPagesCountLabel);
             this.Controls.Add(this.dividerPassPagesCount);
@@ -462,6 +462,6 @@
         public System.Windows.Forms.ToolStripMenuItem AutoBooksPartPassCheckBox;
         public System.Windows.Forms.NumericUpDown dividerPassPagesCount;
         private System.Windows.Forms.ProgressBar buildProgressBar;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button btnReBuild;
     }
 }
