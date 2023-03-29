@@ -262,7 +262,25 @@ namespace ExcelAPP
             }
         }
 
-        private void TestBtn_Click(object sender, EventArgs e)
+        private void partsBookCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            if (partsBookCheckBox.Checked)
+            {
+                PagesInPartBookLabel.Enabled = true;
+                pagesInPartBookNumeric.Enabled = true;
+            }
+            else
+            {
+                PagesInPartBookLabel.Enabled = false;
+                pagesInPartBookNumeric.Enabled = false;
+                dividerPagesCountLabel.Enabled = false;
+                dividerPassPagesCount.Enabled = false;
+                AutoBooksPartPassCheckBox.Checked = true;
+            }
+
+        }
+
+        private void button1_Click(object sender, EventArgs e)
         {
 
         }
