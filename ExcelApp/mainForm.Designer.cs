@@ -238,7 +238,7 @@
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Padding = new System.Windows.Forms.Padding(5, 2, 0, 2);
-            this.menuStrip1.Size = new System.Drawing.Size(909, 30);
+            this.menuStrip1.Size = new System.Drawing.Size(909, 28);
             this.menuStrip1.TabIndex = 28;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -248,7 +248,7 @@
             this.AutoPageBreakerToolStripMenuItem,
             this.AutoBooksPartPassCheckBox});
             this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
-            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(98, 26);
+            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(98, 24);
             this.settingsToolStripMenuItem.Text = "Настройки";
             // 
             // AutoPageBreakerToolStripMenuItem
@@ -273,6 +273,7 @@
             // PagesInPartBookLabel
             // 
             this.PagesInPartBookLabel.AutoSize = true;
+            this.PagesInPartBookLabel.Enabled = false;
             this.PagesInPartBookLabel.Location = new System.Drawing.Point(17, 144);
             this.PagesInPartBookLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.PagesInPartBookLabel.Name = "PagesInPartBookLabel";
@@ -290,9 +291,11 @@
             this.partsBookCheckBox.TabIndex = 31;
             this.partsBookCheckBox.Text = "Разделение на части";
             this.partsBookCheckBox.UseVisualStyleBackColor = true;
+            this.partsBookCheckBox.CheckedChanged += new System.EventHandler(this.partsBookCheckBox_CheckedChanged);
             // 
             // pagesInPartBookNumeric
             // 
+            this.pagesInPartBookNumeric.Enabled = false;
             this.pagesInPartBookNumeric.Location = new System.Drawing.Point(243, 142);
             this.pagesInPartBookNumeric.Margin = new System.Windows.Forms.Padding(4, 4, 13, 12);
             this.pagesInPartBookNumeric.Maximum = new decimal(new int[] {
