@@ -223,6 +223,7 @@ namespace ExcelApp.Functions
                         eWorkbook = app.Workbooks.Open($@"{filePath}");
                         eWorksheet = (Excel.Worksheet)eWorkbook.Sheets[1];
                         eWorksheet.PageSetup.Orientation = XlPageOrientation.xlLandscape;
+                        eWorksheet.PageSetup.PaperSize = XlPaperSize.xlPaperA4;
 
                         //Regex regex = new Regex(@"(\w*)-(\w*)-(\w*)");
                         Regex regex = new Regex(@"\b(\w*)-(\w*[.]?\w*)-(\w*[.]?\w*)\b");
@@ -266,6 +267,7 @@ namespace ExcelApp.Functions
                     eWorkbook = app.Workbooks.Open($@"{filePath}");
                     eWorksheet = (Excel.Worksheet)eWorkbook.Sheets[1];
                     eWorksheet.PageSetup.Orientation = XlPageOrientation.xlLandscape;
+                    eWorksheet.PageSetup.PaperSize = XlPaperSize.xlPaperA4;
 
                     Regex regex = new Regex(@"\b(\w*)-(\w*[.]?\w*)-(\w*)\b");
                     MatchCollection match = regex.Matches(eWorksheet.Range["A18"].Value.ToString());

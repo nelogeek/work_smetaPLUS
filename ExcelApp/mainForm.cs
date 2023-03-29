@@ -248,7 +248,7 @@ namespace ExcelAPP
             }
         }
 
-        private void AutoBooksPartPassCheckBox_Click(object sender, EventArgs e)
+         private void AutoBooksPartPassCheckBox_Click(object sender, EventArgs e)
         {
             if (partsBookCheckBox.Checked)
             {
@@ -286,7 +286,7 @@ namespace ExcelAPP
             }
 
         }
-
+        
         private void btnReBuild_Click(object sender, EventArgs e)
         {
 
