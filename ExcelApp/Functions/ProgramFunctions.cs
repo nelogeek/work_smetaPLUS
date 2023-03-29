@@ -225,9 +225,10 @@ namespace ExcelApp.Functions
                         eWorksheet.PageSetup.Orientation = XlPageOrientation.xlLandscape;
                         eWorksheet.PageSetup.PaperSize = XlPaperSize.xlPaperA4;
 
-                        Regex regex = new Regex(@"(\w*)-(\w*)-(\w*)");
-                        code = regex.Matches(eWorksheet.Range["E8"].Value.ToString())[0].ToString();
-                        ShortCode = code.Replace("p", "").Replace("р", "").Replace("OC-", "").Replace("ОС-", "");
+                        //Regex regex = new Regex(@"(\w*)-(\w*)-(\w*)");
+                        Regex regex = new Regex(@"\b(\w*)-(\w*[.]?\w*)-(\w*[.]?\w*)\b");
+                        code = regex.Matches(eWorksheet.Range["E8"].Value.ToString())[0].ToString().Replace("OC-", "").Replace("ОС-", "").Trim();
+                        ShortCode = code.Replace("p", "").Replace("р", "").Replace("OC-", "").Replace("ОС-", "").Trim();
                         money = eWorksheet.Range["G12"].Value.ToString();
                         nameDate = eWorksheet.Range["C5"].Value.ToString();
                         date = eWorksheet.Range["C18"].Value.ToString().Split(new string[] { " цен " }, StringSplitOptions.None)[1];
@@ -254,7 +255,7 @@ namespace ExcelApp.Functions
                             objectiveFiles[i], // путь файла
                             ShortCode)); // короткий код для сравнения
 
-                        
+
                         eWorkbook.Save();
                         eWorkbook.Close(false);
                     }
@@ -268,17 +269,18 @@ namespace ExcelApp.Functions
                     eWorksheet.PageSetup.Orientation = XlPageOrientation.xlLandscape;
                     eWorksheet.PageSetup.PaperSize = XlPaperSize.xlPaperA4;
 
-                    Regex regex = new Regex(@"(\w*)-(\w*)-(\w*)");
+                    Regex regex = new Regex(@"\b(\w*)-(\w*[.]?\w*)-(\w*)\b");
                     MatchCollection match = regex.Matches(eWorksheet.Range["A18"].Value.ToString());
-                    regex = new Regex(@"(\w*)-(\w*)");
-                     ShortCode = regex.Matches(match[0].Value.ToString())[0].ToString();
-                     money = eWorksheet.Range["C28"].Value.ToString().Replace("(", "").Replace(")", "");
+                    regex = new Regex(@"(\w*)-(\w*[.]?\w*)");
+                    ShortCode = regex.Matches(match[0].Value.ToString())[0].ToString().Trim();
+
+                    money = eWorksheet.Range["C28"].Value.ToString().Replace("(", "").Replace(")", "");
                     if (money == "0")
                     {
                         money = eWorksheet.Range["D28"].Value.ToString().Replace("(", "").Replace(")", "");
                     }
-                     nameDate = eWorksheet.Range["A20"].Value.ToString();
-                     date = eWorksheet.Range["D26"].Value.ToString();
+                    nameDate = eWorksheet.Range["A20"].Value.ToString();
+                    date = eWorksheet.Range["D26"].Value.ToString();
                     nameDate += $"\n(в ценах на {date})";
 
                     if (mf.RdPdToggle.Checked)
@@ -700,14 +702,7 @@ namespace ExcelApp.Functions
                         NumberDocument++;
                         Table.Rows.Add();
                         Table.Cell(row, 1).Range.Text = NumberDocument.ToString();
-                        if (mf.RdPdToggle.Checked)
-                        {
-                            Table.Cell(row, 2).Range.Text = $"{data.ShortCode}p";
-                        }
-                        else
-                        {
-                            Table.Cell(row, 2).Range.Text = data.ShortCode;
-                        }
+                        Table.Cell(row, 2).Range.Text = data.Code;
                         Table.Cell(row, 3).Range.Text = data.NameDate + "\n";
                         Table.Cell(row, 4).Range.Text = data.Price;
                         Table.Cell(row, 6).Range.Text = "1";
@@ -1725,5 +1720,7 @@ namespace ExcelApp.Functions
             firstPageNumbersList = new List<List<int>>();
             GC.Collect();
         }
+
+
     }
 }

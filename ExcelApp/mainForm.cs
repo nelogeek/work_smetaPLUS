@@ -15,7 +15,7 @@ namespace ExcelAPP
 
         public MainForm()
         {
-            if(instance == null)
+            if (instance == null)
                 instance = this;
             InitializeComponent();
 
@@ -78,7 +78,7 @@ namespace ExcelAPP
                 }
                 else if (pf.dirFolders.Length == 2)
                 {
-                    for(int i = 0; i < 2; i++)
+                    for (int i = 0; i < 2; i++)
                     {
                         if (!(pf.dirFolders[i] == $"{pf.path}\\ОС" || pf.dirFolders[i] == $"{pf.path}\\OC" || pf.dirFolders[i] == $"{pf.path}\\Книга смет"))
                         {
@@ -248,9 +248,9 @@ namespace ExcelAPP
             }
         }
 
-        private void AutoBooksPartPassCheckBox_Click(object sender, EventArgs e)
+         private void AutoBooksPartPassCheckBox_Click(object sender, EventArgs e)
         {
-            if(partsBookCheckBox.Checked)
+            if (partsBookCheckBox.Checked)
             {
                 if (AutoBooksPartPassCheckBox.Checked)
                 {
@@ -262,7 +262,8 @@ namespace ExcelAPP
                     dividerPagesCountLabel.Enabled = true;
                     dividerPassPagesCount.Enabled = true;
                 }
-            } else
+            }
+            else
             {
                 AutoBooksPartPassCheckBox.Checked = true;
             }
@@ -283,6 +284,12 @@ namespace ExcelAPP
                 dividerPassPagesCount.Enabled = false;
                 AutoBooksPartPassCheckBox.Checked = true;
             }
+
+        }
+        
+        private void btnReBuild_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
