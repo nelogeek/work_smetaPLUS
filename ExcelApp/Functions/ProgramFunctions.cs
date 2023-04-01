@@ -256,8 +256,8 @@ namespace ExcelApp.Functions
                             ShortCode)); // короткий код для сравнения
 
 
-                        eWorkbook.Save();
-                        eWorkbook.Close(false);
+                        //eWorkbook.Save();
+                        eWorkbook.Close(true);
                     }
                 }
                 for (int j = 0; j < localFiles.Length; j++) //Шаблон для локальных смет
@@ -305,8 +305,8 @@ namespace ExcelApp.Functions
                         ShortCode)); // короткий код для сравнения
 
 
-                    eWorkbook.Save();
-                    eWorkbook.Close(false);
+                    //eWorkbook.Save();
+                    eWorkbook.Close(true);
                 }
 
                 localData = localData.OrderBy(x => x.Code).ThenBy(x => x.Name).ToList(); // Сортировка по коду и названию
@@ -318,6 +318,7 @@ namespace ExcelApp.Functions
                 nameDate = null;
                 date = null;
                 pages = 0;
+                fileName = null;
 
                 return true;
             }
@@ -330,6 +331,10 @@ namespace ExcelApp.Functions
                 DeleteTempFiles();
                 DeleteTempVar();
                 mf.backgroundWorker.ReportProgress(1, "Сборка остановлена");
+                eWorksheet = null;
+                eWorkbook = null;
+                app.Quit();
+                GC.Collect();
 
                 return false;
             }
