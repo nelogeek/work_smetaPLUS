@@ -1,9 +1,15 @@
 using ExcelApp.Functions;
+using Microsoft.Office.Interop.Word;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
+using Task = System.Threading.Tasks.Task;
 
 namespace ExcelAPP
 {
@@ -12,6 +18,10 @@ namespace ExcelAPP
         public static MainForm instance; //Singleton
 
         private readonly ProgramFunctions pf;
+
+        public int cbxIndex;
+
+
 
         public MainForm()
         {
@@ -23,10 +33,15 @@ namespace ExcelAPP
 
             backgroundWorker.WorkerReportsProgress = true;
             backgroundWorker.WorkerSupportsCancellation = true;
+
+            backgroundWorker2.WorkerReportsProgress = true;
+            backgroundWorker2.WorkerSupportsCancellation = true;
         }
 
         private void BtnSelectFolder_Click(object sender, EventArgs e)
         {
+            pf.DeleteTempFiles();
+            pf.DeleteTempVar();
             FolderBrowserDialog selectedPatch = new FolderBrowserDialog();
 
             if (selectedPatch.ShowDialog() == DialogResult.OK)
@@ -38,7 +53,7 @@ namespace ExcelAPP
                 pf.pdfFolder = new DirectoryInfo($"{pf.path}\\TEMPdf"); //Указание пути к папке с временными файлами
                 pf.finalSmetaFolder = new DirectoryInfo($"{pf.path}\\Книга смет"); //Указание пути к итоговой папке
 
-                pf.DeleteTempFiles();
+                
 
                 foreach (var file in pf.localFiles) //Проверка расширения файлов
                 {
@@ -58,6 +73,7 @@ namespace ExcelAPP
                 {
                     MessageBox.Show("В корневой директории отсутствуют папки, книга будет сгенерирована без ОС");
                     pf.SelectFolder();
+
                 }
                 else if (pf.dirFolders.Length == 1)
                 {
@@ -72,7 +88,7 @@ namespace ExcelAPP
                     }
                     else
                     {
-                        MessageBox.Show("В корневом разделе неправльная папка, исправьте название или удалите");
+                        MessageBox.Show("В корневом разделе неправильная папка, исправьте название или удалите");
                         return;
                     }
                 }
@@ -88,10 +104,17 @@ namespace ExcelAPP
                     }
                     pf.SelectFolder();
                 }
-                else if (pf.dirFolders.Length == 3) //Переделать для TEMP PDF
+                else if (pf.dirFolders.Length == 3) 
                 {
-                    MessageBox.Show("В корневом разделе находятся лишние папки");
-                    return;
+                    for (int i = 0; i < 2; i++)
+                    {
+                        if (!(pf.dirFolders[i] == $"{pf.path}\\ОС" || pf.dirFolders[i] == $"{pf.path}\\OC" || pf.dirFolders[i] == $"{pf.path}\\Книга смет" || pf.dirFolders[i] == $"{pf.path}\\TEMPdf"))
+                        {
+                            MessageBox.Show("В корневом разделе неправильная папка");
+                            return;
+                        }
+                    }
+                    pf.SelectFolder();
                 }
                 else
                 {
@@ -124,9 +147,17 @@ namespace ExcelAPP
         {
             pf.stopWatch.Start();
 
-            backgroundWorker.ReportProgress(1, "Парсинг");
+            //backgroundWorker.ReportProgress(1, "Проверка формата смет");
+            //backgroundWorker.ProgressChanged += BackgroundWorker_ProgressChanged;
+            //if (!pf.FormatChecker()) return;
+
+            backgroundWorker.ReportProgress(1, "Проверка формата смет");
             backgroundWorker.ProgressChanged += BackgroundWorker_ProgressChanged;
-            if (!pf.ExcelParser()) return;
+            if (!pf.FormatCheckerAndParser()) return;
+
+            backgroundWorker.ReportProgress(3, "Проверка соответствия");
+            backgroundWorker.ProgressChanged += BackgroundWorker_ProgressChanged;
+            if (!pf.Checker()) return;
 
             backgroundWorker.ReportProgress(10, "Конвертация");
             backgroundWorker.ProgressChanged += BackgroundWorker_ProgressChanged;
@@ -152,13 +183,13 @@ namespace ExcelAPP
             backgroundWorker.ProgressChanged += BackgroundWorker_ProgressChanged;
             if (!pf.MoveFiles()) return;
 
-            backgroundWorker.ReportProgress(90, "Удаление временных файлов");
-            backgroundWorker.ProgressChanged += BackgroundWorker_ProgressChanged;
-            pf.DeleteTempFiles();
+            //backgroundWorker.ReportProgress(90, "Удаление временных файлов");
+            //backgroundWorker.ProgressChanged += BackgroundWorker_ProgressChanged;
+            //pf.DeleteTempFiles();
 
-            backgroundWorker.ReportProgress(95, "Удаление временных переменных");
-            backgroundWorker.ProgressChanged += BackgroundWorker_ProgressChanged;
-            pf.DeleteTempVar();
+            //backgroundWorker.ReportProgress(95, "Удаление временных переменных");
+            //backgroundWorker.ProgressChanged += BackgroundWorker_ProgressChanged;
+            //pf.DeleteTempVar();
 
             backgroundWorker.ReportProgress(100, "Сборка завершена");
             backgroundWorker.ProgressChanged += BackgroundWorker_ProgressChanged;
@@ -176,15 +207,18 @@ namespace ExcelAPP
             {
                 labelProgressStage.Text = "Отмена!";
                 pf.EnableButtons();
+                btnReBuild.Enabled = false;
             }
             else if (e.Error != null)
             {
                 labelProgressStage.Text = "Ошибка: " + e.Error.Message;
                 pf.EnableButtons();
+                btnReBuild.Enabled = false;
             }
             else
             {
                 pf.EnableButtons();
+                btnReBuild.Enabled = true;
                 infoTextBox.Clear();
             }
         }
@@ -235,6 +269,9 @@ namespace ExcelAPP
                 if (dialogResult == DialogResult.Yes)
                 {
                     pf.DeleteTempVar();
+                    pf.DeleteTempFiles();
+                    pf.ExcelKiller();
+                    pf.WordKiller();
                     e.Cancel = false;
                 }
                 else
@@ -254,12 +291,12 @@ namespace ExcelAPP
             {
                 if (AutoBooksPartPassCheckBox.Checked)
                 {
-                    dividerPagesCountLabel.Enabled = false;
+                    //dividerPagesCountLabel.Enabled = false;
                     dividerPassPagesCount.Enabled = false;
                 }
                 else
                 {
-                    dividerPagesCountLabel.Enabled = true;
+                    //dividerPagesCountLabel.Enabled = true;
                     dividerPassPagesCount.Enabled = true;
                 }
             }
@@ -271,25 +308,193 @@ namespace ExcelAPP
 
         private void partsBookCheckBox_CheckedChanged(object sender, EventArgs e)
         {
+            btnReBuild.Enabled = false;
             if (partsBookCheckBox.Checked)
             {
-                PagesInPartBookLabel.Enabled = true;
                 pagesInPartBookNumeric.Enabled = true;
+
+                SplitBookContentCheckBox.Checked = true;
+                SplitBookContentCheckBox.Enabled = false;
             }
             else
             {
-                PagesInPartBookLabel.Enabled = false;
                 pagesInPartBookNumeric.Enabled = false;
-                dividerPagesCountLabel.Enabled = false;
                 dividerPassPagesCount.Enabled = false;
                 AutoBooksPartPassCheckBox.Checked = true;
+
+                SplitBookContentCheckBox.Enabled = true;
             }
 
         }
 
         private void btnReBuild_Click(object sender, EventArgs e)
         {
+            if (pf.fullBookPageCount > 400 && !partsBookCheckBox.Checked) //Проверка на слишком большое количество страниц
+            {
+                DialogResult dialogResult = MessageBox.Show("Вы точно хотите собрать одну книгу объемом более 400 страниц", "Подтверждение создания книги", MessageBoxButtons.YesNo);
+                if (dialogResult == DialogResult.No)
+                {
+                    return;
+                }
+            }
+            if (backgroundWorker2.IsBusy != true)
+            {
+                pf.DisableButtons();
+                btnReBuild.Enabled = false;
+                backgroundWorker2.RunWorkerAsync();
+                buildProgressBar.Visible = true;
+            }
 
+        }
+
+        public void BackgroundWorker2_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            if (e.Cancelled == true)
+            {
+                labelProgressStage.Text = "Отмена!";
+                pf.EnableButtons();
+                btnReBuild.Enabled = true;
+            }
+            else if (e.Error != null)
+            {
+                labelProgressStage.Text = "Ошибка: " + e.Error.Message;
+                pf.EnableButtons();
+                btnReBuild.Enabled = true;
+            }
+            else
+            {
+                pf.EnableButtons();
+                btnReBuild.Enabled = true;
+                infoTextBox.Clear();
+            }
+        }
+
+        public void BackgroundWorker2_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            labelProgressStage.Text = e.UserState.ToString();
+            buildProgressBar.Value = e.ProgressPercentage;
+        }
+
+        public void BackgroundWorker2_DoWork(object sender, DoWorkEventArgs e)
+        {
+            if (pf.path != null)
+            {
+                if (Directory.Exists($"{pf.finalSmetaFolder.FullName}"))
+                {
+                    DialogResult dialogResult = MessageBox.Show("Вы хотите заменить папку 'Книга смет'?", "Подтверждение замены папки", MessageBoxButtons.YesNo);
+                    if (dialogResult == DialogResult.Yes)
+                    {
+                        Directory.Delete(pf.finalSmetaFolder.FullName, true);
+                        RunBackgroundWorker2_DoWork();
+                    }
+                    else
+                    {
+                        backgroundWorker2.ReportProgress(0, "Сборка остановлена");
+                        return;
+                    }
+                }
+                else
+                {
+                    RunBackgroundWorker2_DoWork();
+                }
+            }
+            else
+            {
+                MessageBox.Show($"Ошибка! Вы не выбрали папку");
+                backgroundWorker2.ReportProgress(0, "Сборка остановлена");
+                return;
+            }
+        }
+
+        protected void RunBackgroundWorker2_DoWork() //Запуск сборки
+        {
+            pf.stopWatch.Start();
+
+            pf.firstPageNumbersList = new List<List<int>>();
+
+            backgroundWorker2.ReportProgress(1, "Поиск обновленных файлов");
+            backgroundWorker2.ProgressChanged += BackgroundWorker2_ProgressChanged;
+            if (!pf.UpdatedFindFiles()) return;
+
+            backgroundWorker2.ReportProgress(20, "Конвертирование");
+            backgroundWorker2.ProgressChanged += BackgroundWorker2_ProgressChanged;
+            if (!pf.UpdatedConverter()) return;
+
+            backgroundWorker2.ReportProgress(45, "Создание папки");
+            backgroundWorker2.ProgressChanged += BackgroundWorker2_ProgressChanged;
+            if (!pf.UpdatedCreateFinalSmetaFolder()) return;
+
+            backgroundWorker2.ReportProgress(50, "Сборка книги");
+            backgroundWorker2.ProgressChanged += BackgroundWorker2_ProgressChanged;
+            if(!pf.UpdatedPdfMerge()) return;
+
+            backgroundWorker2.ReportProgress(80, "Нумерация содержания");
+            backgroundWorker2.ProgressChanged += BackgroundWorker2_ProgressChanged;
+            if (!pf.UpdatedTitleNumOfPart()) return;
+
+            backgroundWorker2.ReportProgress(90, "Перемещение файлов");
+            backgroundWorker2.ProgressChanged += BackgroundWorker2_ProgressChanged;
+            if (!pf.UpdatedMoveFiles()) return;
+
+
+            backgroundWorker2.ReportProgress(100, "Сборка завершена");
+            backgroundWorker2.ProgressChanged += BackgroundWorker_ProgressChanged;
+
+            pf.stopWatch.Stop();
+            TimeSpan ts = pf.stopWatch.Elapsed;
+            pf.stopWatch.Reset();
+            string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}", ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
+            backgroundWorker2.ReportProgress(100, $"Время пересборки: {elapsedTime}");
+        }
+
+        private void MainForm_Load(object sender, EventArgs e)
+        {
+            pf.Attention();
+            cbxType.SelectedIndex = 0;
+        }
+
+       
+        private void cbxType_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            cbxIndex = cbxType.SelectedIndex;
+            //btnReBuild.Enabled = false;
+        }
+
+        
+
+        private void RdPdToggle_CheckedChanged(object sender, EventArgs e)
+        {
+            btnReBuild.Enabled = false;
+        }
+
+        private void SplitBookContentCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            //btnReBuild.Enabled = false;
+        }
+
+        private void TwoSidedPrintCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            //btnReBuild.Enabled = false;
+        }
+
+        private void dividerPassPagesCount_ValueChanged(object sender, EventArgs e)
+        {
+            //btnReBuild.Enabled = false;
+        }
+
+        private void pagesInPartBookNumeric_ValueChanged(object sender, EventArgs e)
+        {
+            //btnReBuild.Enabled = false;
+        }
+
+        private void CountPagePZNumeric_ValueChanged(object sender, EventArgs e)
+        {
+            //btnReBuild.Enabled = false;
+        }
+
+        private void StartNumberNumeric_ValueChanged(object sender, EventArgs e)
+        {
+            //btnReBuild.Enabled = false;
         }
     }
 }
