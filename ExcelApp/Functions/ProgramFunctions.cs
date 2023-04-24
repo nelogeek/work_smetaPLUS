@@ -1,4 +1,4 @@
-﻿using ExcelAPP;
+using ExcelAPP;
 using iTextSharp.text;
 using Microsoft.Office.Interop.Excel;
 using Microsoft.Office.Interop.Word;
