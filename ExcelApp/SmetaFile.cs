@@ -8,6 +8,12 @@ using Org.BouncyCastle.Bcpg.OpenPgp;
 
 namespace ExcelAPP
 {
+    enum FileType
+    {
+        Local,
+        Objective,
+        Resource
+    }
     class SmetaFile : IComparable<SmetaFile>
     {
         public string Code { get; set; }
@@ -20,7 +26,9 @@ namespace ExcelAPP
         public int Part { get; set; }
         public int NumOfPage { get; set; }
 
-        public SmetaFile(string Code, string Name, string NameDate, string Price, int PageCount, FileInfo FolderInfo, string ShortCode)
+        public FileType Type { get; set; }
+
+        public SmetaFile(string Code, string Name, string NameDate, string Price, int PageCount, FileInfo FolderInfo, string ShortCode, FileType Type)
         {
             this.Code = Code;
             this.Name = Name;
@@ -31,6 +39,7 @@ namespace ExcelAPP
             this.ShortCode = ShortCode;
             this.Part = -1;
             this.NumOfPage = -1;
+            this.Type = Type;
         }
 
         //public ~SmetaFile() //TODO make a destructor (garbage collection)

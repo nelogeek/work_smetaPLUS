@@ -46,8 +46,11 @@
             this.dividerPassPagesCount = new System.Windows.Forms.NumericUpDown();
             this.dividerPagesCountLabel = new System.Windows.Forms.Label();
             this.buildProgressBar = new System.Windows.Forms.ProgressBar();
-            this.RdPdToggle = new ExcelApp.Controls.ToggleButton();
             this.btnReBuild = new System.Windows.Forms.Button();
+            this.backgroundWorker2 = new System.ComponentModel.BackgroundWorker();
+            this.cbxType = new System.Windows.Forms.ComboBox();
+            this.label5 = new System.Windows.Forms.Label();
+            this.RdPdToggle = new ExcelApp.Controls.ToggleButton();
             ((System.ComponentModel.ISupportInitialize)(this.StartNumberNumeric)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.CountPagePZNumeric)).BeginInit();
             this.menuStrip1.SuspendLayout();
@@ -121,6 +124,7 @@
             0,
             0,
             0});
+            this.StartNumberNumeric.ValueChanged += new System.EventHandler(this.StartNumberNumeric_ValueChanged);
             // 
             // label1
             // 
@@ -164,6 +168,7 @@
             0,
             0,
             0});
+            this.CountPagePZNumeric.ValueChanged += new System.EventHandler(this.CountPagePZNumeric_ValueChanged);
             // 
             // TwoSidedPrintCheckBox
             // 
@@ -178,6 +183,7 @@
             this.TwoSidedPrintCheckBox.Text = "Двустронняя печать";
             this.TwoSidedPrintCheckBox.UseMnemonic = false;
             this.TwoSidedPrintCheckBox.UseVisualStyleBackColor = true;
+            this.TwoSidedPrintCheckBox.CheckedChanged += new System.EventHandler(this.TwoSidedPrintCheckBox_CheckedChanged);
             // 
             // backgroundWorker
             // 
@@ -190,6 +196,7 @@
             this.SplitBookContentCheckBox.AutoSize = true;
             this.SplitBookContentCheckBox.Checked = true;
             this.SplitBookContentCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.SplitBookContentCheckBox.Enabled = false;
             this.SplitBookContentCheckBox.Location = new System.Drawing.Point(20, 241);
             this.SplitBookContentCheckBox.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.SplitBookContentCheckBox.Name = "SplitBookContentCheckBox";
@@ -197,6 +204,7 @@
             this.SplitBookContentCheckBox.TabIndex = 20;
             this.SplitBookContentCheckBox.Text = "Содержание отдельно";
             this.SplitBookContentCheckBox.UseVisualStyleBackColor = true;
+            this.SplitBookContentCheckBox.CheckedChanged += new System.EventHandler(this.SplitBookContentCheckBox_CheckedChanged);
             // 
             // infoTextBox
             // 
@@ -214,7 +222,7 @@
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label2.Location = new System.Drawing.Point(43, 294);
+            this.label2.Location = new System.Drawing.Point(17, 328);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(31, 18);
             this.label2.TabIndex = 25;
@@ -224,7 +232,7 @@
             // 
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label3.Location = new System.Drawing.Point(136, 294);
+            this.label3.Location = new System.Drawing.Point(110, 328);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(30, 18);
             this.label3.TabIndex = 26;
@@ -239,7 +247,7 @@
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Padding = new System.Windows.Forms.Padding(5, 2, 0, 2);
-            this.menuStrip1.Size = new System.Drawing.Size(909, 28);
+            this.menuStrip1.Size = new System.Drawing.Size(909, 30);
             this.menuStrip1.TabIndex = 28;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -249,7 +257,7 @@
             this.AutoPageBreakerToolStripMenuItem,
             this.AutoBooksPartPassCheckBox});
             this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
-            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(98, 24);
+            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(98, 26);
             this.settingsToolStripMenuItem.Text = "Настройки";
             // 
             // AutoPageBreakerToolStripMenuItem
@@ -274,7 +282,6 @@
             // PagesInPartBookLabel
             // 
             this.PagesInPartBookLabel.AutoSize = true;
-            this.PagesInPartBookLabel.Enabled = false;
             this.PagesInPartBookLabel.Location = new System.Drawing.Point(17, 144);
             this.PagesInPartBookLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.PagesInPartBookLabel.Name = "PagesInPartBookLabel";
@@ -285,6 +292,8 @@
             // partsBookCheckBox
             // 
             this.partsBookCheckBox.AutoSize = true;
+            this.partsBookCheckBox.Checked = true;
+            this.partsBookCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
             this.partsBookCheckBox.Location = new System.Drawing.Point(20, 265);
             this.partsBookCheckBox.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.partsBookCheckBox.Name = "partsBookCheckBox";
@@ -296,7 +305,6 @@
             // 
             // pagesInPartBookNumeric
             // 
-            this.pagesInPartBookNumeric.Enabled = false;
             this.pagesInPartBookNumeric.Location = new System.Drawing.Point(243, 142);
             this.pagesInPartBookNumeric.Margin = new System.Windows.Forms.Padding(4, 4, 13, 12);
             this.pagesInPartBookNumeric.Maximum = new decimal(new int[] {
@@ -317,6 +325,7 @@
             0,
             0,
             0});
+            this.pagesInPartBookNumeric.ValueChanged += new System.EventHandler(this.pagesInPartBookNumeric_ValueChanged);
             // 
             // dividerPassPagesCount
             // 
@@ -341,11 +350,11 @@
             0,
             0,
             0});
+            this.dividerPassPagesCount.ValueChanged += new System.EventHandler(this.dividerPassPagesCount_ValueChanged);
             // 
             // dividerPagesCountLabel
             // 
             this.dividerPagesCountLabel.AutoSize = true;
-            this.dividerPagesCountLabel.Enabled = false;
             this.dividerPagesCountLabel.Location = new System.Drawing.Point(17, 182);
             this.dividerPagesCountLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.dividerPagesCountLabel.Name = "dividerPagesCountLabel";
@@ -361,10 +370,49 @@
             this.buildProgressBar.TabIndex = 37;
             this.buildProgressBar.Visible = false;
             // 
+            // btnReBuild
+            // 
+            this.btnReBuild.Enabled = false;
+            this.btnReBuild.Location = new System.Drawing.Point(20, 362);
+            this.btnReBuild.Name = "btnReBuild";
+            this.btnReBuild.Size = new System.Drawing.Size(163, 28);
+            this.btnReBuild.TabIndex = 38;
+            this.btnReBuild.Text = "Пересобрать книгу";
+            this.btnReBuild.UseVisualStyleBackColor = true;
+            this.btnReBuild.Click += new System.EventHandler(this.btnReBuild_Click);
+            // 
+            // backgroundWorker2
+            // 
+            this.backgroundWorker2.DoWork += new System.ComponentModel.DoWorkEventHandler(this.BackgroundWorker2_DoWork);
+            this.backgroundWorker2.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.BackgroundWorker2_ProgressChanged);
+            this.backgroundWorker2.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.BackgroundWorker2_RunWorkerCompleted);
+            // 
+            // cbxType
+            // 
+            this.cbxType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbxType.FormattingEnabled = true;
+            this.cbxType.Items.AddRange(new object[] {
+            "Лукойл",
+            "Газпром"});
+            this.cbxType.Location = new System.Drawing.Point(82, 293);
+            this.cbxType.Name = "cbxType";
+            this.cbxType.Size = new System.Drawing.Size(140, 24);
+            this.cbxType.TabIndex = 39;
+            this.cbxType.SelectedIndexChanged += new System.EventHandler(this.cbxType_SelectedIndexChanged);
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(17, 296);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(59, 16);
+            this.label5.TabIndex = 40;
+            this.label5.Text = "Объект:";
+            // 
             // RdPdToggle
             // 
             this.RdPdToggle.AutoSize = true;
-            this.RdPdToggle.Location = new System.Drawing.Point(81, 295);
+            this.RdPdToggle.Location = new System.Drawing.Point(55, 328);
             this.RdPdToggle.Margin = new System.Windows.Forms.Padding(4);
             this.RdPdToggle.MinimumSize = new System.Drawing.Size(48, 21);
             this.RdPdToggle.Name = "RdPdToggle";
@@ -375,16 +423,7 @@
             this.RdPdToggle.Size = new System.Drawing.Size(48, 21);
             this.RdPdToggle.TabIndex = 23;
             this.RdPdToggle.UseVisualStyleBackColor = true;
-            // 
-            // btnReBuild
-            // 
-            this.btnReBuild.Location = new System.Drawing.Point(20, 362);
-            this.btnReBuild.Name = "btnReBuild";
-            this.btnReBuild.Size = new System.Drawing.Size(163, 28);
-            this.btnReBuild.TabIndex = 38;
-            this.btnReBuild.Text = "Пересобрать книгу";
-            this.btnReBuild.UseVisualStyleBackColor = true;
-            this.btnReBuild.Click += new System.EventHandler(this.btnReBuild_Click);
+            this.RdPdToggle.CheckedChanged += new System.EventHandler(this.RdPdToggle_CheckedChanged);
             // 
             // MainForm
             // 
@@ -393,6 +432,8 @@
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(230)))));
             this.ClientSize = new System.Drawing.Size(909, 434);
+            this.Controls.Add(this.label5);
+            this.Controls.Add(this.cbxType);
             this.Controls.Add(this.btnReBuild);
             this.Controls.Add(this.buildProgressBar);
             this.Controls.Add(this.dividerPagesCountLabel);
@@ -424,6 +465,7 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Smeta++";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
+            this.Load += new System.EventHandler(this.MainForm_Load);
             ((System.ComponentModel.ISupportInitialize)(this.StartNumberNumeric)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.CountPagePZNumeric)).EndInit();
             this.menuStrip1.ResumeLayout(false);
@@ -462,6 +504,9 @@
         public System.Windows.Forms.ToolStripMenuItem AutoBooksPartPassCheckBox;
         public System.Windows.Forms.NumericUpDown dividerPassPagesCount;
         private System.Windows.Forms.ProgressBar buildProgressBar;
-        private System.Windows.Forms.Button btnReBuild;
+        public System.ComponentModel.BackgroundWorker backgroundWorker2;
+        public System.Windows.Forms.Button btnReBuild;
+        public System.Windows.Forms.ComboBox cbxType;
+        private System.Windows.Forms.Label label5;
     }
 }
