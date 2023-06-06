@@ -990,6 +990,7 @@ namespace ExcelApp.Functions
                     eWorkbook = app.Workbooks.Open(filePath);
                     eWorksheet = (Worksheet)eWorkbook.Sheets[1];
                     eWorksheet.PageSetup.RightFooter = ""; //Удаление нумерации страниц в Excel
+                    eWorksheet.PageSetup.PaperSize = Excel.XlPaperSize.xlPaperA4;
                     app.ActiveWorkbook.ExportAsFixedFormat(Excel.XlFixedFormatType.xlTypePDF, $"{pdfFolder.FullName}\\{file.FolderInfo}");
                     eWorkbook.Close(false);
                 }
@@ -999,6 +1000,7 @@ namespace ExcelApp.Functions
                     eWorkbook = app.Workbooks.Open(filePath);
                     eWorksheet = (Worksheet)eWorkbook.Sheets[1];
                     eWorksheet.PageSetup.RightFooter = ""; //Удаление нумерации страниц в Excel
+                    eWorksheet.PageSetup.PaperSize = Excel.XlPaperSize.xlPaperA4;
                     app.ActiveWorkbook.ExportAsFixedFormat(Excel.XlFixedFormatType.xlTypePDF, $"{pdfFolder.FullName}\\{file.FolderInfo}");
                     eWorkbook.Close(false);
                 }
