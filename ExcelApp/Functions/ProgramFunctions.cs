@@ -19,6 +19,7 @@ using Microsoft.Office.Core;
 using iTextSharp.text.pdf.qrcode;
 using System.Text;
 using Org.BouncyCastle.Utilities;
+using System.Threading;
 
 namespace ExcelApp.Functions
 {
@@ -352,6 +353,106 @@ namespace ExcelApp.Functions
         }
 
 
+        public void SetHeightStrInOS_gazprom(Excel.Workbook workbook)
+        {
+            try
+            {
+
+            Excel.Worksheet worksheet = (Excel.Worksheet)workbook.Sheets[1];
+            Excel.Range usedRange = worksheet.UsedRange;
+            Excel.Range columnRange = usedRange.Columns["C"];
+
+            bool startIncreasingHeight = false;
+
+            //Thread.Sleep(5000);
+
+            foreach (Excel.Range cell in columnRange.Cells)
+            {
+                object cellValue = cell.Value;
+                string cellText = cellValue != null ? Convert.ToString(cellValue) : string.Empty;
+
+
+
+                if (startIncreasingHeight)
+                {
+                    if (cellValue != null && (double)cell.EntireRow.RowHeight < 25.5)
+                    {
+                        cell.EntireRow.RowHeight = 25.5; // Установите желаемую высоту строки
+                    }
+
+                    if (cellText.Contains("Итого \"Локальные сметы (расчеты)\""))
+                    {
+                        break;
+                    }
+                }
+                else
+                {
+                    if (cellText.Contains("3"))
+                    {
+                        startIncreasingHeight = true;
+                    }
+                }
+            }
+            workbook.Save();
+
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+
+
+
+        public void SetHeightStrInOS_lukoil(Excel.Workbook workbook)
+        {
+            try
+            {
+
+            Excel.Worksheet worksheet = (Excel.Worksheet)workbook.Sheets[1];
+            Excel.Range usedRange = worksheet.UsedRange;
+            Excel.Range columnRange = usedRange.Columns["C"];
+
+            bool startIncreasingHeight = false;
+            
+            //Thread.Sleep(5000);
+
+            foreach (Excel.Range cell in columnRange.Cells)
+            {
+                object cellValue = cell.Value;
+                string cellText = cellValue != null ? Convert.ToString(cellValue) : string.Empty;
+
+
+
+                if (startIncreasingHeight)
+                {
+                    if (cellValue != null && (double)cell.EntireRow.RowHeight < 25.5)
+                    {
+                        cell.EntireRow.RowHeight = 25.5; // Установите желаемую высоту строки
+                    }
+
+                    if (cellText.Contains("Итого \"Локальные сметы (расчеты)\""))
+                    {
+                        break;
+                    }
+                }
+                else
+                {
+                    if (cellText.Contains("3"))
+                    {
+                        startIncreasingHeight = true;
+                    }
+                }
+            }
+            workbook.Save();
+            }
+            catch(Exception ex) { }
+        }
+
+
+
+
+
 
         public bool FormatCheckerAndParser() // Проверка формата смет и парс данных
         {
@@ -361,6 +462,8 @@ namespace ExcelApp.Functions
             Excel.Application app = new Excel.Application
             {
                 DisplayAlerts = false,
+                //Visible = true,
+                //ScreenUpdating = true
                 Visible = false,
                 ScreenUpdating = false
             };
@@ -405,6 +508,9 @@ namespace ExcelApp.Functions
                                 nameDate = eWorksheet.Range["C5"].Value.ToString();
                                 date = eWorksheet.Range["C18"].Value.ToString().Split(new string[] { " цен " }, StringSplitOptions.None)[1];
                                 nameDate += $"\n(в ценах на {date})";
+
+                                //изменение высоты строк
+                                SetHeightStrInOS_lukoil(eWorkbook);
 
                                 if (mf.RdPdToggle.Checked)
                                 {
@@ -552,6 +658,9 @@ namespace ExcelApp.Functions
                                 nameDate = eWorksheet.Range["C9"].Value.ToString();
                                 date = eWorksheet.Range["B16"].Value.ToString().Split(new string[] { " цен " }, StringSplitOptions.None)[1];
                                 nameDate += $"\n(в ценах на {date})";
+
+                                //изменение высоты строк
+                                SetHeightStrInOS_gazprom(eWorkbook);
 
                                 if (mf.RdPdToggle.Checked)
                                 {
@@ -1984,7 +2093,7 @@ namespace ExcelApp.Functions
                             {
                                 firstPageNumbersList[1].Add(tempFirstPageNubmer);
                             }
-                           
+
                         }
                         outputPdfDocument.Save(fileNameConcatPdf);
                         inputPdfDocument.Close();
